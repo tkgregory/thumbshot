@@ -1,4 +1,36 @@
 /* ./src/index.css */
 @tailwind base;
+
+@layer base {
+    body {
+        @apply flex;
+        @apply items-center;
+        @apply min-h-lvh;
+        @apply text-white;
+        @apply bg-gray-900;
+        @apply transition
+    }
+
+    input {
+        @apply bg-gray-800;
+        @apply border-2;
+        @apply border-gray-800;
+        @apply rounded-lg;
+        @apply p-2;
+        @apply text-white;
+        @apply focus:outline-none;
+        @apply focus:border-blue-500;
+        @apply transition;
+
+    }
+
+    #app {
+        @apply grid;
+        @apply grid-cols-2;
+        @apply py-8;
+        @apply mx-auto;
+      }
+}
+
 @tailwind components;
 @tailwind utilities;
