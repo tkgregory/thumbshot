@@ -2,7 +2,18 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,vue}'],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        roboto: 'Roboto, Arial, sans-serif'
+      },
+      fontSize: {
+        youtube: '1.6em',
+        "youtube-parent": '10px',
+      },
+      lineHeight: {
+        'youtube': '2.2'
+      }
+    },
   },
   plugins: [],
 }

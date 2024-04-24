@@ -2,13 +2,25 @@
 @tailwind base;
 
 @layer base {
+    @font-face {
+        font-family: 'Roboto';
+        font-style: medium;
+        font-weight: 500;
+        font-display: swap;
+        src: url(/fonts/roboto-medium.woff2) format('woff2'), url(/fonts/roboto-medium.ttf) format('ttf');
+      }
+
+    /* html {
+        font-size: 10px;
+    } */
+
     body {
         @apply flex;
         @apply items-center;
         @apply min-h-lvh;
         @apply text-white;
-        @apply bg-gray-900;
-        @apply transition
+        @apply transition;
+        background-color:  rgb(15, 15, 15);
     }
 
     input {
