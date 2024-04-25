@@ -11,7 +11,7 @@ export default {
         "youtube-parent": '10px',
       },
       lineHeight: {
-        'youtube': '2.2'
+        'youtube': '22px'
       }
     },
   },

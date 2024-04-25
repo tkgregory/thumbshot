@@ -10,10 +10,6 @@
         src: url(/fonts/roboto-medium.woff2) format('woff2'), url(/fonts/roboto-medium.ttf) format('ttf');
       }
 
-    /* html {
-        font-size: 10px;
-    } */
-
     body {
         @apply flex;
         @apply items-center;
