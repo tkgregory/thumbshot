@@ -13,6 +13,7 @@
     body {
         @apply flex;
         @apply items-center;
+        @apply justify-center;
         @apply min-h-lvh;
         @apply text-white;
         @apply transition;
@@ -31,13 +32,6 @@
         @apply transition;
 
     }
-
-    #app {
-        @apply grid;
-        @apply grid-cols-2;
-        @apply py-8;
-        @apply mx-auto;
-      }
 }
 
 @tailwind components;
