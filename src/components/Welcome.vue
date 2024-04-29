@@ -1,4 +1,6 @@
 <script lang="ts">
+const validExtensions = ['jpg', 'jpeg', 'png']
+
 export default {
   data() {
     return {
@@ -8,14 +10,32 @@ export default {
   },
   methods: {
     onChangeImage(event: any) {
-      if (event.target.files[0]) {
-        const reader = new FileReader();
-        reader.onloadend = function () {
-          var output = document.getElementById("output") as HTMLImageElement;
-          output.setAttribute("src", reader.result as string);
-        };
-        reader.readAsDataURL(event.target.files[0]);
+      if (!event.target.files[0]) {
+        return
       }
+      if (validExtensions.indexOf(event.target.files[0].name.split('.').pop().toLowerCase()) == -1) {
+        alert(`Image must be one of these types: ${validExtensions.join(", ")}`)
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onloadend = function () {
+        var image = new Image()
+        image.src = reader.result as string
+        image.onload = function () {
+          if (image.width / image.height != 16 / 9) {
+            alert("Image aspect ratio must be 16:9")
+            return
+          }
+          if (image.width < 1280 || image.height < 720) {
+            alert("Image size must be at least 1280x720 pixels")
+            return
+          }
+          var output = document.getElementById("output") as HTMLImageElement
+          output.setAttribute("src", reader.result as string)
+        }
+      }
+      reader.readAsDataURL(event.target.files[0])
     }
   },
 }
