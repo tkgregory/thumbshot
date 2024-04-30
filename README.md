@@ -1,3 +1,5 @@
+[![CI](https://github.com/tkgregory/youtube-hook-comparison/actions/workflows/ci.yml/badge.svg)](https://github.com/tkgregory/youtube-hook-comparison/actions/workflows/ci.yml)
+
 # youtube-hook-comparison
 
 This template should help get you started developing with Vue 3 in Vite.
