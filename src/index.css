@@ -30,7 +30,13 @@
         @apply focus:outline-none;
         @apply focus:border-blue-500;
         @apply transition;
+    }
 
+    svg {
+        @apply cursor-pointer;
+        @apply hover:scale-125;
+        @apply transition;
+        @apply duration-200;
     }
 }
 
