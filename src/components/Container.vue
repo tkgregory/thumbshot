@@ -36,12 +36,20 @@ export default {
             this.previewData[index2] = firstElement
         },
         saveStorage() {
-            localStorage.setItem('previewData', JSON.stringify(this.previewData))
+            try {
+                localStorage.setItem('previewData', JSON.stringify(this.previewData))
+            } catch (e) {
+                console.error('Failed to save to local storage', e)
+            }
         },
         loadStorage() {
-            const previewData = localStorage.getItem('previewData')
-            if (previewData) {
-                this.previewData = JSON.parse(previewData as string);
+            try {
+                const previewData = localStorage.getItem('previewData')
+                if (previewData) {
+                    this.previewData = JSON.parse(previewData as string);
+                }
+            } catch (e) {
+                console.error('Failed to load from local storage', e)
             }
         },
         reset() {
