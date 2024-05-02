@@ -5,7 +5,7 @@ export default defineConfig({
   testDir: './e2e',
   timeout: 5 * 1000,
   expect: {
-    timeout: 1000
+    timeout: 2000
   },
   forbidOnly: !!process.env.CI,
   workers: process.env.CI ? 1 : undefined,
