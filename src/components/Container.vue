@@ -9,7 +9,8 @@ import { ArrowLeftRight } from 'lucide-vue-next';
 export default {
     data() {
         return {
-            previewData: [] as any[]
+            previewData: [] as any[],
+            maxPreviewCount: 9
         }
     },
     created() {
@@ -28,11 +29,11 @@ export default {
         removePreview() {
             this.previewData.pop()
         },
-        swapPreview() {
-            const firstElement = this.previewData[0]
-            const secondElement = this.previewData[1]
-            this.previewData[0] = secondElement
-            this.previewData[1] = firstElement
+        swapPreview(index1: number, index2: number) {
+            const firstElement = this.previewData[index1]
+            const secondElement = this.previewData[index2]
+            this.previewData[index1] = secondElement
+            this.previewData[index2] = firstElement
         },
         saveStorage() {
             localStorage.setItem('previewData', JSON.stringify(this.previewData))
@@ -57,17 +58,21 @@ export default {
         <div class="flex justify-center">
             <button @click="reset" class="btn btn-neutral">Reset</button>
         </div>
-        <div class="flex gap-4 flex-wrap">
+        <div class="flex gap-y-4 flex-wrap">
             <template v-for="(preview, index) in previewData">
-                <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title"
-                    @changeTitle="(title) => { preview.title = title; saveStorage(); }"
-                    @changeImageSrc="(imageSrc) => { preview.imageSrc = imageSrc; saveStorage(); }" />
-                <div class="flex flex-col gap-4 justify-center">
-                    <CirclePlus v-if="previewData.length == 1" @click="addPreview(); saveStorage();" />
-                    <CircleMinus v-if="previewData.length == 2 && index == 0"
-                        @click="removePreview(); saveStorage();" />
-                    <ArrowLeftRight v-if="previewData.length == 2 && index == 0"
-                        @click="swapPreview(); saveStorage();" />
+                <div class="flex">
+                    <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title"
+                        @changeTitle="(title) => { preview.title = title; saveStorage(); }"
+                        @changeImageSrc="(imageSrc) => { preview.imageSrc = imageSrc; saveStorage(); }" />
+
+                    <div class="flex flex-col gap-4 justify-center">
+                        <CirclePlus v-if="previewData.length != maxPreviewCount && index == previewData.length - 1"
+                            @click="addPreview(); saveStorage();" />
+                        <CircleMinus v-if="previewData.length != 1 && index == previewData.length - 1"
+                            @click="removePreview(); saveStorage();" />
+                        <ArrowLeftRight v-if="previewData.length != 1 && index != previewData.length - 1"
+                            @click="swapPreview(index + 1, index); saveStorage();" />
+                    </div>
                 </div>
             </template>
         </div>
