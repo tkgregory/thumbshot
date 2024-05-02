@@ -89,8 +89,7 @@ export default {
       <div class="flex flex-col">
         <div class="flex">
           <div class="mt-[12px] mr-[12px] shrink-0">
-            <img class="rounded-full w-[48px] h-[48px]"
-              src="https://yt3.ggpht.com/X0qndfJx9whZBlyyCwVvJw6vUk6wi7GdhemvveYlAUXyMBR_YrEMV-9U64m0T7h9qQ3OE46R=s88-c-k-c0x00ffffff-no-rj" />
+            <div class="rounded-full bg-gray-400 w-[48px] h-[48px]" />
           </div>
           <div class="text-youtube-parent">
             <div
