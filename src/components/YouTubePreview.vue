@@ -4,12 +4,21 @@ const validExtensions = ['jpg', 'jpeg', 'png']
 export default {
   data() {
     return {
-      title: "I made these 23 websites (and earned $562,943)",
       file: '',
       errors: [],
-      imageSrc: "https://i.ytimg.com/vi/hCMEGQfLIEM/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCMpxw60a6wuygbengcJqCViJOFnQ"
     }
   },
+  props: {
+    title: {
+      required: true,
+      type: String
+    },
+    imageSrc: {
+      required: true,
+      type: String
+    }
+  },
+  emits: ['changeTitle', 'changeImageSrc'],
   methods: {
     onChangeImage(event: any) {
 
@@ -37,8 +46,8 @@ export default {
             errors.push("Image size must be at least 1280x720 pixels")
             return
           }
-          self.imageSrc = reader.result as string
           errors.length = 0
+          self.$emit("changeImageSrc", reader.result as string)
         }
       }
       reader.readAsDataURL(event.target.files[0])
@@ -52,7 +61,8 @@ export default {
     <div class="mb-8 flex flex-col gap-2">
       <label class="input input-bordered flex items-center gap-2">
         Title
-        <input v-model="title" name="title" type="text" class="grow" placeholder="Your video title" />
+        <input name="title" :value="title" @input="$emit('changeTitle', ($event.target as HTMLInputElement).value)"
+          type="text" class="grow" placeholder="Your video title" />
       </label>
       <input name="thumbnail" type="file" @change="onChangeImage($event)"
         class="file-input file-input-bordered w-full" />
