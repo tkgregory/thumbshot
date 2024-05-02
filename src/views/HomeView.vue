@@ -3,7 +3,7 @@ import Container from '../components/Container.vue'
 </script>
 
 <template>
-  <main class="max-w-screen-2xl p-8">
+  <main class="max-w-screen-2xl px-1 py-4 sm:px-4">
     <Container />
   </main>
 </template>

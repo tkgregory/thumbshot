@@ -79,7 +79,7 @@ export default {
         </div>
       </template>
     </div>
-    <div class="w-[400px] mx-2 mb-10 font-medium text-[12px] font-roboto">
+    <div class="sm:w-[300px] md:w-[400px] mx-2 mb-10 font-medium text-[12px] font-roboto">
       <div class="relative">
         <img class="rounded-xl object-cover" :src="imageSrc" id="output" />
         <div class="absolute bottom-0 right-0 rounded bg-[#00000099] m-[8px] px-[4px] py-[1px]">
