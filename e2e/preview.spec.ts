@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('Shows default YouTube preview on load', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('div >> text="My awesome video 1"')).toHaveCount(1)
+    await expect(page.locator('div >> text="Some Channel Name"')).toHaveCount(1)
 });
 
 test('Update title', async ({ page }) => {

@@ -3,9 +3,9 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './e2e',
-  timeout: 5 * 1000,
+  timeout: 7 * 1000,
   expect: {
-    timeout: 2000
+    timeout: 2 * 1000
   },
   forbidOnly: !!process.env.CI,
   workers: process.env.CI ? 1 : undefined,

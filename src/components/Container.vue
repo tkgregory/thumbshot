@@ -6,6 +6,46 @@ import { ArrowLeftRight } from 'lucide-vue-next';
 </script>
 
 <script lang="ts">
+
+const realYouTubeVideos = [
+    {
+        videoId: 'XpN_Abd1RQc',
+        title: 'Batman: Arkham Shadow - Official Teaser Trailer'
+    },
+    {
+        videoId: '2ya8Oww8xWo',
+        title: 'Godzilla Attacks Brawl Stars!!!'
+    },
+    {
+        videoId: 'mEIJxaJLGUE',
+        title: 'British Students’ Last Meal before Military: Korea’s #1 BBQ'
+    },
+    {
+        videoId: 'HJqYoQBXXxs',
+        title: "Finding out I'm pregnant & telling my family | BABY 3"
+    },
+    {
+        videoId: 'TiMuT2BhwO0',
+        title: 'Gracie Abrams - Risk (Official Music Video)'
+    },
+    {
+        videoId: '4TU3EqSHLr4',
+        title: 'YOUTUBER GUESS WHO: REAL LIFE EDITION'
+    },
+    {
+        videoId: 'WBoWd991ClI',
+        title: 'We Built an Actual WATER SLIDE in our House!'
+    },
+    {
+        videoId: 'y6bJd27xoks',
+        title: 'THE BOOGEYMAN CAME OUT TO PLAY! | Kendrick Lamar - Euphoria (Drake diss) (REACTION!!!)'
+    },
+    {
+        videoId: 'hDTorbKavfI',
+        title: 'Alter | Based on a True Story'
+    }
+]
+
 export default {
     data() {
         return {
@@ -21,9 +61,11 @@ export default {
     },
     methods: {
         addPreview() {
+            const random = Math.floor(Math.random() * realYouTubeVideos.length);
+
             this.previewData.push({
-                title: `My awesome video ${this.previewData.length + 1}`,
-                imageSrc: "https://i.ytimg.com/vi/hCMEGQfLIEM/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCMpxw60a6wuygbengcJqCViJOFnQ"
+                title: realYouTubeVideos[random].title,
+                imageSrc: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`
             })
         },
         removePreview() {
