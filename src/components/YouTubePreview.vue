@@ -25,6 +25,10 @@ export default {
       required: true,
       type: String
     },
+    fileName: {
+      required: true,
+      type: String
+    },
     deleteEnabled: {
       required: true,
       type: Boolean
@@ -50,7 +54,8 @@ export default {
         return
       }
       const errors: string[] = this.errors
-      if (validExtensions.indexOf(event.target.files[0].name.split('.').pop().toLowerCase()) == -1) {
+      const fileName = event.target.files[0].name
+      if (validExtensions.indexOf(fileName.split('.').pop().toLowerCase()) == -1) {
         errors.push(`Image must be one of these types: ${validExtensions.join(", ")}`)
         return
       }
@@ -71,7 +76,7 @@ export default {
             return
           }
           errors.length = 0
-          self.$emit("changeImageSrc", reader.result as string)
+          self.$emit("changeImageSrc", reader.result as string, fileName)
         }
       }
       reader.readAsDataURL(event.target.files[0])
@@ -88,8 +93,14 @@ export default {
         <input name="title" :value="title" @input="$emit('changeTitle', ($event.target as HTMLInputElement).value)"
           type="text" class="grow" placeholder="Your video title" />
       </label>
-      <input name="thumbnail" type="file" @change="onChangeImage($event)"
-        class="file-input file-input-bordered w-full" />
+      <div class="file-input file-input-bordered w-full flex items-center">
+        <label class="flex items-center gap-4 p-2">
+          <div class="btn btn-neutral btn-sm uppercase">Choose File</div>
+          <div v-if="fileName">{{ fileName }}</div>
+          <input name="thumbnail" type="file" accept="image/*" @change="onChangeImage($event)" class="hidden" />
+        </label>
+      </div>
+
       <template v-if="errors.length">
         <div role="alert" class="alert alert-warning">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"

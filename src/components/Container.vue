@@ -68,7 +68,8 @@ export default {
 
             this.previewData.splice(index, 0, {
                 title: realYouTubeVideos[random].title,
-                imageSrc: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`
+                imageSrc: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`,
+                fileName: ''
             })
         },
         deletePreview(index: number) {
@@ -122,8 +123,8 @@ export default {
                 <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title"
                     :deleteEnabled="previewData.length != 1" :addEnabled="previewData.length != maxPreviewCount"
                     :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1"
-                    @changeTitle="(title) => { preview.title = title; saveStorage(); }"
-                    @changeImageSrc="(imageSrc) => { preview.imageSrc = imageSrc; saveStorage(); }"
+                    :fileName="preview.fileName" @changeTitle="(title) => { preview.title = title; saveStorage(); }"
+                    @changeImageSrc="(imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveStorage(); }"
                     @deletePreview="deletePreview(index); saveStorage();"
                     @addPreview="addPreview(index + 1); saveStorage();" @moveLeft="moveLeft(index); saveStorage();"
                     @moveRight="moveRight(index); saveStorage();" />
