@@ -61,9 +61,12 @@ export default {
     },
     methods: {
         addPreview() {
+            this.addPreview(this.previewData.length)
+        },
+        addPreview(index: number) {
             const random = Math.floor(Math.random() * realYouTubeVideos.length);
 
-            this.previewData.push({
+            this.previewData.splice(index, 0, {
                 title: realYouTubeVideos[random].title,
                 imageSrc: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`
             })
@@ -116,8 +119,8 @@ export default {
                         @changeImageSrc="(imageSrc) => { preview.imageSrc = imageSrc; saveStorage(); }" />
 
                     <div class="flex flex-col gap-4 justify-center">
-                        <CirclePlus v-if="previewData.length != maxPreviewCount && index == previewData.length - 1"
-                            @click="addPreview(); saveStorage();" />
+                        <CirclePlus v-if="previewData.length != maxPreviewCount"
+                            @click="addPreview(index + 1); saveStorage();" />
                         <CircleMinus v-if="previewData.length != 1 && index == previewData.length - 1"
                             @click="removePreview(); saveStorage();" />
                         <ArrowLeftRight v-if="previewData.length != 1 && index != previewData.length - 1"
