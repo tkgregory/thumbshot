@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import { CircleMinus } from 'lucide-vue-next';
+import { CirclePlus } from 'lucide-vue-next';
+import { CircleArrowLeft } from 'lucide-vue-next';
+import { CircleArrowRight } from 'lucide-vue-next';
+</script>
+
+
 <script lang="ts">
 const validExtensions = ['jpg', 'jpeg', 'png']
 
@@ -16,9 +24,25 @@ export default {
     imageSrc: {
       required: true,
       type: String
+    },
+    deleteEnabled: {
+      required: true,
+      type: Boolean
+    },
+    addEnabled: {
+      required: true,
+      type: Boolean
+    },
+    moveLeftEnabled: {
+      required: true,
+      type: Boolean
+    },
+    moveRightEnabled: {
+      required: true,
+      type: Boolean
     }
   },
-  emits: ['changeTitle', 'changeImageSrc'],
+  emits: ['changeTitle', 'changeImageSrc', 'deletePreview', 'addPreview', 'moveLeft', 'moveRight'],
   methods: {
     onChangeImage(event: any) {
 
@@ -57,7 +81,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <div class="mx-[8px] mb-10">
     <div class="mb-8 flex flex-col gap-2">
       <label class="input input-bordered flex items-center gap-2">
         Title
@@ -79,11 +103,41 @@ export default {
         </div>
       </template>
     </div>
-    <div class="sm:w-[300px] md:w-[400px] mx-2 mb-10 font-medium text-[12px] font-roboto">
+    <div class="sm:w-[300px] md:w-[400px] font-medium text-[12px] font-roboto">
       <div class="relative">
-        <img class="rounded-xl object-cover" :src="imageSrc" id="output" />
-        <div class="absolute bottom-0 right-0 rounded bg-[#00000099] m-[8px] px-[4px] py-[1px]">
-          10:08
+        <div class="relative group">
+          <img class="rounded-xl object-cover group-hover:brightness-[.30] transition duration-200 cursor-pointer"
+            :src="imageSrc" id="output" />
+          <div class="absolute bottom-0 right-0 rounded bg-[#00000099] m-[8px] px-[4px] py-[1px]">
+            10:08
+          </div>
+          <div class="absolute hidden group-hover:flex gap-4 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div class="w-[32px]">
+              <span :title="moveLeftEnabled ? 'Move left' : undefined">
+                <CircleArrowLeft :size="32" :class="{ [`clickable`]: moveLeftEnabled, [`disabled`]: !moveLeftEnabled }"
+                  @click="moveLeftEnabled && $emit('moveLeft')" />
+              </span>
+            </div>
+            <div class="w-[32px]">
+              <span :title="deleteEnabled ? 'Delete this preview' : undefined">
+                <CircleMinus :size="32" :class="{ [`clickable`]: deleteEnabled, [`disabled`]: !deleteEnabled }"
+                  @click="deleteEnabled && $emit('deletePreview')" />
+              </span>
+            </div>
+            <div class="w-[32px]">
+              <span :title="addEnabled ? 'Add new preview' : undefined">
+                <CirclePlus :size="32" :class="{ [`clickable`]: addEnabled, [`disabled`]: !addEnabled }"
+                  @click="addEnabled && $emit('addPreview')" />
+              </span>
+            </div>
+            <div class="w-[32px]">
+              <span :title="moveRightEnabled ? 'Move right' : undefined">
+                <CircleArrowRight :size="32"
+                  :class="{ [`clickable`]: moveRightEnabled, [`disabled`]: !moveRightEnabled }"
+                  @click="moveRightEnabled && $emit('moveRight')" />
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="flex flex-col">

@@ -56,11 +56,11 @@ export default {
     created() {
         this.loadStorage()
         if (this.previewData.length == 0) {
-            this.addPreview()
+            this.addPreviewAtEnd()
         }
     },
     methods: {
-        addPreview() {
+        addPreviewAtEnd() {
             this.addPreview(this.previewData.length)
         },
         addPreview(index: number) {
@@ -71,14 +71,20 @@ export default {
                 imageSrc: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`
             })
         },
-        removePreview() {
-            this.previewData.pop()
+        deletePreview(index: number) {
+            this.previewData.splice(index, 1)
         },
-        swapPreview(index1: number, index2: number) {
-            const firstElement = this.previewData[index1]
-            const secondElement = this.previewData[index2]
-            this.previewData[index1] = secondElement
-            this.previewData[index2] = firstElement
+        moveLeft(index: number) {
+            const firstElement = this.previewData[index - 1]
+            const secondElement = this.previewData[index]
+            this.previewData[index - 1] = secondElement
+            this.previewData[index] = firstElement
+        },
+        moveRight(index: number) {
+            const firstElement = this.previewData[index]
+            const secondElement = this.previewData[index + 1]
+            this.previewData[index] = secondElement
+            this.previewData[index + 1] = firstElement
         },
         saveStorage() {
             try {
@@ -99,7 +105,7 @@ export default {
         },
         reset() {
             this.previewData.length = 0
-            this.addPreview()
+            this.addPreviewAtEnd()
             this.saveStorage()
         }
     }
@@ -113,20 +119,14 @@ export default {
         </div>
         <div class="flex gap-y-4 flex-wrap">
             <template v-for="(preview, index) in previewData">
-                <div class="flex">
-                    <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title"
-                        @changeTitle="(title) => { preview.title = title; saveStorage(); }"
-                        @changeImageSrc="(imageSrc) => { preview.imageSrc = imageSrc; saveStorage(); }" />
-
-                    <div class="flex flex-col gap-4 justify-center">
-                        <CirclePlus v-if="previewData.length != maxPreviewCount"
-                            @click="addPreview(index + 1); saveStorage();" />
-                        <CircleMinus v-if="previewData.length != 1 && index == previewData.length - 1"
-                            @click="removePreview(); saveStorage();" />
-                        <ArrowLeftRight v-if="previewData.length != 1 && index != previewData.length - 1"
-                            @click="swapPreview(index + 1, index); saveStorage();" />
-                    </div>
-                </div>
+                <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title"
+                    :deleteEnabled="previewData.length != 1" :addEnabled="previewData.length != maxPreviewCount"
+                    :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1"
+                    @changeTitle="(title) => { preview.title = title; saveStorage(); }"
+                    @changeImageSrc="(imageSrc) => { preview.imageSrc = imageSrc; saveStorage(); }"
+                    @deletePreview="deletePreview(index); saveStorage();"
+                    @addPreview="addPreview(index + 1); saveStorage();" @moveLeft="moveLeft(index); saveStorage();"
+                    @moveRight="moveRight(index); saveStorage();" />
             </template>
         </div>
     </div>
