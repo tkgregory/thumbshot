@@ -1,0 +1,32 @@
+service: thumbshot
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  deploymentMethod: direct
+plugins:
+  - serverless-webpack
+custom:
+  webpack:
+    webpackConfig: 'webpack.config.cjs'
+    includeModules:
+      forceExclude:
+        - '@sparticuz/chromium'
+package:
+  patterns:
+    - '!**'
+    - 'functions/**'
+functions:
+  api:
+    handler: functions/post/generate-preview-image.handler
+    events:
+      - httpApi:
+          path: /
+          method: post
+    layers:
+      - !Ref ChromiumLambdaLayer
+layers:
+  chromium:
+    package:
+      artifact: layer/chromium-v123.0.1-layer.zip
