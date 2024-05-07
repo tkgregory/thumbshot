@@ -2,14 +2,6 @@
 @tailwind base;
 
 @layer base {
-    @font-face {
-        font-family: 'Roboto';
-        font-style: medium;
-        font-weight: 500;
-        font-display: swap;
-        src: url(/fonts/roboto-medium.woff2) format('woff2'), url(/fonts/roboto-medium.ttf) format('ttf');
-      }
-
     body {
         @apply flex;
         @apply items-center;

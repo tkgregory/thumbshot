@@ -124,29 +124,29 @@ export default {
           </div>
           <div class="absolute hidden group-hover:flex gap-4 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <div class="w-[32px]">
-              <span :title="moveLeftEnabled ? 'Move left' : undefined">
+              <div class="tooltip" :data-tip="moveLeftEnabled ? 'Move left' : undefined">
                 <CircleArrowLeft :size="32" :class="{ [`clickable`]: moveLeftEnabled, [`disabled`]: !moveLeftEnabled }"
                   @click="moveLeftEnabled && $emit('moveLeft')" />
-              </span>
+              </div>
             </div>
             <div class="w-[32px]">
-              <span :title="deleteEnabled ? 'Delete this preview' : undefined">
+              <div class="tooltip" :data-tip="deleteEnabled ? 'Delete this preview' : undefined">
                 <CircleMinus :size="32" :class="{ [`clickable`]: deleteEnabled, [`disabled`]: !deleteEnabled }"
                   @click="deleteEnabled && $emit('deletePreview')" />
-              </span>
+              </div>
             </div>
             <div class="w-[32px]">
-              <span :title="addEnabled ? 'Add new preview' : undefined">
+              <div class="tooltip" :data-tip="addEnabled ? 'Add new preview' : undefined">
                 <CirclePlus :size="32" :class="{ [`clickable`]: addEnabled, [`disabled`]: !addEnabled }"
                   @click="addEnabled && $emit('addPreview')" />
-              </span>
+              </div>
             </div>
             <div class="w-[32px]">
-              <span :title="moveRightEnabled ? 'Move right' : undefined">
+              <div class="tooltip" :data-tip="moveRightEnabled ? 'Move right' : undefined">
                 <CircleArrowRight :size="32"
                   :class="{ [`clickable`]: moveRightEnabled, [`disabled`]: !moveRightEnabled }"
                   @click="moveRightEnabled && $emit('moveRight')" />
-              </span>
+              </div>
             </div>
           </div>
         </div>

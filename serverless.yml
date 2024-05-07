@@ -5,6 +5,14 @@ provider:
   runtime: nodejs18.x
   region: us-east-1
   deploymentMethod: direct
+  httpApi:
+    cors:
+      allowedOrigins:
+        - 'http://localhost:5173'
+      allowedHeaders:
+        - Content-Type
+      allowedMethods:
+        - POST
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
@@ -24,7 +32,7 @@ functions:
     handler: functions/post/generate-preview-image.handler
     events:
       - httpApi:
-          path: /
+          path: /preview
           method: post
     layers:
       - !Ref ChromiumLambdaLayer

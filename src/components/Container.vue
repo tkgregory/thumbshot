@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import YouTubePreview from './YouTubePreview.vue'
-import { CirclePlus } from 'lucide-vue-next';
-import { CircleMinus } from 'lucide-vue-next';
-import { ArrowLeftRight } from 'lucide-vue-next';
+import { Camera } from 'lucide-vue-next';
+import { RotateCcw } from 'lucide-vue-next';
+import { Copy } from 'lucide-vue-next';
+import { Check } from 'lucide-vue-next';
+import { ref } from 'vue'
 </script>
 
 <script lang="ts">
@@ -46,11 +48,14 @@ const realYouTubeVideos = [
     }
 ]
 
+const isLoading = ref(false);
 export default {
     data() {
         return {
             previewData: [] as any[],
-            maxPreviewCount: 9
+            maxPreviewCount: 9,
+            previewUrl: null,
+            isJustCopied: false
         }
     },
     created() {
@@ -108,6 +113,36 @@ export default {
             this.previewData.length = 0
             this.addPreviewAtEnd()
             this.saveStorage()
+        },
+        generatePreview() {
+            isLoading.value = true
+            return fetch(`${import.meta.env.VITE_API_URL}/preview`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.previewData)
+            }).then(response => {
+                if (response.status !== 200) {
+                    throw new Error(`Invalid response with status ${response.status}`)
+                }
+                return response.json()
+            }).then(json => {
+                isLoading.value = false
+                this.previewUrl = json.previewUrl
+                if (document) {
+                    (document.getElementById('my_modal_1') as HTMLFormElement).showModal();
+                }
+            });
+        },
+        copyToClipboard() {
+            if (this.previewUrl != null) {
+                this.isJustCopied = true
+                setTimeout(() => {
+                    this.isJustCopied = false
+                }, 3000)
+                return navigator.clipboard.writeText(this.previewUrl)
+            }
         }
     }
 }
@@ -115,8 +150,36 @@ export default {
 
 <template>
     <div class="flex flex-col gap-16">
-        <div class="flex justify-center">
-            <button @click="reset" class="btn btn-neutral">Reset</button>
+        <div class="flex justify-center gap-4">
+            <div class="tooltip" data-tip="Reset">
+                <button @click="reset" class="btn btn-square">
+                    <RotateCcw />
+                </button>
+            </div>
+            <div class="tooltip" data-tip="Generate shareable preview image">
+                <button @click="!isLoading && generatePreview()" class="btn btn-square" :disabled="isLoading">
+                    <Camera v-if="!isLoading" />
+                    <span v-if="isLoading" class="loading loading-spinner loading-md"></span>
+                </button>
+            </div>
+            <dialog id="my_modal_1" class="modal">
+                <div class="modal-box">
+                    <h3 class="font-bold text-lg">Share your preview image</h3>
+                    <div class="flex items-center">
+                        <input type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs my-4"
+                            :value="previewUrl" readonly />
+                        <div class="tooltip" :data-tip="isJustCopied ? 'Copied!' : 'Copy URL to clipboard'">
+                            <button @click="copyToClipboard" class="btn btn-square mx-4">
+                                <Copy v-if="!isJustCopied" />
+                                <Check v-if="isJustCopied" color="#00ff00" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <form method="dialog" class="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
         </div>
         <div class="flex gap-y-4 flex-wrap">
             <template v-for="(preview, index) in previewData">

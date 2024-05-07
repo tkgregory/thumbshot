@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        roboto: 'Roboto, Arial, sans-serif'
+        roboto: ['Roboto', 'Arial', 'sans-serif']
       },
       fontSize: {
         youtube: '1.6em',

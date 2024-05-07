@@ -19,7 +19,8 @@ export const handler = async (event) => {
     });
 
     let page = await browser.newPage();
-    await page.goto('https://example.com');
+    await page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' });
+    await page.goto('https://d293-82-69-101-116.ngrok-free.app');
 
     const objectKey = `${uuid()}.png`
     const screenshot = await page.screenshot();
