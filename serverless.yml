@@ -7,18 +7,20 @@ provider:
   deploymentMethod: direct
 plugins:
   - serverless-webpack
+  - serverless-iam-roles-per-function
 custom:
   webpack:
     webpackConfig: 'webpack.config.cjs'
     includeModules:
       forceExclude:
         - '@sparticuz/chromium'
+        - '@aws-sdk/client-s3'
 package:
   patterns:
     - '!**'
     - 'functions/**'
 functions:
-  api:
+  generatePreviewImage:
     handler: functions/post/generate-preview-image.handler
     events:
       - httpApi:
@@ -26,7 +28,38 @@ functions:
           method: post
     layers:
       - !Ref ChromiumLambdaLayer
+    environment:
+      BUCKET_NAME: !Ref PreviewsBucket
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
+    timeout: 25
 layers:
   chromium:
     package:
       artifact: layer/chromium-v123.0.1-layer.zip
+resources:
+  Resources:
+    PreviewsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: thumbshot-${sls:stage}-previews
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+    PreviewsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref PreviewsBucket
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action:
+                - s3:GetObject
+              Effect: Allow
+              Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
+              Principal: '*'
