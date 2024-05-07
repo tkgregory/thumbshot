@@ -3,6 +3,7 @@
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { v4 as uuid } from "uuid";
 
 const s3Client = new S3Client({});
 
@@ -20,17 +21,23 @@ export const handler = async (event) => {
     let page = await browser.newPage();
     await page.goto('https://example.com');
 
+    const objectKey = `${uuid()}.png`
     const screenshot = await page.screenshot();
     const s3putObjectCommand = new PutObjectCommand({
       Bucket: process.env.BUCKET_NAME,
-      Key: "test.png",
+      Key: objectKey,
       Body: screenshot,
     });
 
-    const response = await s3Client.send(s3putObjectCommand);
+    await s3Client.send(s3putObjectCommand);
     return {
       statusCode: 200,
-      body: JSON.stringify(response),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        { "previewUrl": `https://${process.env.BUCKET_DOMAIN_NAME}/${objectKey}` },
+        null,
+        2
+      ),
     };
 
   } finally {

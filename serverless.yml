@@ -30,6 +30,7 @@ functions:
       - !Ref ChromiumLambdaLayer
     environment:
       BUCKET_NAME: !Ref PreviewsBucket
+      BUCKET_DOMAIN_NAME: !GetAtt PreviewsBucket.DomainName
     iamRoleStatements:
       - Effect: Allow
         Action:
