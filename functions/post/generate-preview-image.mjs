@@ -19,11 +19,14 @@ export const handler = async (event) => {
     });
 
     let page = await browser.newPage();
+    await page.evaluateOnNewDocument((previewData) => {
+      localStorage.setItem('previewData', previewData);
+    }, event.body);
     await page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' });
-    await page.goto('https://d293-82-69-101-116.ngrok-free.app');
+    await page.goto('https://3eb8-82-69-101-116.ngrok-free.app');
 
     const objectKey = `${uuid()}.png`
-    const screenshot = await page.screenshot();
+    const screenshot = await page.screenshot({ fullPage: true });
     const s3putObjectCommand = new PutObjectCommand({
       Bucket: process.env.BUCKET_NAME,
       Key: objectKey,

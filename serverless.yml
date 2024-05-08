@@ -45,6 +45,7 @@ functions:
           - s3:PutObject
         Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
     timeout: 25
+    memorySize: 4096
 layers:
   chromium:
     package:
