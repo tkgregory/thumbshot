@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EditableText from './EditableText.vue';
 import { CircleMinus } from 'lucide-vue-next';
 import { CirclePlus } from 'lucide-vue-next';
 import { CircleArrowLeft } from 'lucide-vue-next';
@@ -88,11 +89,6 @@ export default {
 <template>
   <div class="mx-[8px] mb-10">
     <div class="mb-8 flex flex-col gap-2">
-      <label class="input input-bordered flex items-center gap-2">
-        Title
-        <input name="title" :value="title" @input="$emit('changeTitle', ($event.target as HTMLInputElement).value)"
-          type="text" class="grow" placeholder="Your video title" />
-      </label>
       <div class="file-input file-input-bordered w-full flex items-center">
         <label class="flex items-center gap-4 p-2">
           <div class="btn btn-neutral btn-sm uppercase">Choose File</div>
@@ -156,10 +152,10 @@ export default {
           <div class="mt-[12px] mr-[12px] shrink-0">
             <div class="rounded-full bg-gray-400 w-[48px] h-[48px]" />
           </div>
-          <div class="text-youtube-parent">
+          <div class="text-youtube-parent grow">
             <div
               class="font-medium text-youtube text-[#F1F1F1] leading-youtube mt-[12px] mb-[4px] overflow-ellipsis overflow-hidden line-clamp-2">
-              {{ title }}
+              <EditableText :value="title" @changeTitle="(title: string) => $emit('changeTitle', title)" />
             </div>
             <div class="flex flex-col text-[#AAAAAA] font-normal text-youtube">
               <div>Some Channel Name</div>
