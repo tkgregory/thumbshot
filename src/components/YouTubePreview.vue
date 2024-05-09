@@ -15,6 +15,7 @@ export default {
   data() {
     return {
       file: '',
+      error: null as string | null
     }
   },
   props: {
@@ -55,7 +56,7 @@ export default {
       }
       const fileName = event.target.files[0].name
       if (validExtensions.indexOf(fileName.split('.').pop().toLowerCase()) == -1) {
-        alert(`Image must be one of these types: ${validExtensions.join(", ")}`)
+        this.showError(event, `Image must be one of these types: ${validExtensions.join(", ")}`)
         return
       }
 
@@ -66,17 +67,25 @@ export default {
         image.src = reader.result as string
         image.onload = function () {
           if (image.width / image.height != 16 / 9) {
-            alert("Image aspect ratio must be 16:9")
+            self.showError(event, "Image aspect ratio must be 16:9")
             return
           }
           if (image.width < 1280 || image.height < 720) {
-            alert("Image size must be at least 1280x720 pixels")
+            self.showError(event, "Image size must be at least 1280x720 pixels")
             return
           }
           self.$emit("changeImageSrc", reader.result as string, fileName)
         }
       }
       reader.readAsDataURL(event.target.files[0])
+    },
+    showError(event: any, errorMessage: string) {
+      this.error = errorMessage
+      if (document) {
+        console.log("Showing modal");
+        (document.getElementById('error_modal') as HTMLFormElement).showModal();
+      }
+      event.target.value = null
     }
   },
 }
@@ -141,4 +150,16 @@ export default {
       </div>
     </div>
   </div>
+
+  <Teleport to="body">
+    <dialog id="error_modal" class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Ooops</h3>
+        <p>{{ error }}</p>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+      </form>
+    </dialog>
+  </Teleport>
 </template>
