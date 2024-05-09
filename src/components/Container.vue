@@ -166,8 +166,8 @@ export default {
                 <div class="modal-box">
                     <h3 class="font-bold text-lg">Share your preview image</h3>
                     <div class="flex items-center">
-                        <input type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs my-4"
-                            :value="previewUrl" readonly />
+                        <input type="text" class="input input-bordered w-full max-w-xs my-4" :value="previewUrl"
+                            readonly />
                         <div class="tooltip" :data-tip="isJustCopied ? 'Copied!' : 'Copy URL to clipboard'">
                             <button @click="copyToClipboard" class="btn btn-square mx-4">
                                 <Copy v-if="!isJustCopied" />

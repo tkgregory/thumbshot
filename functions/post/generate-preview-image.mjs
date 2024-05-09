@@ -23,7 +23,7 @@ export const handler = async (event) => {
       localStorage.setItem('previewData', previewData);
     }, event.body);
     await page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' });
-    await page.goto('https://3eb8-82-69-101-116.ngrok-free.app');
+    await page.goto('https://5237-82-69-101-116.ngrok-free.app');
 
     const objectKey = `${uuid()}.png`
     const screenshot = await page.screenshot({ fullPage: true });

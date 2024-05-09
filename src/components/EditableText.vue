@@ -20,6 +20,6 @@ function edit() {
     <span v-if="!isEditing && value != null" @click="edit" class="cursor-pointer">{{ value }}</span>
     <input v-if="isEditing || !value"
         @blur="isEditing = false; $emit('changeTitle', ($event.target as HTMLInputElement).value);"
-        @focus="($event.target as HTMLInputElement).select()" name="title" :value="value" type="text"
-        placeholder="Your video title" class="w-full" ref="titleInput" />
+        @focus="($event.target as HTMLInputElement).select()" @keyup.enter="($event.target as HTMLInputElement).blur()"
+        name="title" :value="value" type="text" placeholder="Your video title" class="w-full" ref="titleInput" />
 </template>

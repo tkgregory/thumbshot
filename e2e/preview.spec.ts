@@ -7,8 +7,10 @@ test('Shows default YouTube preview on load', async ({ page }) => {
 
 test('Update title', async ({ page }) => {
     await page.goto('/')
+    await page.locator('span').first().click()
     await page.locator('input[name="title"]').fill('Updated title')
-    await expect(page.locator('div >> text="Updated title"')).toHaveCount(1)
+    await page.locator('input[name="title"]').blur()
+    await expect(page.locator('span >> text="Updated title"')).toHaveCount(1)
 });
 
 test('Thumbnail too small', async ({ page }) => {
