@@ -4,6 +4,7 @@ import { CircleMinus } from 'lucide-vue-next';
 import { CirclePlus } from 'lucide-vue-next';
 import { CircleArrowLeft } from 'lucide-vue-next';
 import { CircleArrowRight } from 'lucide-vue-next';
+import { Upload } from 'lucide-vue-next';
 </script>
 
 
@@ -14,7 +15,6 @@ export default {
   data() {
     return {
       file: '',
-      errors: [],
     }
   },
   props: {
@@ -50,17 +50,14 @@ export default {
   emits: ['changeTitle', 'changeImageSrc', 'deletePreview', 'addPreview', 'moveLeft', 'moveRight'],
   methods: {
     onChangeImage(event: any) {
-
       if (!event.target.files[0]) {
         return
       }
-      const errors: string[] = this.errors
       const fileName = event.target.files[0].name
       if (validExtensions.indexOf(fileName.split('.').pop().toLowerCase()) == -1) {
-        errors.push(`Image must be one of these types: ${validExtensions.join(", ")}`)
+        alert(`Image must be one of these types: ${validExtensions.join(", ")}`)
         return
       }
-
 
       var self = this;
       const reader = new FileReader()
@@ -69,14 +66,13 @@ export default {
         image.src = reader.result as string
         image.onload = function () {
           if (image.width / image.height != 16 / 9) {
-            errors.push("Image aspect ratio must be 16:9")
+            alert("Image aspect ratio must be 16:9")
             return
           }
           if (image.width < 1280 || image.height < 720) {
-            errors.push("Image size must be at least 1280x720 pixels")
+            alert("Image size must be at least 1280x720 pixels")
             return
           }
-          errors.length = 0
           self.$emit("changeImageSrc", reader.result as string, fileName)
         }
       }
@@ -88,28 +84,6 @@ export default {
 
 <template>
   <div class="mx-[8px] mb-10">
-    <div class="mb-8 flex flex-col gap-2">
-      <div class="file-input file-input-bordered w-full flex items-center">
-        <label class="flex items-center gap-4 p-2">
-          <div class="btn btn-neutral btn-sm uppercase">Choose File</div>
-          <div v-if="fileName">{{ fileName }}</div>
-          <input name="thumbnail" type="file" accept="image/*" @change="onChangeImage($event)" class="hidden" />
-        </label>
-      </div>
-
-      <template v-if="errors.length">
-        <div role="alert" class="alert alert-warning">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-            viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-          <ul>
-            <li v-for="error in errors">{{ error }}</li>
-          </ul>
-        </div>
-      </template>
-    </div>
     <div class="sm:w-[300px] md:w-[400px] font-medium text-[12px] font-roboto">
       <div class="relative">
         <div class="relative group">
@@ -118,31 +92,29 @@ export default {
           <div class="absolute bottom-0 right-0 rounded bg-[#00000099] m-[8px] px-[4px] py-[1px]">
             10:08
           </div>
-          <div class="absolute hidden group-hover:flex gap-4 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div class="w-[32px]">
-              <div class="tooltip" :data-tip="moveLeftEnabled ? 'Move left' : undefined">
-                <CircleArrowLeft :size="32" :class="{ [`clickable`]: moveLeftEnabled, [`disabled`]: !moveLeftEnabled }"
-                  @click="moveLeftEnabled && $emit('moveLeft')" />
-              </div>
+          <div
+            class="absolute hidden group-hover:flex items-center gap-4 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div class="tooltip w-[32px]" :data-tip="moveLeftEnabled ? 'Move left' : undefined">
+              <CircleArrowLeft :size="32" :class="{ [`clickable`]: moveLeftEnabled, [`disabled`]: !moveLeftEnabled }"
+                @click="moveLeftEnabled && $emit('moveLeft')" />
             </div>
-            <div class="w-[32px]">
-              <div class="tooltip" :data-tip="deleteEnabled ? 'Delete this preview' : undefined">
-                <CircleMinus :size="32" :class="{ [`clickable`]: deleteEnabled, [`disabled`]: !deleteEnabled }"
-                  @click="deleteEnabled && $emit('deletePreview')" />
-              </div>
+            <div class="tooltip w-[32px]" :data-tip="deleteEnabled ? 'Delete this preview' : undefined">
+              <CircleMinus :size="32" :class="{ [`clickable`]: deleteEnabled, [`disabled`]: !deleteEnabled }"
+                @click="deleteEnabled && $emit('deletePreview')" />
             </div>
-            <div class="w-[32px]">
-              <div class="tooltip" :data-tip="addEnabled ? 'Add new preview' : undefined">
-                <CirclePlus :size="32" :class="{ [`clickable`]: addEnabled, [`disabled`]: !addEnabled }"
-                  @click="addEnabled && $emit('addPreview')" />
-              </div>
+            <div class="tooltip w-[32px]" data-tip="Change thumbnail">
+              <label>
+                <Upload :size="32" class="clickable" />
+                <input name="thumbnail" type="file" accept="image/*" @change="onChangeImage($event)" class="hidden" />
+              </label>
             </div>
-            <div class="w-[32px]">
-              <div class="tooltip" :data-tip="moveRightEnabled ? 'Move right' : undefined">
-                <CircleArrowRight :size="32"
-                  :class="{ [`clickable`]: moveRightEnabled, [`disabled`]: !moveRightEnabled }"
-                  @click="moveRightEnabled && $emit('moveRight')" />
-              </div>
+            <div class="tooltip w-[32px]" :data-tip="addEnabled ? 'Add new preview' : undefined">
+              <CirclePlus :size="32" :class="{ [`clickable`]: addEnabled, [`disabled`]: !addEnabled }"
+                @click="addEnabled && $emit('addPreview')" />
+            </div>
+            <div class="tooltip w-[32px]" :data-tip="moveRightEnabled ? 'Move right' : undefined">
+              <CircleArrowRight :size="32" :class="{ [`clickable`]: moveRightEnabled, [`disabled`]: !moveRightEnabled }"
+                @click="moveRightEnabled && $emit('moveRight')" />
             </div>
           </div>
         </div>
