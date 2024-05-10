@@ -16,6 +16,7 @@ provider:
     cors:
       allowedOrigins:
         - 'http://localhost:5173'
+        - 'https://${param:domainName}'
       allowedHeaders:
         - Content-Type
       allowedMethods:
@@ -57,6 +58,7 @@ functions:
     environment:
       BUCKET_NAME: !Ref PreviewsBucket
       BUCKET_DOMAIN_NAME: !GetAtt PreviewsBucket.DomainName
+      DOMAIN_NAME: '${param:domainName}'
     iamRoleStatements:
       - Effect: Allow
         Action:

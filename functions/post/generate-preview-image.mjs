@@ -20,10 +20,10 @@ export const handler = async (event) => {
 
     let page = await browser.newPage();
     await page.evaluateOnNewDocument((previewData) => {
+      localStorage.setItem('showInstructions', false);
       localStorage.setItem('previewData', previewData);
     }, event.body);
-    await page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' });
-    await page.goto('https://5237-82-69-101-116.ngrok-free.app');
+    await page.goto(`https://${process.env.DOMAIN_NAME}`);
 
     const objectKey = `${uuid()}.png`
     const screenshot = await page.screenshot({ fullPage: true });
