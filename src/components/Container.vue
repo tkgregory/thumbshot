@@ -149,15 +149,16 @@ export default {
 </script>
 
 <template>
-    <div class="flex flex-col gap-16">
+    <div class="flex flex-col gap-8">
         <div class="flex justify-center gap-4">
             <div class="tooltip" data-tip="Reset">
-                <button @click="reset" class="btn btn-square">
+                <button @click="reset" class="btn btn-square btn-neutral">
                     <RotateCcw />
                 </button>
             </div>
             <div class="tooltip" data-tip="Generate shareable preview image">
-                <button @click="!isLoading && generatePreview()" class="btn btn-square" :disabled="isLoading">
+                <button @click="!isLoading && generatePreview()" class="btn btn-square btn-primary"
+                    :disabled="isLoading">
                     <Camera v-if="!isLoading" />
                     <span v-if="isLoading" class="loading loading-spinner loading-md"></span>
                 </button>
@@ -181,7 +182,7 @@ export default {
                 </form>
             </dialog>
         </div>
-        <div class="flex gap-y-4 flex-wrap">
+        <div class="flex gap-y-[40px] gap-x-[16px] flex-wrap">
             <template v-for="(preview, index) in previewData">
                 <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title"
                     :deleteEnabled="previewData.length != 1" :addEnabled="previewData.length != maxPreviewCount"

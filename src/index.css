@@ -2,13 +2,7 @@
 @tailwind base;
 
 @layer base {
-    body {
-        @apply flex;
-        @apply items-center;
-        @apply justify-center;
-        @apply min-h-lvh;
-        @apply text-white;
-        @apply transition;
+    [data-theme="dark"] body {
         background-color:  rgb(15, 15, 15);
     }
 

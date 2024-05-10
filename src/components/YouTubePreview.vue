@@ -92,8 +92,8 @@ export default {
 </script>
 
 <template>
-  <div class="mx-[8px] mb-10">
-    <div class="sm:w-[300px] md:w-[400px] font-medium text-[12px] font-roboto">
+  <div>
+    <div class="sm:w-[300px] md:w-[390px] font-medium text-[12px] font-roboto">
       <div class="relative">
         <div class="relative group">
           <img class="rounded-xl object-cover group-hover:brightness-[.30] transition duration-200 cursor-pointer"
