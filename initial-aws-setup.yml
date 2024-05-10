@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  DomainName:
+    Type: String
+    Default: thumbshot.io
+Resources:
+  GitHubRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: 'arn:aws:iam::299404798587:oidc-provider/token.actions.githubusercontent.com'
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub:
+                  - repo:tkgregory/thumbshot:*
+              ForAllValues:StringEquals:
+                token.actions.githubusercontent.com:iss: https://token.actions.githubusercontent.com
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              AWS: 299404798587
+      Policies:
+        - PolicyName: ThumbshotGitHub
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:CreateBucket
+                  - s3:ListBucket*
+                  - s3:Put*
+                  - s3:Get*
+                  - s3:DeleteBucket
+                  - s3:DeleteObject
+                  - s3:DeleteBucketPolicy
+                  - s3:DeleteBucketWebsite
+                Resource:
+                  - 'arn:aws:s3:::thumbshot-*'
+              - Effect: Allow
+                Action: apigateway:*
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - cloudfront:Update*
+                  - cloudfront:Get*
+                  - cloudfront:List*
+                  - cloudfront:Create*
+                  - cloudfront:Delete*
+                  - cloudfront:TagResource
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:CreateRole
+                  - iam:UpdateRole
+                  - iam:DeleteRole
+                  - iam:DeleteRolePolicy
+                  - iam:PassRole
+                  - iam:PutRolePolicy
+                Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/thumbshot-*'
+              - Effect: Allow
+                Action:
+                  - iam:CreateServiceLinkedRole
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - lambda:Get*
+                  - lambda:List*
+                  - lambda:CreateFunction
+                  - lambda:DeleteFunction
+                  - lambda:UpdateFunctionConfiguration
+                  - lambda:UpdateFunctionCode
+                  - lambda:PublishVersion
+                  - lambda:CreateAlias
+                  - lambda:DeleteAlias
+                  - lambda:UpdateAlias
+                  - lambda:AddPermission
+                  - lambda:RemovePermission
+                  - lambda:TagResource
+                  - lambda:UntagResource
+                  - lambda:EnableReplication*
+                Resource:
+                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:thumbshot-*'
+              - Effect: Allow
+                Action:
+                  - logs:DescribeLogGroups
+                  - logs:CreateLogGroup
+                  - logs:DeleteLogGroup
+                  - logs:TagResource
+                  - logs:UntagResource
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/thumbshot-*'
+              - Effect: Allow
+                Action:
+                  - route53:ChangeResourceRecordSets
+                  - route53:Get*
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - acm:ListCertificates
+                  - acm:RequestCertificate
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - acm:DeleteCertificate
+                  - acm:AddTagsToCertificate
+                  - acm:DescribeCertificate
+                Resource: !Sub 'arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/*'
+              - Effect: Allow
+                Action:
+                  - cloudformation:*
+                Resource:
+                  - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/thumbshot-*'
+                  - !Sub 'arn:aws:cloudformation:us-east-1:${AWS::AccountId}:stack/thumbshot-*'
+              - Effect: Allow
+                Action:
+                  - cloudformation:ValidateTemplate
+                Resource: '*'
+Outputs:
+  GitHubRole:
+    Value: !GetAtt GitHubRole.Arn

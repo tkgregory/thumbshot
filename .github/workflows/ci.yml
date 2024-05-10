@@ -20,3 +20,11 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 7
+    - run: npm run build
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: us-east-1
+    - uses: serverless/github-action@v3.2
+      with:
+        args: -c "serverless deploy --stage dev"

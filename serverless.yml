@@ -1,5 +1,12 @@
 service: thumbshot
 frameworkVersion: '3'
+params:
+  default:
+    domainName: ${sls:stage}.thumbshot.io
+    websiteBucketName: thumbshot-${sls:stage}-website
+    websiteHostedZoneId: Z084235213DTZ50AT2VLL
+  prod:
+    domainName: thumbshot.io
 provider:
   name: aws
   runtime: nodejs18.x
@@ -16,7 +23,18 @@ provider:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
+  - serverless-s3-sync
+  - serverless-certificate-creator
 custom:
+  s3Sync:
+    - bucketName: ${param:websiteBucketName}
+      localDir: ./dist
+      deleteRemoved: true
+  customCertificate:
+    certificateName: '${param:domainName}'
+    hostedZoneIds: ${param:websiteHostedZoneId}
+    subjectAlternativeNames :
+      - '*.${param:domainName}'
   webpack:
     webpackConfig: 'webpack.config.cjs'
     includeModules:
@@ -73,3 +91,59 @@ resources:
               Effect: Allow
               Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
               Principal: '*'
+    WebsiteBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${param:websiteBucketName}
+        WebsiteConfiguration:
+          IndexDocument: index.html
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+    WebsiteBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref WebsiteBucket
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action:
+                - s3:GetObject
+              Effect: Allow
+              Principal: '*'
+              Resource: !Sub 'arn:aws:s3:::${WebsiteBucket}/*'
+    CloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Enabled: true
+          Aliases:
+            - ${param:domainName}
+          ViewerCertificate:
+            AcmCertificateArn: ${certificate(${self:custom.customCertificate.certificateName}):CertificateArn}
+            SslSupportMethod: sni-only
+          DefaultCacheBehavior:
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf # CORS-S3Origin
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+          Origins:
+          - Id: S3Origin
+            DomainName: !Select [1, !Split ["//", !GetAtt WebsiteBucket.WebsiteURL]]
+            CustomOriginConfig:
+              OriginProtocolPolicy: 'http-only'
+    WebsiteDNSRecord:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneId: ${param:websiteHostedZoneId}
+        Name: ${param:domainName}.
+        Type: A
+        AliasTarget:
+          DNSName: !GetAtt CloudFrontDistribution.DomainName
+          HostedZoneId: Z2FDTNDATAQYW2 # value as described in AWS docs
