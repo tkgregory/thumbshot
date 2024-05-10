@@ -1,21 +1,22 @@
-import { expect, test, FileChooser } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-test('Shows default YouTube preview on load', async ({ page }) => {
+test.beforeEach(async ({page}) => {
     await page.goto('/')
+    await page.locator('button:has-text("Compare My Thumbnails")').click()
+  });
+
+test('Shows default YouTube preview on load', async ({page}) => {
     await expect(page.locator('div >> text="Some Channel Name"')).toHaveCount(1)
 });
 
-test('Update title', async ({ page }) => {
-    await page.goto('/')
-    await page.locator('span').first().click()
+test('Update title', async ({page}) => {
+    await page.locator('span[class="cursor-pointer"]').first().click()
     await page.locator('input[name="title"]').fill('Updated title')
     await page.locator('input[name="title"]').blur()
     await expect(page.locator('span >> text="Updated title"')).toHaveCount(1)
 });
 
-test('Thumbnail too small', async ({ page }) => {
-    await page.goto('/')
-
+test('Thumbnail too small', async ({page}) => {
     const fileChooserPromise = page.waitForEvent('filechooser');
     await page.hover('#output', {position: {x: 10, y:10}})
     await page.locator('div[data-tip="Change thumbnail"] > label').click()
@@ -25,9 +26,7 @@ test('Thumbnail too small', async ({ page }) => {
     await page.locator('p:has-text("Image size must be at least 1280x720 pixels")').click();
 });
 
-test('Thumbnail wrong format', async ({ page }) => {
-    await page.goto('/')
-
+test('Thumbnail wrong format', async ({page}) => {
     const fileChooserPromise = page.waitForEvent('filechooser');
     await page.hover('#output', {position: {x: 10, y:10}})
     await page.locator('div[data-tip="Change thumbnail"] > label').click()
@@ -37,9 +36,7 @@ test('Thumbnail wrong format', async ({ page }) => {
     await page.locator('p:has-text("Image must be one of these types: jpg, jpeg, png")').click();
 });
 
-test('Thumbnail wrong aspect ratio', async ({ page }) => {
-    await page.goto('/')
-
+test('Thumbnail wrong aspect ratio', async ({page}) => {
     const fileChooserPromise = page.waitForEvent('filechooser');
     await page.hover('#output', {position: {x: 10, y:10}})
     await page.locator('div[data-tip="Change thumbnail"] > label').click()
@@ -49,8 +46,7 @@ test('Thumbnail wrong aspect ratio', async ({ page }) => {
     await page.locator('p:has-text("Image aspect ratio must be 16:9")').click();
 });
 
-test('Thumbnail can be oversized', async ({ page }) => {
-    await page.goto('/')
+test('Thumbnail can be oversized', async ({page}) => {
     await page.locator('input[name="thumbnail"]').setInputFiles(['./e2e/images/oversized.png']);
     await expect(page.locator('div[role="alert"]')).toHaveCount(0)
 });

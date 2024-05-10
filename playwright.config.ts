@@ -3,19 +3,18 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './e2e',
-  timeout: 7 * 1000,
+  timeout: 10 * 1000,
   expect: {
     timeout: 2 * 1000
   },
   forbidOnly: !!process.env.CI,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: 'html',
   use: {
     actionTimeout: 0,
     baseURL: 'http://localhost:5173',
     trace: 'retain-on-failure',
   },
-
   projects: [
     {
       name: 'chromium',

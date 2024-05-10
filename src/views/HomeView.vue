@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import Container from '../components/Container.vue'
 
+let showInstructions = ref(localStorage.getItem('showInstructions') !== 'false')
 onMounted(() => {
-  if (!localStorage.getItem('hideInstructions')) {
+  if (showInstructions.value) {
     (document.getElementById('instructions_modal') as HTMLFormElement).showModal()
   }
 })
 
 function hideInstructions() {
   (document.getElementById('instructions_modal') as HTMLFormElement).close()
-  localStorage.setItem('hideInstructions', 'true')
+  localStorage.setItem('showInstructions', 'false')
 }
 </script>
 
@@ -25,7 +26,9 @@ function hideInstructions() {
   <footer class="flex flex-col max-w-screen-xl mx-auto items-center gap-4 mt-8 py-16 px-8 text-sm">
     <div>Created with ❤️ by <a href="mailto:tom@tomgregory.com">Tom Gregory</a>.</div>
   </footer>
-  <dialog id="instructions_modal" class="modal">
+
+
+  <dialog v-if="showInstructions" id="instructions_modal" class="modal">
     <div class="modal-box">
       <h3 class="font-bold text-lg">Compare and share YouTube title & thumbnail ideas!</h3>
       <ol class="p-4 list-decimal text-lg">
