@@ -116,7 +116,6 @@ Resources:
                   - cloudformation:*
                 Resource:
                   - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/thumbshot-*'
-                  - !Sub 'arn:aws:cloudformation:us-east-1:${AWS::AccountId}:stack/thumbshot-*'
               - Effect: Allow
                 Action:
                   - cloudformation:ValidateTemplate
