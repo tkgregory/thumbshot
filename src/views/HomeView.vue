@@ -18,7 +18,7 @@ function hideInstructions() {
 <template>
   <header class="flex max-w-screen-xl mx-auto items-center gap-2 py-4 px-8">
     <img src="/logo.png" alt="logo" width="30" height="30" />
-    <span class="text-2xl">ThumbShot</span>
+    <span class="text-2xl">thumbshot.io</span>
   </header>
   <main class="max-w-screen-xl min-h-screen mx-auto py-4 px-8">
     <Container />
