@@ -27,7 +27,7 @@ export const handler = async (event) => {
     if (process.env.SET_NGROK_HEADER === 'true') {
       page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' })
     }
-    await page.goto(`https://${process.env.DOMAIN_NAME}`);
+    await page.goto(`https://${process.env.DOMAIN_NAME}/screenshot`);
 
     const youtubeContainer = await page.$('screenshot-container');
     const screenshot = await youtubeContainer.screenshot();
