@@ -17,7 +17,7 @@ jobs:
     - run: npm ci
     - run: npx playwright install --with-deps
     - run: npx playwright test
-    - run: npm run build
+    - run: npm run build:dev
     - uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
@@ -25,6 +25,34 @@ jobs:
     - uses: serverless/github-action@v3.2
       with:
         args: deploy --stage dev
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 7
+  deploy:
+    concurrency: ci-prod
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - run: npm ci
+    - run: npx playwright install --with-deps
+    - run: npm run build
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: us-east-1
+    - uses: serverless/github-action@v3.2
+      with:
+        args: deploy --stage prod
     - uses: actions/upload-artifact@v4
       if: always()
       with:
