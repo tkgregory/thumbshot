@@ -88,6 +88,11 @@ Resources:
                   - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:thumbshot-*'
               - Effect: Allow
                 Action:
+                  - lambda:PublishLayerVersion
+                Resource:
+                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:chromium'
+              - Effect: Allow
+                Action:
                   - logs:DescribeLogGroups
                   - logs:CreateLogGroup
                   - logs:DeleteLogGroup
