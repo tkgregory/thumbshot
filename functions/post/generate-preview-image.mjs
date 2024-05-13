@@ -23,10 +23,15 @@ export const handler = async (event) => {
       localStorage.setItem('showInstructions', false);
       localStorage.setItem('previewData', previewData);
     }, event.body);
+
+    if (process.env.SET_NGROK_HEADER === 'true') {
+      page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' })
+    }
     await page.goto(`https://${process.env.DOMAIN_NAME}`);
 
+    const youtubeContainer = await page.$('screenshot-container');
+    const screenshot = await youtubeContainer.screenshot();
     const objectKey = `${uuid()}.png`
-    const screenshot = await page.screenshot({ fullPage: true });
     const s3putObjectCommand = new PutObjectCommand({
       Bucket: process.env.BUCKET_NAME,
       Key: objectKey,

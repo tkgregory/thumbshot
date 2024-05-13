@@ -43,6 +43,9 @@ custom:
       forceExclude:
         - '@sparticuz/chromium'
         - '@aws-sdk/client-s3'
+  setNgrokHeader:
+    dev: true
+    prod: false
 package:
   patterns:
     - '!**'
@@ -60,6 +63,7 @@ functions:
       BUCKET_NAME: !Ref PreviewsBucket
       BUCKET_DOMAIN_NAME: !GetAtt PreviewsBucket.DomainName
       DOMAIN_NAME: '${param:domainName}'
+      SET_NGROK_HEADER: ${self:custom.setNgrokHeader.${opt:stage, sls:stage}}
     iamRoleStatements:
       - Effect: Allow
         Action:
