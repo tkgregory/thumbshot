@@ -62,6 +62,7 @@ Resources:
                   - iam:DeleteRolePolicy
                   - iam:PassRole
                   - iam:PutRolePolicy
+                  - iam:TagRole
                 Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/thumbshot-*'
               - Effect: Allow
                 Action:
@@ -89,8 +90,9 @@ Resources:
               - Effect: Allow
                 Action:
                   - lambda:PublishLayerVersion
+                  - lambda:GetLayerVersion
                 Resource:
-                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:chromium'
+                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:chromium*'
               - Effect: Allow
                 Action:
                   - logs:DescribeLogGroups
