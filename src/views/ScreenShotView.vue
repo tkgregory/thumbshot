@@ -3,7 +3,7 @@ import YouTubeContainer from '../components/YouTubeContainer.vue'
 </script>
 
 <template>
-    <main class="max-w-screen-xl min-h-screen mx-auto">
+    <main class="max-w-screen-xl min-h-screen mx-auto px-8">
         <screenshot-container class="block p-[16px]">
             <YouTubeContainer />
 
