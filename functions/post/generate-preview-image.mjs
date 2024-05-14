@@ -29,8 +29,22 @@ export const handler = async (event) => {
     }
     await page.goto(`https://${process.env.DOMAIN_NAME}/#/screenshot`);
 
-    const youtubeContainer = await page.$('screenshot-container');
-    const screenshot = await youtubeContainer.screenshot();
+    async function getBoundingRectangle(element) {
+      return page.evaluate(element => {
+        const { x, y, width, height } = element.getBoundingClientRect();
+        return { left: x, top: y, width, height };
+      }, element);
+    }
+
+    const first = await getBoundingRectangle(await page.$('youtube-container > youtube-preview:first-child'));
+    const last = await getBoundingRectangle(await page.$('youtube-container > youtube-preview:last-child'));
+    const screenshotContainer = await page.$('screenshot-container');
+    const screenshotContainerStats = await getBoundingRectangle(screenshotContainer);
+
+    const isSingleRow = first.top === last.top
+    const options = isSingleRow ? { clip: { x: 0, y: 0, width: last.left + last.width - first.left + 16 * 2, height: screenshotContainerStats.height } } : {}
+    const screenshot = await screenshotContainer.screenshot(options);
+
     const objectKey = `${uuid()}.png`
     const s3putObjectCommand = new PutObjectCommand({
       Bucket: process.env.BUCKET_NAME,
