@@ -82,7 +82,7 @@ function showError(event: any, errorMessage: string) {
 </script>
 
 <template>
-  <youtube-preview class="block sm:w-[300px] md:w-[390px] font-medium text-[12px] font-roboto">
+  <youtube-preview class="block font-medium text-[12px] font-roboto">
     <youtube-thumbnail class="relative group">
       <img class="rounded-xl object-cover group-hover:brightness-[.30] transition duration-200 cursor-pointer"
         :src="imageSrc" id="output" />

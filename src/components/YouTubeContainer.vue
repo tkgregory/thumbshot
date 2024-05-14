@@ -116,7 +116,7 @@ function reset() {
 </script>
 
 <template>
-    <youtube-container class="flex gap-y-[40px] gap-x-[16px] flex-wrap">
+    <youtube-container class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] ">
         <template v-for="(preview, index) in previewData">
             <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :deleteEnabled="previewData.length != 1"
                 :addEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"

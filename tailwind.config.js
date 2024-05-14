@@ -15,7 +15,10 @@ export default {
       },
       lineHeight: {
         'youtube': '22px'
-      }
+      },
+      gridTemplateColumns: {
+        'auto-fill-300': 'repeat(auto-fill, minmax(300px, 1fr))',
+      },
     },
   },
   plugins: [require("daisyui")],
