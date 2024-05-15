@@ -42,7 +42,9 @@ export const handler = async (event) => {
     const screenshotContainerStats = await getBoundingRectangle(screenshotContainer);
 
     const isSingleRow = first.top === last.top
-    const options = isSingleRow ? { clip: { x: 0, y: 0, width: last.left + last.width - first.left + 16 * 2, height: screenshotContainerStats.height } } : {}
+    const padding = first.left - screenshotContainerStats.left
+    const width = last.left + last.width - first.left + padding * 2
+    const options = isSingleRow ? { clip: { x: 0, y: 0, width: width, height: screenshotContainerStats.height } } : {}
     const screenshot = await screenshotContainer.screenshot(options);
 
     const objectKey = `${uuid()}.png`
