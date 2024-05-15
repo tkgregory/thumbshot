@@ -15,6 +15,10 @@ defineProps({
     required: true,
     type: String
   },
+  channelName: {
+    required: true,
+    type: String
+  },
   imageSrc: {
     required: true,
     type: String
@@ -40,7 +44,7 @@ defineProps({
     type: Boolean
   }
 })
-const emit = defineEmits(['changeTitle', 'changeImageSrc', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight'])
+const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImageSrc', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight'])
 
 function onChangeImage(event: any) {
   if (!event.target.files[0]) {
@@ -123,10 +127,12 @@ function showError(event: any, errorMessage: string) {
       <youtube-metadata-text class="text-youtube-parent grow">
         <div
           class="font-medium text-youtube text-[#F1F1F1] leading-youtube mt-[12px] mb-[4px] overflow-ellipsis overflow-hidden line-clamp-2">
-          <EditableText :value="title" @changeTitle="(title: string) => $emit('changeTitle', title)" />
+          <EditableText :value="title" placeholder="Your video title"
+            @changeValue="(title: string) => $emit('changeTitle', title)" />
         </div>
         <div class="flex flex-col text-[#AAAAAA] font-normal text-youtube">
-          <div>Some Channel Name</div>
+          <EditableText :value="channelName" placeholder="Your channel name"
+            @changeValue="(channelName: string) => $emit('changeChannelName', channelName)" />
           <div>
             <span>13K views</span>
             <span class="before:content-['•'] before:mx-1">3 days ago</span>

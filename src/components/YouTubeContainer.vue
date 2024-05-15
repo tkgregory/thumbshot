@@ -6,44 +6,54 @@ type YouTubePreview = {
     title: string;
     imageSrc: string;
     fileName: string;
+    channelName: string;
 }
 
 const realYouTubeVideos = [
     {
         videoId: 'XpN_Abd1RQc',
-        title: 'Batman: Arkham Shadow - Official Teaser Trailer'
+        title: 'Batman: Arkham Shadow - Official Teaser Trailer',
+        channelName: 'Some channel name'
     },
     {
         videoId: '2ya8Oww8xWo',
-        title: 'Godzilla Attacks Brawl Stars!!!'
+        title: 'Godzilla Attacks Brawl Stars!!!',
+        channelName: 'Some channel name'
     },
     {
         videoId: 'mEIJxaJLGUE',
-        title: 'British Students’ Last Meal before Military: Korea’s #1 BBQ'
+        title: 'British Students’ Last Meal before Military: Korea’s #1 BBQ',
+        channelName: 'Some channel name'
     },
     {
         videoId: 'HJqYoQBXXxs',
-        title: "Finding out I'm pregnant & telling my family | BABY 3"
+        title: "Finding out I'm pregnant & telling my family | BABY 3",
+        channelName: 'Some channel name'
     },
     {
         videoId: 'TiMuT2BhwO0',
-        title: 'Gracie Abrams - Risk (Official Music Video)'
+        title: 'Gracie Abrams - Risk (Official Music Video)',
+        channelName: 'Some channel name'
     },
     {
         videoId: '4TU3EqSHLr4',
-        title: 'YOUTUBER GUESS WHO: REAL LIFE EDITION'
+        title: 'YOUTUBER GUESS WHO: REAL LIFE EDITION',
+        channelName: 'Some channel name'
     },
     {
         videoId: 'WBoWd991ClI',
-        title: 'We Built an Actual WATER SLIDE in our House!'
+        title: 'We Built an Actual WATER SLIDE in our House!',
+        channelName: 'Some channel name'
     },
     {
         videoId: 'y6bJd27xoks',
-        title: 'THE BOOGEYMAN CAME OUT TO PLAY! | Kendrick Lamar - Euphoria (Drake diss) (REACTION!!!)'
+        title: 'THE BOOGEYMAN CAME OUT TO PLAY! | Kendrick Lamar - Euphoria (Drake diss) (REACTION!!!)',
+        channelName: 'Some channel name'
     },
     {
         videoId: 'hDTorbKavfI',
-        title: 'Alter | Based on a True Story'
+        title: 'Alter | Based on a True Story',
+        channelName: 'Some channel name'
     }
 ]
 
@@ -67,7 +77,8 @@ function addPreview(index: number) {
     previewData.value.splice(index, 0, {
         title: realYouTubeVideos[random].title,
         imageSrc: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`,
-        fileName: ''
+        fileName: '',
+        channelName: realYouTubeVideos[random].channelName
     })
 }
 
@@ -122,10 +133,11 @@ function reset() {
 <template>
     <youtube-container class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] ">
         <template v-for="(preview, index) in previewData">
-            <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :deleteEnabled="previewData.length != 1"
-                :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
-                :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName"
-                @changeTitle="(title) => { preview.title = title; saveStorage(); }"
+            <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
+                :deleteEnabled="previewData.length != 1" :duplicateEnabled="previewData.length != maxPreviewCount"
+                :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1"
+                :fileName="preview.fileName" @changeTitle="(title) => { preview.title = title; saveStorage(); }"
+                @changeChannelName="(channelName) => { preview.channelName = channelName; saveStorage(); }"
                 @changeImageSrc="(imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveStorage(); }"
                 @deletePreview="deletePreview(index); saveStorage();"
                 @duplicatePreview="duplicatePreview(index); saveStorage();" @moveLeft="moveLeft(index); saveStorage();"
