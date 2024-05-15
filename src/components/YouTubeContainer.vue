@@ -72,7 +72,7 @@ function addPreview(index: number) {
 }
 
 function duplicatePreview(index: number) {
-    previewData.value.splice(index, 0, previewData.value[index])
+    previewData.value.splice(index, 0, JSON.parse(JSON.stringify(previewData.value[index])))
 }
 
 function deletePreview(index: number) {
