@@ -6,12 +6,17 @@ import { Copy } from 'lucide-vue-next';
 import { Check } from 'lucide-vue-next';
 import { Download } from 'lucide-vue-next';
 import { ref } from 'vue'
+import { computed } from 'vue'
 
 const isLoading = ref(false);
 const previewUrl = ref()
 const isJustCopied = ref(false)
 const isJustDownloaded = ref(false)
 const youtubeContainer = ref<InstanceType<typeof YouTubeContainer>>()
+
+const isEmpty = computed(() => {
+    return youtubeContainer.value?.previewData.length == 0
+})
 
 function reset() {
     youtubeContainer.value?.reset()
@@ -62,14 +67,14 @@ function download() {
 <template>
     <div class="flex flex-col gap-8">
         <div class="flex justify-center gap-4">
-            <div class="tooltip" data-tip="Reset">
-                <button @click="reset" class="btn btn-square btn-neutral">
+            <div class="tooltip" :data-tip="!isEmpty ? 'Reset' : undefined">
+                <button @click="reset" class="btn btn-square btn-neutral" :disabled="isEmpty">
                     <RotateCcw />
                 </button>
             </div>
-            <div class="tooltip" data-tip="Generate shareable preview image">
+            <div class="tooltip" :data-tip="!isEmpty ? 'Generate shareable preview image' : undefined">
                 <button @click="!isLoading && generatePreview()" class="btn btn-square btn-primary"
-                    :disabled="isLoading">
+                    :disabled="isLoading || isEmpty">
                     <Camera v-if="!isLoading" />
                     <span v-if="isLoading" class="loading loading-spinner loading-md"></span>
                 </button>
