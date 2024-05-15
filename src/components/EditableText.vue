@@ -4,7 +4,7 @@ import { ref, nextTick } from 'vue'
 const isEditing = ref(false)
 const inputElement = ref<null | { focus: () => null }>(null)
 
-defineProps(['value', 'placeholder'])
+defineProps(['name', 'value', 'placeholder'])
 defineEmits(['changeValue'])
 
 function edit() {
@@ -21,5 +21,5 @@ function edit() {
     <input v-if="isEditing || !value"
         @blur="isEditing = false; $emit('changeValue', ($event.target as HTMLInputElement).value);"
         @focus="($event.target as HTMLInputElement).select()" @keyup.enter="($event.target as HTMLInputElement).blur()"
-        :value="value" type="text" :placeholder="placeholder" class="w-full" ref="inputElement" />
+        :name="name" :value="value" type="text" :placeholder="placeholder" class="w-full" ref="inputElement" />
 </template>

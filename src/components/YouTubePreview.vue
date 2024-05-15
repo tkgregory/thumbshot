@@ -127,11 +127,11 @@ function showError(event: any, errorMessage: string) {
       <youtube-metadata-text class="text-youtube-parent grow">
         <div
           class="font-medium text-youtube text-[#F1F1F1] leading-youtube mt-[12px] mb-[4px] overflow-ellipsis overflow-hidden line-clamp-2">
-          <EditableText :value="title" placeholder="Your video title"
+          <EditableText name="title" :value="title" placeholder="Your video title"
             @changeValue="(title: string) => $emit('changeTitle', title)" />
         </div>
         <div class="flex flex-col text-[#AAAAAA] font-normal text-youtube">
-          <EditableText :value="channelName" placeholder="Your channel name"
+          <EditableText name="channelName" :value="channelName" placeholder="Your channel name"
             @changeValue="(channelName: string) => $emit('changeChannelName', channelName)" />
           <div>
             <span>13K views</span>
