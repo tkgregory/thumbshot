@@ -71,6 +71,10 @@ function addPreview(index: number) {
     })
 }
 
+function duplicatePreview(index: number) {
+    previewData.value.splice(index, 0, previewData.value[index])
+}
+
 function deletePreview(index: number) {
     previewData.value.splice(index, 1)
 }
@@ -119,12 +123,12 @@ function reset() {
     <youtube-container class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] ">
         <template v-for="(preview, index) in previewData">
             <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :deleteEnabled="previewData.length != 1"
-                :addEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
+                :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
                 :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName"
                 @changeTitle="(title) => { preview.title = title; saveStorage(); }"
                 @changeImageSrc="(imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveStorage(); }"
                 @deletePreview="deletePreview(index); saveStorage();"
-                @addPreview="addPreview(index + 1); saveStorage();" @moveLeft="moveLeft(index); saveStorage();"
+                @duplicatePreview="duplicatePreview(index); saveStorage();" @moveLeft="moveLeft(index); saveStorage();"
                 @moveRight="moveRight(index); saveStorage();" />
         </template>
     </youtube-container>

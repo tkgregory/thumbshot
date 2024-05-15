@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import EditableText from './EditableText.vue';
-import { CirclePlus } from 'lucide-vue-next';
+import { CopyPlus } from 'lucide-vue-next';
 import { CircleArrowLeft } from 'lucide-vue-next';
 import { CircleArrowRight } from 'lucide-vue-next';
 import { Upload } from 'lucide-vue-next';
@@ -27,7 +27,7 @@ defineProps({
     required: true,
     type: Boolean
   },
-  addEnabled: {
+  duplicateEnabled: {
     required: true,
     type: Boolean
   },
@@ -40,7 +40,7 @@ defineProps({
     type: Boolean
   }
 })
-const emit = defineEmits(['changeTitle', 'changeImageSrc', 'deletePreview', 'addPreview', 'moveLeft', 'moveRight'])
+const emit = defineEmits(['changeTitle', 'changeImageSrc', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight'])
 
 function onChangeImage(event: any) {
   if (!event.target.files[0]) {
@@ -106,9 +106,9 @@ function showError(event: any, errorMessage: string) {
             <input name="thumbnail" type="file" accept="image/*" @change="onChangeImage($event)" class="hidden" />
           </label>
         </div>
-        <div class="tooltip w-[32px]" :data-tip="addEnabled ? 'Add new preview' : undefined">
-          <CirclePlus :size="32" :class="{ [`clickable`]: addEnabled, [`disabled`]: !addEnabled }"
-            @click="addEnabled && $emit('addPreview')" />
+        <div class="tooltip w-[32px]" :data-tip="duplicateEnabled ? 'Duplicate' : undefined">
+          <CopyPlus :size="32" :class="{ [`clickable`]: duplicateEnabled, [`disabled`]: !duplicateEnabled }"
+            @click="duplicateEnabled && $emit('duplicatePreview')" />
         </div>
         <div class="tooltip w-[32px]" :data-tip="moveRightEnabled ? 'Move right' : undefined">
           <CircleArrowRight :size="32" :class="{ [`clickable`]: moveRightEnabled, [`disabled`]: !moveRightEnabled }"
