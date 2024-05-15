@@ -84,7 +84,7 @@ function download() {
                     <h3 class="font-bold text-lg">Share your preview image</h3>
                     <div class="flex items-center gap-2">
                         <input type="text" class="input input-bordered w-full max-w-xs my-4" :value="previewUrl"
-                            readonly />
+                            id="previewUrl" readonly />
                         <div class="tooltip" :data-tip="isJustCopied ? 'Copied!' : 'Copy URL to clipboard'">
                             <button @click="copyToClipboard" class="btn btn-square btn-neutral">
                                 <Copy v-if="!isJustCopied" />
