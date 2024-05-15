@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import EditableText from './EditableText.vue';
-import { CircleMinus } from 'lucide-vue-next';
 import { CirclePlus } from 'lucide-vue-next';
 import { CircleArrowLeft } from 'lucide-vue-next';
 import { CircleArrowRight } from 'lucide-vue-next';
 import { Upload } from 'lucide-vue-next';
+import { X } from 'lucide-vue-next';
 import { ref } from 'vue'
 
 const error = ref()
@@ -89,15 +89,16 @@ function showError(event: any, errorMessage: string) {
       <div class="absolute bottom-0 right-0 rounded bg-[#00000099] m-[8px] px-[4px] py-[1px] text-white">
         10:08
       </div>
+      <div class="absolute hidden group-hover:flex top-0 right-0 -translate-x-1/4 translate-y-1/4 tooltip w-[32px]"
+        :data-tip="deleteEnabled ? 'Delete this preview' : undefined">
+        <X :size="32" :class="{ [`clickable`]: deleteEnabled, [`disabled`]: !deleteEnabled }"
+          @click="deleteEnabled && $emit('deletePreview')" />
+      </div>
       <div
         class="absolute hidden group-hover:flex items-center gap-4 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <div class="tooltip w-[32px]" :data-tip="moveLeftEnabled ? 'Move left' : undefined">
           <CircleArrowLeft :size="32" :class="{ [`clickable`]: moveLeftEnabled, [`disabled`]: !moveLeftEnabled }"
             @click="moveLeftEnabled && $emit('moveLeft')" />
-        </div>
-        <div class="tooltip w-[32px]" :data-tip="deleteEnabled ? 'Delete this preview' : undefined">
-          <CircleMinus :size="32" :class="{ [`clickable`]: deleteEnabled, [`disabled`]: !deleteEnabled }"
-            @click="deleteEnabled && $emit('deletePreview')" />
         </div>
         <div class="tooltip w-[32px]" data-tip="Change thumbnail">
           <label>
