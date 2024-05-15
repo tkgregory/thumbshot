@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test.beforeEach(async ({page}) => {
     await page.goto('/')
     await page.locator('button:has-text("Compare My Thumbnails")').click()
+    await page.locator('div[data-tip="Randomize"]').click()
   });
 
 test('Shows default YouTube preview on load', async ({page}) => {
@@ -47,6 +48,6 @@ test('Thumbnail wrong aspect ratio', async ({page}) => {
 });
 
 test('Thumbnail can be oversized', async ({page}) => {
-    await page.locator('input[name="thumbnail"]').setInputFiles(['./e2e/images/oversized.png']);
+    await page.locator('input[name="thumbnail"]').first().setInputFiles(['./e2e/images/oversized.png']);
     await expect(page.locator('div[role="alert"]')).toHaveCount(0)
 });

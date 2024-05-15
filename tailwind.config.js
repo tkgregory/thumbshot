@@ -19,6 +19,9 @@ export default {
       gridTemplateColumns: {
         'auto-fill-300': 'repeat(auto-fill, minmax(300px, 1fr))',
       },
+      colors: {
+        'youtube-dark': '#0F0F0F',
+      },
     },
   },
   plugins: [require("daisyui")],
