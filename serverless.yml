@@ -140,11 +140,36 @@ resources:
               - GET
               - HEAD
               - OPTIONS
+          CacheBehaviors:
+            - PathPattern: /js/script.js
+              TargetOriginId: Plausible
+              ViewerProtocolPolicy: https-only
+              CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+              AllowedMethods:
+                - GET
+                - HEAD
+            - PathPattern: /api/event
+              TargetOriginId: Plausible
+              ViewerProtocolPolicy: https-only
+              CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+              OriginRequestPolicyId: acba4595-bd28-49b8-b9fe-13317c0390fa # UserAgentRefererHeaders
+              AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
           Origins:
           - Id: S3Origin
             DomainName: !Select [1, !Split ["//", !GetAtt WebsiteBucket.WebsiteURL]]
             CustomOriginConfig:
               OriginProtocolPolicy: 'http-only'
+          - Id: Plausible
+            DomainName: plausible.io
+            CustomOriginConfig:
+              OriginProtocolPolicy: 'https-only'
     WebsiteDNSRecord:
       Type: AWS::Route53::RecordSet
       Properties:
