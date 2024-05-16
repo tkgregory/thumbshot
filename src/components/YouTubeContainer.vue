@@ -116,7 +116,10 @@ function saveStorage() {
     try {
         localStorage.setItem('previewData', JSON.stringify(previewData.value))
     } catch (e) {
-        console.error('Failed to save to local storage', e)
+        console.error(e)
+        if (e instanceof DOMException) {
+            showError("Thumbnail images too large. \n\nYou can add more thumbnails, but they won't be available when you reload the page. \n\nPlease use smaller thumbnail images e.g. 1280x720 JPG files.")
+        }
     }
 }
 
@@ -142,38 +145,44 @@ function onChangeImage(event: any, callback: MyCallback) {
     if (!event.target.files[0]) {
         return
     }
+
     const fileName = event.target.files[0].name
     if (validExtensions.indexOf(fileName.split('.').pop().toLowerCase()) == -1) {
-        showError(event, `Image must be one of these types: ${validExtensions.join(", ")}`)
+        showError(`Image must be one of these types: ${validExtensions.join(", ")}`)
         return
+    } else {
+        const reader = new FileReader()
+        reader.onloadend = function () {
+            var image = new Image()
+            image.src = reader.result as string
+            image.onload = function () {
+                if (image.width / image.height != 16 / 9) {
+                    showError("Image aspect ratio must be 16:9")
+                    return
+                }
+                if (image.width < 1280 || image.height < 720) {
+                    showError("Image size must be at least 1280x720 pixels")
+                    return
+                }
+                callback(reader.result as string, fileName)
+            }
+        }
+        reader.readAsDataURL(event.target.files[0])
     }
 
-    const reader = new FileReader()
-    reader.onloadend = function () {
-        var image = new Image()
-        image.src = reader.result as string
-        image.onload = function () {
-            if (image.width / image.height != 16 / 9) {
-                showError(event, "Image aspect ratio must be 16:9")
-                return
-            }
-            if (image.width < 1280 || image.height < 720) {
-                showError(event, "Image size must be at least 1280x720 pixels")
-                return
-            }
-            callback(reader.result as string, fileName)
-        }
-    }
-    reader.readAsDataURL(event.target.files[0])
+    resetImageInput(event)
 }
 
-function showError(event: any, errorMessage: string) {
+function resetImageInput(event: any) {
+    event.target.value = null
+}
+
+function showError(errorMessage: string) {
     error.value = errorMessage
     if (document) {
         console.log("Showing modal");
         (document.getElementById('error_modal') as HTMLFormElement).showModal();
     }
-    event.target.value = null
 }
 </script>
 
