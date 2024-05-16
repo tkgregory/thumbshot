@@ -20,44 +20,36 @@ test('Exceeding browser local storage limit shows useful message', async ({page}
 });
 
 test('Thumbnail too small', async ({page}) => {
-    await page.locator('div[data-tip="Randomize"]').click()
-
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.hover('#output', {position: {x: 10, y:10}})
-    await page.locator('div[data-tip="Change thumbnail"] > label').click()
+    await page.locator('div[data-tip="Add thumbnail"] > label').click()
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(['./e2e/images/right-ratio-too-small.png']);
 
-    await page.locator('p:has-text("Image size must be at least 1280x720 pixels")').click();
+    await expect(page.locator('p:has-text("Image size must be at least 1280x720 pixels")')).toHaveCount(1)
 });
 
 test('Thumbnail wrong format', async ({page}) => {
-    await page.locator('div[data-tip="Randomize"]').click()
-
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.hover('#output', {position: {x: 10, y:10}})
-    await page.locator('div[data-tip="Change thumbnail"] > label').click()
+    await page.locator('div[data-tip="Add thumbnail"] > label').click()
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(['./e2e/images/incorrect-format.txt']);
 
-    await page.locator('p:has-text("Image must be one of these types: jpg, jpeg, png")').click();
+    await expect(page.locator('p:has-text("Image must be one of these types: jpg, jpeg, png")')).toHaveCount(1)
 });
 
 test('Thumbnail wrong aspect ratio', async ({page}) => {
-    await page.locator('div[data-tip="Randomize"]').click()
-
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.hover('#output', {position: {x: 10, y:10}})
-    await page.locator('div[data-tip="Change thumbnail"] > label').click()
+    await page.locator('div[data-tip="Add thumbnail"] > label').click()
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(['./e2e/images/wrong-aspect-ratio.png']);
 
-    await page.locator('p:has-text("Image aspect ratio must be 16:9")').click();
+    await expect(page.locator('p:has-text("Image aspect ratio must be 16:9")')).toHaveCount(1)
 });
 
 test('Thumbnail can be oversized', async ({page}) => {
-    await page.locator('div[data-tip="Randomize"]').click()
-
-    await page.locator('input[name="thumbnail"]').first().setInputFiles(['./e2e/images/oversized.png']);
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.locator('div[data-tip="Add thumbnail"] > label').click()
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(['./e2e/images/oversized.png']);
     await expect(page.locator('div[role="alert"]')).toHaveCount(0)
 });
