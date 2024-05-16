@@ -27,6 +27,7 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-s3-sync
   - serverless-certificate-creator
+  - serverless-plugin-aws-alerts
 custom:
   s3Sync:
     - bucketName: ${param:websiteBucketName}
@@ -43,6 +44,15 @@ custom:
       forceExclude:
         - '@sparticuz/chromium'
         - '@aws-sdk/client-s3'
+  alerts:
+    topics:
+      alarm:
+        topic: ${self:service}-${sls:stage}-alerts-alarm
+        notifications:
+          - protocol: email
+            endpoint: t.k.gregory@gmail.com
+    alarms:
+      - functionErrors
   setNgrokHeader:
     dev: true
     prod: false
