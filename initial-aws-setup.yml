@@ -127,6 +127,19 @@ Resources:
                 Action:
                   - cloudformation:ValidateTemplate
                 Resource: '*'
+              - Sid: CloudWatch
+                Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricAlarm
+                  - cloudwatch:DeleteAlarms
+                Resource:
+                  - '*'
+              - Sid: SNS
+                Effect: Allow
+                Action:
+                  - sns:*
+                Resource:
+                  - '*'
 Outputs:
   GitHubRole:
     Value: !GetAtt GitHubRole.Arn
