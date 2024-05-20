@@ -1,6 +1,6 @@
-import { Page, expect } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
-export class ThumbShot {
+export class ThumbShotPage {
     constructor(public readonly page: Page) {
     }
 

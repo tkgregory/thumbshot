@@ -15,7 +15,7 @@ export default defineConfig({
     baseURL: 'http://localhost:5173',
     trace: 'retain-on-failure',
   },
-  projects: [
+  projects: process.env.CI ? [
     {
       name: 'chromium',
       use: {
@@ -33,9 +33,13 @@ export default defineConfig({
       use: {
         ...devices['Desktop Safari']
       }
-    }
-  ],
-
+    }] : [
+      {
+        name: 'chromium',
+        use: {
+          ...devices['Desktop Chrome']
+        }
+      }],
   webServer: {
     command: 'vite dev',
     port: 5173,

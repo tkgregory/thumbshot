@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from './pages/fixtures';
 
 test.beforeEach(async ({page}) => {
     await page.goto('/')
@@ -52,4 +52,26 @@ test('Thumbnail can be oversized', async ({page}) => {
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(['./e2e/images/oversized.png']);
     await expect(page.locator('div[role="alert"]')).toHaveCount(0)
+});
+
+test('Thumbnail can be the same as previous', async ({page, thumbshotPage}) => {
+    thumbshotPage.addThumbnail('same-file/1.jpg')
+    const image1 = await page.locator('youtube-thumbnail > img:first-child').first()
+    const src1 = await image1.getAttribute('src')
+
+    thumbshotPage.addThumbnail('same-file/2.jpg')
+    const image2 = await page.locator('youtube-thumbnail > img:first-child').first()
+    const src2 = await image2.getAttribute('src')
+    await expect(src2).toBe(src1)
+});
+
+test('Thumbnail can have same name as previous', async ({page, thumbshotPage}) => {
+    thumbshotPage.addThumbnail('same-name/1/quit.jpg')
+    const image1 = await page.locator('youtube-thumbnail > img:first-child').first()
+    const src1 = await image1.getAttribute('src')
+
+    thumbshotPage.addThumbnail('same-name/2/quit.jpg')
+    const image2 = await page.locator('youtube-thumbnail > img:first-child').nth(1)
+    const src2 = await image2.getAttribute('src')
+    await expect(src2).not.toBe(src1)
 });

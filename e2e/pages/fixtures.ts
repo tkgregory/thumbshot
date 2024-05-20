@@ -1,13 +1,13 @@
 import { test as base } from '@playwright/test';
-import { ThumbShot } from './thumbshot-page';
+import { ThumbShotPage } from './thumbshot-page';
 
 type MyFixtures = {
-    thumbshot: ThumbShot;
+    thumbshotPage: ThumbShotPage;
 };
 
 export const test = base.extend<MyFixtures>({
-    thumbshot: async ({ page }, use) => {
-        await use(new ThumbShot(page));
+    thumbshotPage: async ({ page }, use) => {
+        await use(new ThumbShotPage(page));
     },
 });
 
