@@ -6,6 +6,10 @@
         background-color:  rgb(15, 15, 15);
     }
 
+    a:hover {
+        @apply underline;
+    }
+
     input {
         @apply bg-gray-800;
         @apply border-2;
