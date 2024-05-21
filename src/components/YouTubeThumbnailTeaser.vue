@@ -5,9 +5,9 @@ import { Shuffle } from 'lucide-vue-next';
 defineEmits(['changeImage', 'randomize'])
 </script>
 <template>
-    <div class="relative group">
+    <div class="relative group aspect-video">
         <div
-            class="aspect-video rounded-xl object-cover group-hover:brightness-[.30] transition duration-200 cursor-pointer bg-youtube-dark" />
+            class="rounded-xl object-cover group-hover:brightness-[.30] transition duration-200 cursor-pointer bg-youtube-dark" />
         <div class="absolute left-1/2 top-0 -translate-x-1/2 translate-y-full text-xl w-full text-center">
             Add thumbnail or randomize
         </div>

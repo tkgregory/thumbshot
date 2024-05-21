@@ -187,30 +187,41 @@ function showError(errorMessage: string) {
 </script>
 
 <template>
-    <youtube-container
-        class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
-        <template v-for="(preview, index) in previewData">
-            <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
-                :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
-                :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName"
-                @changeTitle="(title) => { preview.title = title; saveStorage(); }"
-                @changeChannelName="(channelName) => { preview.channelName = channelName; saveStorage(); }"
-                @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveStorage(); })"
-                @deletePreview="deletePreview(index); saveStorage();"
-                @duplicatePreview="duplicatePreview(index); saveStorage();" @moveLeft="moveLeft(index); saveStorage();"
-                @moveRight="moveRight(index); saveStorage();" />
-        </template>
-        <template v-if="previewData.length != maxPreviewCount">
+    <template v-if="previewData.length === 0">
+        <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
             <YouTubeThumbnailTeaser @randomize="randomize(); saveStorage();"
                 @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { buildPreviewFromTeaser(imageSrc, fileName); saveStorage(); })" />
-        </template>
-        <template v-else>
-            <div class="aspect-video flex flex-col justify-center items-center text-xl">
-                <p>Preview limit reached.</p>
-                <p>Remove previews to add more.</p>
+            <div class="hidden md:block relative">
+                <img src="/visualisation.png" class="absolute -translate-x-16" />
             </div>
-        </template>
-    </youtube-container>
+        </div>
+    </template>
+    <template v-else>
+        <youtube-container
+            class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
+            <template v-for="(preview, index) in previewData">
+                <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
+                    :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
+                    :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName"
+                    @changeTitle="(title) => { preview.title = title; saveStorage(); }"
+                    @changeChannelName="(channelName) => { preview.channelName = channelName; saveStorage(); }"
+                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveStorage(); })"
+                    @deletePreview="deletePreview(index); saveStorage();"
+                    @duplicatePreview="duplicatePreview(index); saveStorage();"
+                    @moveLeft="moveLeft(index); saveStorage();" @moveRight="moveRight(index); saveStorage();" />
+            </template>
+            <template v-if="previewData.length != maxPreviewCount">
+                <YouTubeThumbnailTeaser @randomize="randomize(); saveStorage();"
+                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { buildPreviewFromTeaser(imageSrc, fileName); saveStorage(); })" />
+            </template>
+            <template v-else>
+                <div class="aspect-video flex flex-col justify-center items-center text-xl">
+                    <p>Preview limit reached.</p>
+                    <p>Remove previews to add more.</p>
+                </div>
+            </template>
+        </youtube-container>
+    </template>
 
     <Teleport to="body">
         <dialog id="error_modal" class="modal">
