@@ -19,7 +19,7 @@ test('Shows numbers', async ({page}) => {
 
 test('Doesn\'t show numbers', async ({page, settingsPage}) => {
   await settingsPage.open()
-  await settingsPage.numberingSetting().uncheck()
+  await settingsPage.numberingSetting().click()
 
   await page.goto('/#/screenshot')
 
