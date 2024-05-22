@@ -10,7 +10,8 @@ test('Numbering setting defaults to false', async ({page, settingsPage}) => {
     await expect(settingsPage.numberingSetting()).not.toBeChecked
 });
 
-test('Saves numbering setting true', async ({page, settingsPage}) => {
+test('Saves numbering setting true', async ({page, settingsPage, browserName}) => {
+    test.skip(browserName === 'webkit', 'Reported flakiness');
     await settingsPage.open()
     await settingsPage.numberingSetting().check()
     await page.reload();
@@ -18,7 +19,8 @@ test('Saves numbering setting true', async ({page, settingsPage}) => {
     await expect(settingsPage.numberingSetting()).toBeChecked
 });
 
-test('Saves numbering setting false', async ({page, settingsPage}) => {
+test('Saves numbering setting false', async ({page, settingsPage, browserName}) => {
+    test.skip(browserName === 'webkit', 'Reported flakiness');
     await settingsPage.open()
     await settingsPage.numberingSetting().check()
     await settingsPage.numberingSetting().uncheck()

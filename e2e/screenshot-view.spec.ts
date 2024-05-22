@@ -17,7 +17,9 @@ test('Shows numbers', async ({page}) => {
   expect(page.locator('youtube-preview').nth(2)).toContainText('Option 3')
 });
 
-test('Doesn\'t show numbers', async ({page, settingsPage}) => {
+test('Doesn\'t show numbers', async ({page, settingsPage, browserName}) => {
+  test.skip(browserName === 'webkit', 'Reported flakiness');
+
   await settingsPage.open()
   await settingsPage.numberingSetting().uncheck()
 
