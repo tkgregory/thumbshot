@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import YouTubePreview from './YouTubePreview.vue'
 import { ref } from 'vue'
+import { loadSettings } from '../composables/settings'
 
 type YouTubePreview = {
     title: string;
@@ -28,10 +29,10 @@ function loadStorage() {
 <template>
     <youtube-container
         class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
-        <template v-for="(preview) in previewData">
+        <template v-for="(preview, index) in previewData">
             <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
                 :duplicateEnabled="false" :moveLeftEnabled="false" :moveRightEnabled="false"
-                :fileName="preview.fileName" />
+                :fileName="preview.fileName" :index="index" :showNumbers="loadSettings().showNumbers" />
         </template>
     </youtube-container>
 </template>

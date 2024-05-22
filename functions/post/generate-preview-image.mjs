@@ -19,10 +19,15 @@ export const handler = async (event) => {
     });
 
     let page = await browser.newPage();
-    await page.evaluateOnNewDocument((previewData) => {
+    await page.evaluateOnNewDocument((body) => {
       localStorage.setItem('showInstructions', false);
-      localStorage.setItem('previewData', previewData);
-    }, event.body);
+      if (body.previewData) {
+        localStorage.setItem('previewData', JSON.stringify(body.previewData));
+        localStorage.setItem('settings', JSON.stringify(body.settings));
+      } else { // handle legacy API body format
+        localStorage.setItem('previewData', JSON.stringify(body))
+      }
+    }, JSON.parse(event.body));
 
     if (process.env.SET_NGROK_HEADER === 'true') {
       page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' })

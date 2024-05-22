@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import YouTubeContainer from './YouTubeContainer.vue'
+import Settings from './Settings.vue'
 import { Camera } from 'lucide-vue-next';
 import { RotateCcw } from 'lucide-vue-next';
 import { Copy } from 'lucide-vue-next';
@@ -7,6 +8,7 @@ import { Check } from 'lucide-vue-next';
 import { Download } from 'lucide-vue-next';
 import { ref } from 'vue'
 import { computed } from 'vue'
+import { loadSettings } from '../composables/settings'
 
 const isLoading = ref(false);
 const previewUrl = ref()
@@ -29,7 +31,10 @@ function generatePreview() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(youtubeContainer.value?.previewData)
+        body: JSON.stringify({
+            previewData: youtubeContainer.value?.previewData,
+            settings: loadSettings()
+        })
     }).then(response => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
@@ -78,6 +83,9 @@ function download() {
                     <Camera v-if="!isLoading" />
                     <span v-if="isLoading" class="loading loading-spinner loading-md"></span>
                 </button>
+            </div>
+            <div class="tooltip" data-tip="Change settings">
+                <Settings />
             </div>
             <dialog id="my_modal_1" class="modal">
                 <div class="modal-box">

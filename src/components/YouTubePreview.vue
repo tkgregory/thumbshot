@@ -30,13 +30,22 @@ defineProps({
   moveRightEnabled: {
     required: true,
     type: Boolean
-  }
+  },
+  index: {
+    required: true,
+    type: Number
+  },
+  showNumbers: {
+    type: Boolean,
+    default: false
+  },
 })
 const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight'])
 </script>
 
 <template>
-  <youtube-preview class="block">
+  <youtube-preview class="block text-youtube-parent">
+    <div v-if="showNumbers" class="text-youtube mb-1">Option {{ index + 1 }}</div>
     <YouTubeThumbnail :imageSrc="imageSrc" :moveLeftEnabled="moveLeftEnabled" :moveRightEnabled="moveRightEnabled"
       :duplicateEnabled="duplicateEnabled" @duplicatePreview="$emit('duplicatePreview')"
       @deletePreview="$emit('deletePreview')" @changeImage="(event) => emit('changeImage', event)" @moveLeft="
@@ -45,7 +54,7 @@ const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'de
       <youtube-channel-image class="mt-[12px] mr-[12px] shrink-0">
         <div class="rounded-full bg-gray-400 w-[48px] h-[48px]"></div>
       </youtube-channel-image>
-      <youtube-metadata-text class="text-youtube-parent grow">
+      <youtube-metadata-text class="grow">
         <div
           class="font-medium text-youtube text-[#F1F1F1] leading-youtube mt-[12px] mb-[4px] overflow-ellipsis overflow-hidden line-clamp-2">
           <EditableText name="title" :value="title" placeholder="Your video title"

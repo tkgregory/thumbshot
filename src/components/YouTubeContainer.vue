@@ -202,7 +202,7 @@ function showError(errorMessage: string) {
             <template v-for="(preview, index) in previewData">
                 <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
                     :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
-                    :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName"
+                    :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index"
                     @changeTitle="(title) => { preview.title = title; saveStorage(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; saveStorage(); }"
                     @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveStorage(); })"
