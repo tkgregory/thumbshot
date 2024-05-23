@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import YouTubeContainer from './YouTubeContainer.vue'
+import LoadingButton from './LoadingButton.vue'
 import Settings from './Settings.vue'
 import { Camera } from 'lucide-vue-next';
 import { RotateCcw } from 'lucide-vue-next';
@@ -9,8 +10,10 @@ import { Download } from 'lucide-vue-next';
 import { ref } from 'vue'
 import { computed } from 'vue'
 import { loadSettings } from '../composables/settings'
+import { fetchPreview } from '../composables/api'
 
-const isLoading = ref(false);
+const isGeneratingPreview = ref(false);
+const isGeneratingSinglePreview = ref(false);
 const previewUrl = ref()
 const isJustCopied = ref(false)
 const isJustDownloaded = ref(false)
@@ -25,28 +28,27 @@ function reset() {
 }
 
 function generatePreview() {
-    isLoading.value = true
-    return fetch(`${import.meta.env.VITE_API_URL}/preview`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            previewData: youtubeContainer.value?.previewData,
-            settings: loadSettings()
-        })
-    }).then(response => {
-        if (response.status !== 200) {
-            throw new Error(`Invalid response with status ${response.status}`)
-        }
-        return response.json()
-    }).then(json => {
-        isLoading.value = false
-        previewUrl.value = json.previewUrl
-        if (document) {
-            (document.getElementById('my_modal_1') as HTMLFormElement).showModal();
-        }
-    });
+    isGeneratingPreview.value = true
+    return fetchPreview(youtubeContainer.value?.previewData, loadSettings())
+        .then(json => {
+            isGeneratingPreview.value = false
+            previewUrl.value = json.previewUrl
+            if (document) {
+                (document.getElementById('generate_preview_modal') as HTMLFormElement).showModal();
+            }
+        });
+}
+
+function generateSinglePreview(index: number) {
+    isGeneratingSinglePreview.value = true
+    return fetchPreview([youtubeContainer.value?.previewData[index]], loadSettings())
+        .then(json => {
+            isGeneratingSinglePreview.value = false
+            previewUrl.value = json.previewUrl
+            if (document) {
+                (document.getElementById('generate_preview_modal') as HTMLFormElement).showModal();
+            }
+        });
 }
 
 function copyToClipboard() {
@@ -78,16 +80,14 @@ function download() {
                 </button>
             </div>
             <div class="tooltip" :data-tip="!isEmpty ? 'Generate shareable preview image' : undefined">
-                <button @click="!isLoading && generatePreview()" class="btn btn-square btn-primary"
-                    :disabled="isLoading || isEmpty">
-                    <Camera v-if="!isLoading" />
-                    <span v-if="isLoading" class="loading loading-spinner loading-md"></span>
-                </button>
+                <LoadingButton @click="generatePreview" :disabled="isEmpty" :isLoading="isGeneratingPreview">
+                    <Camera />
+                </LoadingButton>
             </div>
             <div class="tooltip" data-tip="Change settings">
                 <Settings />
             </div>
-            <dialog id="my_modal_1" class="modal">
+            <dialog id="generate_preview_modal" class="modal">
                 <div class="modal-box">
                     <h3 class="font-bold text-lg">Share your preview image</h3>
                     <div class="flex items-center gap-2">
@@ -115,6 +115,7 @@ function download() {
                 </form>
             </dialog>
         </div>
-        <YouTubeContainer ref="youtubeContainer" />
+        <YouTubeContainer ref="youtubeContainer" :isGeneratingSinglePreview="isGeneratingSinglePreview"
+            @generateSinglePreview="(index) => generateSinglePreview(index)" />
     </div>
 </template>

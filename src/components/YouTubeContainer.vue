@@ -66,6 +66,8 @@ const error = ref()
 loadStorage()
 
 defineExpose({ reset, previewData })
+defineEmits(['generateSinglePreview'])
+defineProps(['isGeneratingSinglePreview'])
 
 function randomize() {
     const index = previewData.value.length
@@ -203,12 +205,14 @@ function showError(errorMessage: string) {
                 <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
                     :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
                     :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index"
+                    :isGeneratingPreview="isGeneratingSinglePreview"
                     @changeTitle="(title) => { preview.title = title; saveStorage(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; saveStorage(); }"
                     @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveStorage(); })"
                     @deletePreview="deletePreview(index); saveStorage();"
                     @duplicatePreview="duplicatePreview(index); saveStorage();"
-                    @moveLeft="moveLeft(index); saveStorage();" @moveRight="moveRight(index); saveStorage();" />
+                    @moveLeft="moveLeft(index); saveStorage();" @moveRight="moveRight(index); saveStorage();"
+                    @generatePreview="$emit('generateSinglePreview', index);" />
             </template>
             <template v-if="previewData.length != maxPreviewCount">
                 <YouTubeThumbnailTeaser @randomize="randomize(); saveStorage();"

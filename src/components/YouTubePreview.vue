@@ -39,17 +39,22 @@ defineProps({
     type: Boolean,
     default: false
   },
+  isGeneratingPreview: {
+    type: Boolean,
+    required: true
+  }
 })
-const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight'])
+const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight', 'generatePreview'])
 </script>
 
 <template>
   <youtube-preview class="block text-youtube-parent">
     <div v-if="showNumbers" class="text-youtube mb-1">Option {{ index + 1 }}</div>
     <YouTubeThumbnail :imageSrc="imageSrc" :moveLeftEnabled="moveLeftEnabled" :moveRightEnabled="moveRightEnabled"
-      :duplicateEnabled="duplicateEnabled" @duplicatePreview="$emit('duplicatePreview')"
-      @deletePreview="$emit('deletePreview')" @changeImage="(event) => emit('changeImage', event)" @moveLeft="
-        $emit('moveLeft')" @moveRight="$emit('moveRight')" />
+      :duplicateEnabled="duplicateEnabled" :isGeneratingPreview="isGeneratingPreview"
+      @duplicatePreview="$emit('duplicatePreview')" @deletePreview="$emit('deletePreview')"
+      @changeImage="(event) => emit('changeImage', event)" @moveLeft="
+        $emit('moveLeft')" @moveRight="$emit('moveRight')" @generatePreview="$emit('generatePreview')" />
     <youtube-metadata class="flex">
       <youtube-channel-image class="mt-[12px] mr-[12px] shrink-0">
         <div class="rounded-full bg-gray-400 w-[48px] h-[48px]"></div>

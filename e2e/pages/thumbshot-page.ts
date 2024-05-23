@@ -27,8 +27,17 @@ export class ThumbShotPage {
         return this.page.locator(`youtube-preview:nth-child(${index + 1}) span`).first()
     }
 
+    getScreenshotURL() {
+        return this.page.locator('input[id="previewUrl"]')
+    }
+
     async clickDelete(index: number) {
         await this.page.hover(`youtube-thumbnail:nth-child(${index + 1})`)
         await this.page.locator('youtube-thumbnail div[data-tip="Delete this preview"]').nth(index).click()
+    }
+
+    async clickGenerateSingleScreenshot(index: number) {
+        await this.page.hover(`youtube-thumbnail:nth-child(${index + 1})`)
+        await this.page.locator('youtube-thumbnail div[data-tip="Generate single preview image"]').nth(index).click()
     }
 }

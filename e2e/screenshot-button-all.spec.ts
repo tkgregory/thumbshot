@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from './pages/fixtures';
 
 test.beforeEach(async ({page}) => {
     await page.goto('/')
@@ -14,10 +14,12 @@ test('Screenshot button is enabled when has previews', async ({page}) => {
   await expect(page.locator('div[data-tip="Generate shareable preview image"] > button')).toHaveCount(1)
 });
 
-test('Screenshot button generates downloadable image URL', async ({page, request}) => {
+test('Screenshot button generates downloadable image URL', async ({page, request, thumbshotPage}) => {
   await page.locator('div[data-tip="Randomize"]').click()
   await page.locator('div[data-tip="Generate shareable preview image"] > button').click()
-  const previewUrl = await page.locator('input[id="previewUrl"]').inputValue()
+
+  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/)
+  const previewUrl = await thumbshotPage.getScreenshotURL().inputValue()
 
   const previewUrlResponse = await request.get(previewUrl)
   expect(previewUrlResponse.status()).toBe(200)
