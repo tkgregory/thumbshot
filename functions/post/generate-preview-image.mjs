@@ -69,7 +69,10 @@ export const handler = async (event) => {
         2
       ),
     };
-
+  }
+  catch (error) {
+    console.log("Error with request body: ", JSON.stringify(event.body))
+    throw error;
   } finally {
     if (browser !== null) {
       await browser.close();
