@@ -29,7 +29,7 @@ function reset() {
 
 function generatePreview() {
     isGeneratingPreview.value = true
-    return fetchPreview(youtubeContainer.value?.previewData, loadSettings())
+    return fetchPreview(youtubeContainer.value?.previewData, { showNumbers: loadSettings().showNumbers })
         .then(json => {
             isGeneratingPreview.value = false
             previewUrl.value = json.previewUrl
@@ -41,7 +41,7 @@ function generatePreview() {
 
 function generateSinglePreview(index: number) {
     isGeneratingSinglePreview.value = true
-    return fetchPreview([youtubeContainer.value?.previewData[index]], loadSettings())
+    return fetchPreview([youtubeContainer.value?.previewData[index]], { showNumbers: false })
         .then(json => {
             isGeneratingSinglePreview.value = false
             previewUrl.value = json.previewUrl

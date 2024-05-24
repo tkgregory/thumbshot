@@ -31,6 +31,10 @@ export class ThumbShotPage {
         return this.page.locator('input[id="previewUrl"]')
     }
 
+    getResetButton() {
+        return this.page.locator('div[data-tip="Reset"]')
+    }
+
     async clickDelete(index: number) {
         await this.page.hover(`youtube-thumbnail:nth-child(${index + 1})`)
         await this.page.locator('youtube-thumbnail div[data-tip="Delete this preview"]').nth(index).click()

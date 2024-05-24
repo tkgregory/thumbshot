@@ -41,7 +41,7 @@ defineProps({
   },
   isGeneratingPreview: {
     type: Boolean,
-    required: true
+    default: false
   }
 })
 const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight', 'generatePreview'])

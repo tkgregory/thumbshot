@@ -32,7 +32,8 @@ function loadStorage() {
         <template v-for="(preview, index) in previewData">
             <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
                 :duplicateEnabled="false" :moveLeftEnabled="false" :moveRightEnabled="false"
-                :fileName="preview.fileName" :index="index" :showNumbers="loadSettings().showNumbers" />
+                :fileName="preview.fileName" :index="index"
+                :showNumbers="loadSettings().showNumbers && previewData.length > 1" />
         </template>
     </youtube-container>
 </template>

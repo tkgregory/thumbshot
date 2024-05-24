@@ -29,3 +29,14 @@ test('Doesn\'t show numbers', async ({page, settingsPage, browserName}) => {
   expect(page.locator('youtube-preview').nth(1)).not.toContainText('Option 2')
   expect(page.locator('youtube-preview').nth(2)).not.toContainText('Option 3')
 });
+
+test('Doesn\'t show numbers for single screenshot', async ({page, browserName, thumbshotPage}) => {
+  test.skip(browserName === 'webkit', 'Reported flakiness');
+
+  await thumbshotPage.getResetButton().click()
+  await page.locator('div[data-tip="Randomize"]').click()
+
+  await page.goto('/#/screenshot')
+
+  expect(page.locator('youtube-preview').nth(0)).not.toContainText('Option 1')
+});

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test, expect } from './pages/fixtures';
 
 test.beforeEach(async ({page}) => {
     await page.goto('/')
@@ -14,10 +14,10 @@ test('Reset button is enabled when has previews', async ({page}) => {
   await expect(page.locator('div[data-tip="Reset"] > button')).toHaveCount(1)
 });
 
-test('Reset button removes all previews', async ({page}) => {
+test('Reset button removes all previews', async ({page, thumbshotPage}) => {
   await page.locator('div[data-tip="Randomize"]').click()
   await page.locator('div[data-tip="Randomize"]').click()
   await expect(page.locator('youtube-preview')).toHaveCount(2)
-  await page.locator('div[data-tip="Reset"]').click()
+  await thumbshotPage.getResetButton().click()
   await expect(page.locator('youtube-preview')).toHaveCount(0)
 });
