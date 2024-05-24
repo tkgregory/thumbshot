@@ -10,6 +10,19 @@ const s3Client = new S3Client({});
 export const handler = async (event) => {
   let browser = null;
 
+  const body = JSON.parse(event.body)
+  if (Object.keys(body).length === 0 || Object.keys(body.previewData).length === 0) {
+    return {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        { "error": "Invalid request body" },
+        null,
+        2
+      ),
+    };
+  }
+
   try {
     browser = await puppeteer.launch({
       args: chromium.args,
@@ -27,7 +40,7 @@ export const handler = async (event) => {
       } else { // handle legacy API body format
         localStorage.setItem('previewData', JSON.stringify(body))
       }
-    }, JSON.parse(event.body));
+    }, body);
 
     if (process.env.SET_NGROK_HEADER === 'true') {
       page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' })

@@ -182,8 +182,7 @@ function resetImageInput(event: any) {
 function showError(errorMessage: string) {
     error.value = errorMessage
     if (document) {
-        console.log("Showing modal");
-        (document.getElementById('error_modal') as HTMLFormElement).showModal();
+        (document.getElementById('youtube_container_error_modal') as HTMLFormElement).showModal();
     }
 }
 </script>
@@ -228,7 +227,7 @@ function showError(errorMessage: string) {
     </template>
 
     <Teleport to="body">
-        <dialog id="error_modal" class="modal">
+        <dialog id="youtube_container_error_modal" class="modal">
             <div class="modal-box">
                 <h3 class="font-bold text-lg">Ooops</h3>
                 <p>{{ error }}</p>

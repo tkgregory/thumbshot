@@ -18,6 +18,7 @@ const previewUrl = ref()
 const isJustCopied = ref(false)
 const isJustDownloaded = ref(false)
 const youtubeContainer = ref<InstanceType<typeof YouTubeContainer>>()
+const error = ref()
 
 const isEmpty = computed(() => {
     return youtubeContainer.value?.previewData.length == 0
@@ -31,24 +32,33 @@ function generatePreview() {
     isGeneratingPreview.value = true
     return fetchPreview(youtubeContainer.value?.previewData, { showNumbers: loadSettings().showNumbers })
         .then(json => {
-            isGeneratingPreview.value = false
             previewUrl.value = json.previewUrl
             if (document) {
                 (document.getElementById('generate_preview_modal') as HTMLFormElement).showModal();
             }
-        });
+        }).catch(() => {
+            handlePreviewImageError()
+        }).finally(() => isGeneratingPreview.value = false);
 }
 
 function generateSinglePreview(index: number) {
     isGeneratingSinglePreview.value = true
     return fetchPreview([youtubeContainer.value?.previewData[index]], { showNumbers: false })
         .then(json => {
-            isGeneratingSinglePreview.value = false
             previewUrl.value = json.previewUrl
             if (document) {
                 (document.getElementById('generate_preview_modal') as HTMLFormElement).showModal();
             }
-        });
+        }).catch(() => {
+            handlePreviewImageError()
+        }).finally(() => isGeneratingPreview.value = false);
+}
+
+function handlePreviewImageError() {
+    error.value = "Could not generate preview image. Please try again later."
+    if (document) {
+        (document.getElementById('container_error_modal') as HTMLFormElement).showModal();
+    }
 }
 
 function copyToClipboard() {
@@ -109,6 +119,16 @@ function download() {
                         </div>
 
                     </div>
+                </div>
+                <form method="dialog" class="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
+
+            <dialog id="container_error_modal" class="modal">
+                <div class="modal-box">
+                    <h3 class="font-bold text-lg">Ooops</h3>
+                    <p>{{ error }}</p>
                 </div>
                 <form method="dialog" class="modal-backdrop">
                     <button>close</button>
