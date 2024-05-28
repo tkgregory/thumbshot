@@ -51,7 +51,7 @@ function generateSinglePreview(index: number) {
             }
         }).catch(() => {
             handlePreviewImageError()
-        }).finally(() => isGeneratingPreview.value = false);
+        }).finally(() => isGeneratingSinglePreview.value = false);
 }
 
 function handlePreviewImageError() {

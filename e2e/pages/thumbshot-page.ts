@@ -1,4 +1,5 @@
 import { type Page } from '@playwright/test';
+import { expect } from './fixtures';
 
 export class ThumbShotPage {
     constructor(public readonly page: Page) {
@@ -43,5 +44,13 @@ export class ThumbShotPage {
     async clickGenerateSingleScreenshot(index: number) {
         await this.page.hover(`youtube-thumbnail:nth-child(${index + 1})`)
         await this.page.locator('youtube-thumbnail div[data-tip="Generate single preview image"]').nth(index).click()
+    }
+
+    async generatePreviewModalIsOpen() {
+        await expect(this.page.locator('#generate_preview_modal[open]')).toHaveCount(1)
+    }
+
+    async dismissModal() {
+        await this.page.mouse.click(10, 10)
     }
 }

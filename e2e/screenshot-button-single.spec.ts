@@ -16,6 +16,18 @@ test('Single screenshot button generates downloadable image URL', async ({ reque
   expect(previewUrlResponse.status()).toBe(200)
 });
 
+test('Single screenshot button stops loading', async ({ thumbshotPage }) => {
+  await thumbshotPage.clickGenerateSingleScreenshot(0)
+  await thumbshotPage.generatePreviewModalIsOpen()
+  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 5000 })
+
+  thumbshotPage.dismissModal()
+
+  await thumbshotPage.clickGenerateSingleScreenshot(0)
+  await thumbshotPage.generatePreviewModalIsOpen()
+  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 5000 })
+});
+
 test('Copies downloadable image URL', async ({ page, context, request, browserName, thumbshotPage }) => {
   test.skip(browserName !== 'chromium', 'Still working on it');
 
