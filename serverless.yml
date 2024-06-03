@@ -140,9 +140,8 @@ resources:
             RequireUppercase: false
         EmailConfiguration:
           EmailSendingAccount: DEVELOPER
-          From: Tom Gregory <tom@tomgregory.com>
-          ReplyToEmailAddress: tom@tomgregory.com
-          SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/tomgregory.com'
+          From: !Sub 'Tom Gregory <no-reply@${SESEmailIdentity}>'
+          SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${SESEmailIdentity}'
     PreviewsBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -273,3 +272,7 @@ resources:
             AliasTarget:
               HostedZoneId: !GetAtt ApiDomainName.RegionalHostedZoneId
               DNSName: !GetAtt ApiDomainName.RegionalDomainName
+    SESEmailIdentity:
+      Type: AWS::SES::EmailIdentity
+      Properties:
+        EmailIdentity: '${param:domainName}'
