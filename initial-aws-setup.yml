@@ -140,6 +140,18 @@ Resources:
                   - sns:*
                 Resource:
                   - '*'
+              - Sid: SSM
+                Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/aws/reference/secretsmanager/GOOGLE_CLIENT_SECRET'
+              - Sid: SecretsManager
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:GOOGLE_CLIENT_SECRET-*'
 Outputs:
   GitHubRole:
     Value: !GetAtt GitHubRole.Arn
