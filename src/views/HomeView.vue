@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getCurrentUser, signOut } from 'aws-amplify/auth';
+import { Hub } from 'aws-amplify/utils';
 import { ref, onMounted } from 'vue'
 import Container from '../components/Container.vue'
 
@@ -13,13 +15,45 @@ function hideInstructions() {
   (document.getElementById('instructions_modal') as HTMLFormElement).close()
   localStorage.setItem('showInstructions', 'false')
 }
+
+import { Amplify } from 'aws-amplify';
+import awsconfig from '../aws-exports';
+Amplify.configure(awsconfig);
+
+const isSignedIn = ref(false)
+
+checkSignInStatus()
+function checkSignInStatus() {
+  getCurrentUser()
+    .then(() => {
+      isSignedIn.value = true
+    })
+    .catch(() => {
+      isSignedIn.value = false
+    })
+}
+
+Hub.listen('auth', (data) => {
+  console.log('auth event : ', data.payload.event);
+  switch (data.payload.event) {
+    case 'signedOut':
+      checkSignInStatus()
+      break
+  }
+})
 </script>
 
 <template>
-  <header class="flex max-w-screen-xl mx-auto items-center gap-2 py-4 px-8">
-    <img src="/logo.png" alt="logo" width="30" height="30" />
-    <span class="text-2xl">thumbshot.io</span>
-  </header>
+  <div class="navbar bg-base-100">
+    <div class="navbar-start">
+      <a class="btn btn-ghost text-xl"> <img src="/logo.png" alt="logo" width="30" height="30" /> thumbshot.io</a>
+    </div>
+    <div class="navbar-end">
+      <div v-if="isSignedIn" class="btn" @click="signOut(); checkSignInStatus();">Sign out</div>
+      <RouterLink v-else to="/sign-in" class="btn">Sign in</RouterLink>
+    </div>
+  </div>
+
   <main class="max-w-screen-xl min-h-screen mx-auto py-4 px-8">
     <Container />
   </main>

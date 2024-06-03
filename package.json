@@ -17,6 +17,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@aws-amplify/ui-vue": "^4.2.8",
     "lucide-vue-next": "^0.376.0",
     "puppeteer-core": "^22.6.4",
     "uuid": "^8.3.2",
@@ -38,6 +39,7 @@
     "@vue/test-utils": "^2.4.5",
     "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.19",
+    "aws-amplify-serverless-plugin": "file:./aws-amplify-serverless-plugin",
     "daisyui": "^4.10.2",
     "eslint": "^8.57.0",
     "eslint-plugin-playwright": "^1.5.4",

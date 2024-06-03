@@ -28,6 +28,7 @@ plugins:
   - serverless-s3-sync
   - serverless-certificate-creator
   - serverless-plugin-aws-alerts
+  - aws-amplify-serverless-plugin
 custom:
   s3Sync:
     - bucketName: ${param:websiteBucketName}
@@ -56,6 +57,13 @@ custom:
   setNgrokHeader:
     dev: true
     prod: false
+  amplify:
+    - filename: ./src/aws-exports.js
+      type: javascript
+      appClient: WebUserPoolClient
+      s3bucket: disabled
+      redirectSignIn: 'https://${param:domainName}/'
+      redirectSignOut: 'https://${param:domainName}/'
 package:
   patterns:
     - '!**'
@@ -86,7 +94,55 @@ layers:
     package:
       artifact: layer/chromium-v123.0.1-layer.zip
 resources:
+  Conditions:
+    IsNonProd:
+      !Not [!Equals ['${sls:stage}', prod]]
   Resources:
+    WebUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: !Sub '${AWS::StackName}-UserPoolClient'
+        UserPoolId: !Ref UserPool
+        PreventUserExistenceErrors: ENABLED
+        AllowedOAuthFlowsUserPoolClient: true
+        AllowedOAuthFlows:
+          - code
+        AllowedOAuthScopes:
+          - openid
+          - email
+          - profile
+        CallbackURLs:
+          - 'https://${param:domainName}/'
+          - !If [IsNonProd, 'http://localhost:1313/', !Ref "AWS::NoValue"]
+        LogoutURLs:
+          - 'https://${param:domainName}/'
+          - !If [IsNonProd, 'http://localhost:1313/', !Ref "AWS::NoValue"]
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: !Sub '${AWS::StackName}-UserPool'
+        DeletionProtection: ACTIVE
+        UsernameAttributes:
+          - email
+        AutoVerifiedAttributes: ['email']
+        UserAttributeUpdateSettings:
+          AttributesRequireVerificationBeforeUpdate: ['email']
+        Schema:
+          - Name: email
+            Mutable: true
+            Required: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: false
+            RequireNumbers: false
+            RequireSymbols: false
+            RequireUppercase: false
+        EmailConfiguration:
+          EmailSendingAccount: DEVELOPER
+          From: Tom Gregory <tom@tomgregory.com>
+          ReplyToEmailAddress: tom@tomgregory.com
+          SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/tomgregory.com'
     PreviewsBucket:
       Type: AWS::S3::Bucket
       Properties:
