@@ -16,7 +16,7 @@ jobs:
         node-version: 20
     - run: npm ci
     - run: npx playwright install --with-deps
-    - run: npx playwright test
+    - run: npm run test:unit && npm run test:e2e
     - run: npm run build:dev
     - uses: aws-actions/configure-aws-credentials@v4
       with:

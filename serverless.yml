@@ -46,6 +46,7 @@ custom:
       forceExclude:
         - '@sparticuz/chromium'
         - '@aws-sdk/client-s3'
+        - "@aws-sdk/client-cognito-identity-provider"
   alerts:
     topics:
       alarm:
@@ -91,6 +92,15 @@ functions:
         Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
     timeout: 25
     memorySize: 4096
+  preSignUp:
+    handler: functions/cognito/pre-sign-up.handler
+    runtime: nodejs18.x
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - cognito-idp:AdminLinkProviderForUser
+          - cognito-idp:ListUsers
+        Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
 layers:
   chromium:
     package:
@@ -134,6 +144,14 @@ resources:
         AttributeMapping:
           email: email
           email_verified: email_verified
+    PreSignUpLambdaFunctionPolicy:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !GetAtt PreSignUpLambdaFunction.Arn
+        Action: lambda:InvokeFunction
+        Principal: cognito-idp.amazonaws.com
+        SourceAccount: !Ref 'AWS::AccountId'
+        SourceArn: !GetAtt UserPool.Arn
     UserPool:
       Type: AWS::Cognito::UserPool
       Properties:
@@ -155,6 +173,8 @@ resources:
             RequireNumbers: false
             RequireSymbols: false
             RequireUppercase: false
+        LambdaConfig:
+          PreSignUp: !GetAtt PreSignUpLambdaFunction.Arn
         EmailConfiguration:
           EmailSendingAccount: DEVELOPER
           From: !Sub 'Tom Gregory <no-reply@${SESEmailIdentity}>'

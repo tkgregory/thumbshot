@@ -8,7 +8,7 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "build:dev": "run-p type-check \"build-only:dev {@}\" --",
     "preview": "vite preview",
-    "test:unit": "vitest",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=tests",
     "test:e2e": "playwright test",
     "build-only": "vite build",
     "build-only:dev": "vite build --mode development",
@@ -25,6 +25,7 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.588.0",
     "@aws-sdk/client-s3": "^3.569.0",
     "@playwright/test": "^1.43.0",
     "@rushstack/eslint-patch": "^1.8.0",
@@ -44,6 +45,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-playwright": "^1.5.4",
     "eslint-plugin-vue": "^9.23.0",
+    "jest": "^29.7.0",
     "jsdom": "^24.0.0",
     "npm-run-all2": "^6.1.2",
     "postcss": "^8.4.38",
