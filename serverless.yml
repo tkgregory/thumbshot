@@ -175,6 +175,18 @@ resources:
         AliasTarget:
           DNSName: !GetAtt UserPoolDomain.CloudFrontDistribution
           HostedZoneId: Z2FDTNDATAQYW2 # value as described in AWS docs
+    AutomatedTestUser:
+      Type: AWS::Cognito::UserPoolUser
+      Properties:
+        Username: t.k.gregory+automatedtestuser@gmail.com
+        DesiredDeliveryMediums:
+          - EMAIL
+        UserPoolId: !Ref UserPool
+        UserAttributes:
+          - Name: email
+            Value: t.k.gregory+automatedtestuser@gmail.com
+          - Name: email_verified
+            Value: true
     PreviewsBucket:
       Type: AWS::S3::Bucket
       Properties:
