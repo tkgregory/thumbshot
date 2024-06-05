@@ -26,7 +26,9 @@
   },
   "devDependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.588.0",
+    "@aws-sdk/client-dynamodb": "^3.588.0",
     "@aws-sdk/client-s3": "^3.569.0",
+    "@aws-sdk/lib-dynamodb": "^3.588.0",
     "@playwright/test": "^1.43.0",
     "@rushstack/eslint-patch": "^1.8.0",
     "@sparticuz/chromium": "^123.0.1",

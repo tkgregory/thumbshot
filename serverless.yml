@@ -7,6 +7,7 @@ params:
     amplifyOrigin: https://${param:domainName}
     websiteBucketName: thumbshot-${sls:stage}-website
     websiteHostedZoneId: Z084235213DTZ50AT2VLL
+    dynamoDBTablePrefix: ${sls:stage}-
   prod:
     domainName: thumbshot.io
 provider:
@@ -21,8 +22,21 @@ provider:
         - 'https://${param:domainName}'
       allowedHeaders:
         - Content-Type
+        - Authorization
       allowedMethods:
         - POST
+        - GET
+    authorizers:
+      serviceAuthorizer:
+        identitySource: $request.header.Authorization
+        issuerUrl:
+          Fn::Join:
+          - ''
+          - - 'https://cognito-idp.'
+            - '${opt:region, self:provider.region}'
+            - '.amazonaws.com/'
+            - !Ref UserPool
+        audience: !Ref WebUserPoolClient
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
@@ -46,7 +60,9 @@ custom:
       forceExclude:
         - '@sparticuz/chromium'
         - '@aws-sdk/client-s3'
-        - "@aws-sdk/client-cognito-identity-provider"
+        - '@aws-sdk/client-cognito-identity-provider'
+        - '@aws-sdk/client-dynamodb'
+        - '@aws-sdk/lib-dynamodb'
   alerts:
     topics:
       alarm:
@@ -101,6 +117,40 @@ functions:
           - cognito-idp:AdminLinkProviderForUser
           - cognito-idp:ListUsers
         Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+  getCurrentUser:
+    handler: functions/get/get-current-user.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /users/current
+          method: get
+          authorizer: serviceAuthorizer
+    environment:
+      USERS_TABLE_NAME: !Ref UsersTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          - !GetAtt UsersTable.Arn
+          - !Sub '${UsersTable.Arn}/index/email-index'
+  saveCurrentUser:
+    handler: functions/post/save-current-user.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /users/current
+          method: post
+          authorizer: serviceAuthorizer
+    environment:
+      USERS_TABLE_NAME: !Ref UsersTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource:
+          - !GetAtt UsersTable.Arn
+          - !Sub '${UsersTable.Arn}/index/email-index'
 layers:
   chromium:
     package:
@@ -341,3 +391,16 @@ resources:
       Type: AWS::SES::EmailIdentity
       Properties:
         EmailIdentity: '${param:domainName}'
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${param:dynamoDBTablePrefix}users
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true

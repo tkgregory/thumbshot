@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { fetchPathWithAuth } from '../composables/api'
 import YouTubePreview from './YouTubePreview.vue'
 import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
 import { ref } from 'vue'
@@ -63,7 +64,7 @@ const previewData = ref<YouTubePreview[]>([])
 const maxPreviewCount = ref(9)
 const error = ref()
 
-loadStorage()
+loadServer()
 
 defineExpose({ reset, previewData })
 defineEmits(['generateSinglePreview'])
@@ -114,7 +115,19 @@ function moveRight(index: number) {
     previewData.value[index + 1] = firstElement
 }
 
-function saveStorage() {
+async function saveServer() {
+    const body = {
+        previews: previewData.value,
+    }
+
+    fetchPathWithAuth('POST', '/users/current', body).then((response) => {
+        if (response.status !== 204) {
+            throw new Error(`Invalid response with status ${response.status}`)
+        }
+    })
+}
+
+function saveLocalStorage() {
     try {
         localStorage.setItem('previewData', JSON.stringify(previewData.value))
     } catch (e) {
@@ -125,7 +138,18 @@ function saveStorage() {
     }
 }
 
-function loadStorage() {
+async function loadServer() {
+    fetchPathWithAuth('GET', '/users/current').then((response) => {
+        if (response.status !== 200) {
+            throw new Error(`Invalid response with status ${response.status}`)
+        }
+        return response.json()
+    }).then((json) => {
+        previewData.value = json.previews
+    })
+}
+
+function loadLocalStorage() {
     try {
         const localStoragePreviewData = localStorage.getItem('previewData') as string
         if (localStoragePreviewData) {
@@ -138,7 +162,7 @@ function loadStorage() {
 
 function reset() {
     previewData.value.length = 0
-    saveStorage()
+    saveServer()
 }
 
 type MyCallback = (imageSrc: string, fileName: string) => void;
@@ -190,8 +214,8 @@ function showError(errorMessage: string) {
 <template>
     <template v-if="previewData.length === 0">
         <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
-            <YouTubeThumbnailTeaser @randomize="randomize(); saveStorage();"
-                @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { buildPreviewFromTeaser(imageSrc, fileName); saveStorage(); })" />
+            <YouTubeThumbnailTeaser @randomize="randomize(); saveServer();"
+                @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { buildPreviewFromTeaser(imageSrc, fileName); saveServer(); })" />
             <div class="hidden md:block relative">
                 <img src="/visualisation.png" class="absolute -translate-x-16" />
             </div>
@@ -205,17 +229,17 @@ function showError(errorMessage: string) {
                     :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
                     :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index"
                     :isGeneratingPreview="isGeneratingSinglePreview"
-                    @changeTitle="(title) => { preview.title = title; saveStorage(); }"
-                    @changeChannelName="(channelName) => { preview.channelName = channelName; saveStorage(); }"
-                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveStorage(); })"
-                    @deletePreview="deletePreview(index); saveStorage();"
-                    @duplicatePreview="duplicatePreview(index); saveStorage();"
-                    @moveLeft="moveLeft(index); saveStorage();" @moveRight="moveRight(index); saveStorage();"
+                    @changeTitle="(title) => { preview.title = title; saveServer(); }"
+                    @changeChannelName="(channelName) => { preview.channelName = channelName; saveServer(); }"
+                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveServer(); })"
+                    @deletePreview="deletePreview(index); saveServer();"
+                    @duplicatePreview="duplicatePreview(index); saveServer();"
+                    @moveLeft="moveLeft(index); saveServer();" @moveRight="moveRight(index); saveServer();"
                     @generatePreview="$emit('generateSinglePreview', index);" />
             </template>
             <template v-if="previewData.length != maxPreviewCount">
-                <YouTubeThumbnailTeaser @randomize="randomize(); saveStorage();"
-                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { buildPreviewFromTeaser(imageSrc, fileName); saveStorage(); })" />
+                <YouTubeThumbnailTeaser @randomize="randomize(); saveServer();"
+                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { buildPreviewFromTeaser(imageSrc, fileName); saveServer(); })" />
             </template>
             <template v-else>
                 <div class="aspect-video flex flex-col justify-center items-center text-xl">
