@@ -25,6 +25,7 @@ provider:
         - Authorization
       allowedMethods:
         - POST
+        - PUT
         - GET
     authorizers:
       serviceAuthorizer:
@@ -46,9 +47,11 @@ plugins:
   - aws-amplify-serverless-plugin
 custom:
   s3Sync:
-    - bucketName: ${param:websiteBucketName}
-      localDir: ./dist
-      deleteRemoved: true
+    noSync: true
+    buckets:
+      - bucketName: ${param:websiteBucketName}
+        localDir: ./dist
+        deleteRemoved: true
   customCertificate:
     certificateName: '${param:domainName}'
     hostedZoneIds: ${param:websiteHostedZoneId}
@@ -63,6 +66,7 @@ custom:
         - '@aws-sdk/client-cognito-identity-provider'
         - '@aws-sdk/client-dynamodb'
         - '@aws-sdk/lib-dynamodb'
+        - '@aws-sdk/s3-request-presigner'
   alerts:
     topics:
       alarm:
@@ -108,6 +112,20 @@ functions:
         Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
     timeout: 25
     memorySize: 4096
+  createPresignedUploadUrl:
+    handler: functions/post/create-presigned-upload-url.handler
+    events:
+      - httpApi:
+          path: /presigned-upload-url
+          method: post
+          authorizer: serviceAuthorizer
+    environment:
+      BUCKET_NAME: !Ref ThumbnailsBucket
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: !Sub 'arn:aws:s3:::${ThumbnailsBucket}/*'
   preSignUp:
     handler: functions/cognito/pre-sign-up.handler
     runtime: nodejs18.x
@@ -117,40 +135,74 @@ functions:
           - cognito-idp:AdminLinkProviderForUser
           - cognito-idp:ListUsers
         Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
-  getCurrentUser:
-    handler: functions/get/get-current-user.handler
+  getBoard:
+    handler: functions/get/get-board.handler
     runtime: nodejs18.x
     events:
       - httpApi:
-          path: /users/current
+          path: /boards/{id}
           method: get
           authorizer: serviceAuthorizer
     environment:
-      USERS_TABLE_NAME: !Ref UsersTable
+      BOARDS_TABLE_NAME: !Ref BoardsTable
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:GetItem
         Resource:
-          - !GetAtt UsersTable.Arn
-          - !Sub '${UsersTable.Arn}/index/email-index'
-  saveCurrentUser:
-    handler: functions/post/save-current-user.handler
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+  getBoards:
+    handler: functions/get/get-boards.handler
     runtime: nodejs18.x
     events:
       - httpApi:
-          path: /users/current
+          path: /boards
+          method: get
+          authorizer: serviceAuthorizer
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+  createBoard:
+    handler: functions/post/create-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /boards
           method: post
           authorizer: serviceAuthorizer
     environment:
-      USERS_TABLE_NAME: !Ref UsersTable
+      BOARDS_TABLE_NAME: !Ref BoardsTable
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:PutItem
         Resource:
-          - !GetAtt UsersTable.Arn
-          - !Sub '${UsersTable.Arn}/index/email-index'
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+  updateBoard:
+    handler: functions/put/update-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /boards/{id}
+          method: put
+          authorizer: serviceAuthorizer
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
 layers:
   chromium:
     package:
@@ -283,6 +335,35 @@ resources:
               Effect: Allow
               Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
               Principal: '*'
+    ThumbnailsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: thumbshot-${sls:stage}-thumbnails
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - POST
+              AllowedOrigins:
+                - 'http://localhost:5173'
+                - 'https://${param:domainName}'
+    ThumbnailsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref ThumbnailsBucket
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action:
+                - s3:GetObject
+              Effect: Allow
+              Resource: !Sub 'arn:aws:s3:::${ThumbnailsBucket}/*'
+              Principal: '*'
     WebsiteBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -391,16 +472,26 @@ resources:
       Type: AWS::SES::EmailIdentity
       Properties:
         EmailIdentity: '${param:domainName}'
-    UsersTable:
+    BoardsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${param:dynamoDBTablePrefix}users
+        TableName: ${param:dynamoDBTablePrefix}boards
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: userIdIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+            Projection:
+              NonKeyAttributes: []
+              ProjectionType: "ALL"
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true

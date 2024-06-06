@@ -82,7 +82,7 @@ function randomize() {
     })
 }
 
-function buildPreviewFromTeaser(imageSrc: string, fileName: string) {
+async function buildPreviewFromTeaser(imageSrc: string, fileName: string) {
     const index = previewData.value.length
 
     previewData.value.splice(index, 0, {
@@ -115,13 +115,36 @@ function moveRight(index: number) {
     previewData.value[index + 1] = firstElement
 }
 
+async function getPresignedUploadURL() {
+    return fetchPathWithAuth('POST', '/presigned-upload-url').then((response) => {
+        if (response.status !== 200) {
+            throw new Error(`Invalid response with status ${response.status}`)
+        }
+        return response.json()
+    }).then((json) => {
+        return json.presignedUploadURL
+    })
+}
+
+async function uploadThumbnail(imageData: string) {
+    const presignedUploadURL = await getPresignedUploadURL()
+    const requestHeaders: HeadersInit = new Headers();
+    requestHeaders.set("Content-Type", 'multipart/form-data')
+    const blob = await fetch(imageData).then((r) => r.blob());
+    return fetch(presignedUploadURL, {
+        method: 'PUT',
+        headers: requestHeaders,
+        body: blob
+    });
+}
+
 async function saveServer() {
     const body = {
         previews: previewData.value,
     }
 
-    fetchPathWithAuth('POST', '/users/current', body).then((response) => {
-        if (response.status !== 204) {
+    fetchPathWithAuth('PUT', '/boards/65d7beaf-fcc3-45c2-9b6d-490896f2d7aa', body).then((response) => {
+        if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
     })
@@ -139,7 +162,7 @@ function saveLocalStorage() {
 }
 
 async function loadServer() {
-    fetchPathWithAuth('GET', '/users/current').then((response) => {
+    fetchPathWithAuth('GET', '/boards/65d7beaf-fcc3-45c2-9b6d-490896f2d7aa').then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
@@ -231,7 +254,7 @@ function showError(errorMessage: string) {
                     :isGeneratingPreview="isGeneratingSinglePreview"
                     @changeTitle="(title) => { preview.title = title; saveServer(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; saveServer(); }"
-                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; saveServer(); })"
+                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; uploadThumbnail(imageSrc); saveServer(); })"
                     @deletePreview="deletePreview(index); saveServer();"
                     @duplicatePreview="duplicatePreview(index); saveServer();"
                     @moveLeft="moveLeft(index); saveServer();" @moveRight="moveRight(index); saveServer();"

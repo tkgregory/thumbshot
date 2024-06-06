@@ -7,36 +7,36 @@ const client = new DynamoDBClient({})
 const docClient = DynamoDBDocumentClient.from(client)
 
 export const handler = async (event) => {
+    const id = event.pathParameters.id
     const userId = event.requestContext.authorizer.jwt.claims.sub
 
-    const command = new GetCommand({
-        TableName: process.env.USERS_TABLE_NAME,
-        Key: {
-            'id': userId
-        }
-    })
-
-    const userRecord = await docClient.send(command)
-    if (!userRecord.Item) {
+    if (!id) {
         return {
-            statusCode: 404,
-            body: JSON.stringify({ message: "User record not found" }),
+            statusCode: 400,
+            body: JSON.stringify({ message: "Missing path parameter 'id'" }),
             headers: {
                 "content-type": "application/json"
             }
         }
     }
 
-    const responseBody = {
-        id: userRecord.Item.id,
-        previews: userRecord.Item.previews ? Array.from(userRecord.Item.previews) : [],
+    const getJSON = {
+        TableName: process.env.BOARDS_TABLE_NAME,
+        Key: {
+            id: id,
+        },
+        ConditionExpression: "attribute_exists(id) AND userId = :userId",
+        ExpressionAttributeValues: {
+            ":userId": userId,
+        },
     }
+    const response = await docClient.send(new GetCommand(getJSON));
 
     return {
         statusCode: 200,
-        body: JSON.stringify(responseBody),
         headers: {
             "content-type": "application/json"
-        }
+        },
+        body: JSON.stringify(response.Item)
     }
 }
