@@ -21,6 +21,7 @@ const youtubeContainer = ref<InstanceType<typeof YouTubeContainer>>()
 const error = ref()
 
 defineProps(['boardId'])
+defineExpose({ youtubeContainer })
 
 const isEmpty = computed(() => {
     return youtubeContainer.value?.previewData.length == 0

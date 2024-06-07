@@ -65,7 +65,7 @@ const maxPreviewCount = ref(9)
 const error = ref()
 const boardName = ref()
 
-defineExpose({ reset, previewData })
+defineExpose({ reset, previewData, loadBoard })
 defineEmits(['generateSinglePreview'])
 const props = defineProps(['isGeneratingSinglePreview', 'boardId'])
 
@@ -188,6 +188,10 @@ function loadLocalStorage() {
     } catch (e) {
         console.error('Failed to load from local storage', e)
     }
+}
+
+async function loadBoard() {
+    await loadServer();
 }
 
 function reset() {

@@ -23,6 +23,7 @@ Amplify.configure(awsconfig);
 
 const isSignedIn = ref(false)
 const boards = ref<InstanceType<typeof Boards>>()
+const container = ref<InstanceType<typeof Container>>()
 
 checkSignInStatus()
 function checkSignInStatus() {
@@ -51,7 +52,7 @@ Hub.listen('auth', (data) => {
       <a class="btn btn-ghost text-xl"> <img src="/logo.png" alt="logo" width="30" height="30" /> thumbshot.io</a>
     </div>
     <div class="navbar-end flex gap-4">
-      <Boards ref="boards" />
+      <Boards ref="boards" @selectedBoardUpdated="container?.youtubeContainer?.loadBoard()" />
 
       <div v-if="isSignedIn" class="btn" @click="signOut(); checkSignInStatus();">Sign out</div>
       <RouterLink v-else to="/sign-in" class="btn">Sign in</RouterLink>
@@ -59,7 +60,7 @@ Hub.listen('auth', (data) => {
   </div>
 
   <main class="max-w-screen-xl min-h-screen mx-auto py-4 px-8">
-    <Container v-if="boards?.selectedBoardId" :boardId="boards.selectedBoardId" />
+    <Container v-if="boards?.selectedBoardId" :boardId="boards.selectedBoardId" ref="container" />
     <template v-else>
       Create or select a thumbnail board to get started.
     </template>

@@ -13,7 +13,7 @@ export const handler = async (event) => {
     const name = body.name
     const previews = body.previews
 
-    if (!id || !name || !previews) {
+    if (!id || !name) {
         return {
             statusCode: 400,
             body: JSON.stringify({ message: "Invalid request body" }),
@@ -23,17 +23,24 @@ export const handler = async (event) => {
         }
     }
 
+    let updateExpression = "SET #boardName = :name";
+    let expressionAttributeValues = {
+        ":userId": userId,
+        ":name": name,
+    };
+
+    if (previews) {
+        expressionAttributeValues[":previews"] = previews
+        updateExpression = `${updateExpression}, previews = :previews`;
+    }
+
     const updateJSON = {
         TableName: process.env.BOARDS_TABLE_NAME,
         Key: {
             id: id
         },
-        UpdateExpression: "SET previews = :previews, #boardName = :name",
-        ExpressionAttributeValues: {
-            ":userId": userId,
-            ":name": name,
-            ":previews": previews
-        },
+        UpdateExpression: updateExpression,
+        ExpressionAttributeValues: expressionAttributeValues,
         ExpressionAttributeNames: { "#boardName": "name" },
         ConditionExpression: "attribute_exists(id) AND userId = :userId",
         ReturnValues: ReturnValue.ALL_NEW
