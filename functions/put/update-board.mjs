@@ -10,9 +10,10 @@ export const handler = async (event) => {
     const body = JSON.parse(event.body)
     const id = event.pathParameters.id
     const userId = event.requestContext.authorizer.jwt.claims.sub
+    const name = body.name
     const previews = body.previews
 
-    if (!id || !previews) {
+    if (!id || !name || !previews) {
         return {
             statusCode: 400,
             body: JSON.stringify({ message: "Invalid request body" }),
@@ -27,11 +28,13 @@ export const handler = async (event) => {
         Key: {
             id: id
         },
-        UpdateExpression: "SET previews = :previews",
+        UpdateExpression: "SET previews = :previews, #boardName = :name",
         ExpressionAttributeValues: {
-            ":previews": previews,
             ":userId": userId,
+            ":name": name,
+            ":previews": previews
         },
+        ExpressionAttributeNames: { "#boardName": "name" },
         ConditionExpression: "attribute_exists(id) AND userId = :userId",
         ReturnValues: ReturnValue.ALL_NEW
     }

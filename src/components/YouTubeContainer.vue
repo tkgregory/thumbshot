@@ -2,7 +2,7 @@
 import { fetchPathWithAuth } from '../composables/api'
 import YouTubePreview from './YouTubePreview.vue'
 import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 type YouTubePreview = {
     title: string;
@@ -63,12 +63,17 @@ const validExtensions = ['jpg', 'jpeg', 'png']
 const previewData = ref<YouTubePreview[]>([])
 const maxPreviewCount = ref(9)
 const error = ref()
-
-loadServer()
+const boardName = ref()
 
 defineExpose({ reset, previewData })
 defineEmits(['generateSinglePreview'])
-defineProps(['isGeneratingSinglePreview'])
+const props = defineProps(['isGeneratingSinglePreview', 'boardId'])
+
+loadServer()
+
+watch(() => props.boardId, () => {
+    loadServer()
+});
 
 function randomize() {
     const index = previewData.value.length
@@ -140,10 +145,11 @@ async function uploadThumbnail(imageData: string) {
 
 async function saveServer() {
     const body = {
+        name: boardName.value,
         previews: previewData.value,
     }
 
-    fetchPathWithAuth('PUT', '/boards/65d7beaf-fcc3-45c2-9b6d-490896f2d7aa', body).then((response) => {
+    await fetchPathWithAuth('PUT', `/boards/${props.boardId}`, body).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
@@ -162,12 +168,13 @@ function saveLocalStorage() {
 }
 
 async function loadServer() {
-    fetchPathWithAuth('GET', '/boards/65d7beaf-fcc3-45c2-9b6d-490896f2d7aa').then((response) => {
+    fetchPathWithAuth('GET', `/boards/${props.boardId}`).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
         return response.json()
     }).then((json) => {
+        boardName.value = json.name
         previewData.value = json.previews
     })
 }
@@ -235,6 +242,7 @@ function showError(errorMessage: string) {
 </script>
 
 <template>
+    <h2 class="text-2xl">{{ boardName }}</h2>
     <template v-if="previewData.length === 0">
         <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
             <YouTubeThumbnailTeaser @randomize="randomize(); saveServer();"

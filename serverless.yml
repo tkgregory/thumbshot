@@ -27,6 +27,7 @@ provider:
         - POST
         - PUT
         - GET
+        - DELETE
     authorizers:
       serviceAuthorizer:
         identitySource: $request.header.Authorization
@@ -135,6 +136,23 @@ functions:
           - cognito-idp:AdminLinkProviderForUser
           - cognito-idp:ListUsers
         Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+  deleteBoard:
+    handler: functions/delete/delete-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /boards/{id}
+          method: delete
+          authorizer: serviceAuthorizer
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
   getBoard:
     handler: functions/get/get-board.handler
     runtime: nodejs18.x

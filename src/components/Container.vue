@@ -20,6 +20,8 @@ const isJustDownloaded = ref(false)
 const youtubeContainer = ref<InstanceType<typeof YouTubeContainer>>()
 const error = ref()
 
+defineProps(['boardId'])
+
 const isEmpty = computed(() => {
     return youtubeContainer.value?.previewData.length == 0
 })
@@ -135,7 +137,8 @@ function download() {
                 </form>
             </dialog>
         </div>
-        <YouTubeContainer ref="youtubeContainer" :isGeneratingSinglePreview="isGeneratingSinglePreview"
+        <YouTubeContainer ref="youtubeContainer" :boardId="boardId"
+            :isGeneratingSinglePreview="isGeneratingSinglePreview"
             @generateSinglePreview="(index) => generateSinglePreview(index)" />
     </div>
 </template>

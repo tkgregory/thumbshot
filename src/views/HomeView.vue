@@ -3,6 +3,7 @@ import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
 import { ref, onMounted } from 'vue'
 import Container from '../components/Container.vue'
+import Boards from '../components/Boards.vue'
 
 let showInstructions = ref(localStorage.getItem('showInstructions') !== 'false')
 onMounted(() => {
@@ -21,6 +22,7 @@ import awsconfig from '../aws-exports';
 Amplify.configure(awsconfig);
 
 const isSignedIn = ref(false)
+const boards = ref<InstanceType<typeof Boards>>()
 
 checkSignInStatus()
 function checkSignInStatus() {
@@ -48,14 +50,19 @@ Hub.listen('auth', (data) => {
     <div class="navbar-start">
       <a class="btn btn-ghost text-xl"> <img src="/logo.png" alt="logo" width="30" height="30" /> thumbshot.io</a>
     </div>
-    <div class="navbar-end">
+    <div class="navbar-end flex gap-4">
+      <Boards ref="boards" />
+
       <div v-if="isSignedIn" class="btn" @click="signOut(); checkSignInStatus();">Sign out</div>
       <RouterLink v-else to="/sign-in" class="btn">Sign in</RouterLink>
     </div>
   </div>
 
   <main class="max-w-screen-xl min-h-screen mx-auto py-4 px-8">
-    <Container />
+    <Container v-if="boards?.selectedBoardId" :boardId="boards.selectedBoardId" />
+    <template v-else>
+      Create or select a thumbnail board to get started.
+    </template>
   </main>
   <footer class="flex flex-col max-w-screen-xl mx-auto items-center gap-4 mt-8 py-16 px-8 text-sm">
     <div>Created with ❤️ by <a href="mailto:tom@tomgregory.com">Tom Gregory</a>.</div>
