@@ -10,13 +10,18 @@ const selectedBoardId = ref()
 const newBoardName = ref()
 const renamedBoardId = ref()
 const renamedBoardName = ref()
-if (localStorage.getItem('selectedBoardId')) {
-    selectedBoardId.value = localStorage.getItem('selectedBoardId')
-}
-defineExpose({ selectedBoardId })
+defineExpose({ selectedBoardId, boards })
 const emits = defineEmits(['selectedBoardUpdated'])
 
-listBoards()
+listBoards().then(() => {
+    const storedSelectedBoard = localStorage.getItem('selectedBoardId')
+    if (storedSelectedBoard && hasBoard(storedSelectedBoard)) {
+        selectedBoardId.value = storedSelectedBoard
+    } else if (boards.value.length > 0) {
+        selectedBoardId.value = boards.value[0].id
+    }
+})
+
 async function listBoards() {
     return fetchPathWithAuth('GET', '/boards').then((response) => {
         if (response.status !== 200) {
@@ -26,6 +31,10 @@ async function listBoards() {
     }).then((json) => {
         boards.value = json
     })
+}
+
+function hasBoard(boardId: string) {
+    return boards.value.some((board: any) => board.id === boardId)
 }
 
 async function deleteBoard(deleteBoardId: string) {
@@ -120,12 +129,13 @@ watch(selectedBoardId, async (newBoardId) => {
                         <div class="flex py-0 pr-0 h-12" @click="selectedBoardId = board.id">
                             <div class="w-full">{{ board.name }}&nbsp;</div>
                             <div class="hidden group-hover:flex">
-                                <div class="tooltip" data-tip="Rename" @click="showRenameBoard(board.id, board.name)">
+                                <div class="tooltip" data-tip="Rename"
+                                    @click.stop="showRenameBoard(board.id, board.name)">
                                     <div class="btn btn-ghost px-2">
                                         <Pencil :size="14" />
                                     </div>
                                 </div>
-                                <div class="tooltip" data-tip="Delete" @click="deleteBoard(board.id)">
+                                <div class="tooltip tooltip-left" data-tip="Delete" @click.stop="deleteBoard(board.id)">
                                     <div class="btn btn-ghost px-2">
                                         <Trash2 :size="14" />
                                     </div>

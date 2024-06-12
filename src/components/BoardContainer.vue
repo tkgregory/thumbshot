@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import YouTubeContainer from './YouTubeContainer.vue'
+import ThumbnailBoard from './ThumbnailBoard.vue'
 import LoadingButton from './LoadingButton.vue'
 import Settings from './Settings.vue'
 import { Camera } from 'lucide-vue-next';
@@ -17,23 +17,23 @@ const isGeneratingSinglePreview = ref(false);
 const previewUrl = ref()
 const isJustCopied = ref(false)
 const isJustDownloaded = ref(false)
-const youtubeContainer = ref<InstanceType<typeof YouTubeContainer>>()
+const thumbnailBoard = ref<InstanceType<typeof ThumbnailBoard>>()
 const error = ref()
 
 defineProps(['boardId'])
-defineExpose({ youtubeContainer })
+defineExpose({ thumbnailBoard: thumbnailBoard })
 
 const isEmpty = computed(() => {
-    return youtubeContainer.value?.previewData.length == 0
+    return thumbnailBoard.value?.previewData.length == 0
 })
 
 function reset() {
-    youtubeContainer.value?.reset()
+    thumbnailBoard.value?.reset()
 }
 
 function generatePreview() {
     isGeneratingPreview.value = true
-    return fetchPreview(youtubeContainer.value?.previewData, { showNumbers: loadSettings().showNumbers })
+    return fetchPreview(thumbnailBoard.value?.previewData, { showNumbers: loadSettings().showNumbers })
         .then(json => {
             previewUrl.value = json.previewUrl
             if (document) {
@@ -46,7 +46,7 @@ function generatePreview() {
 
 function generateSinglePreview(index: number) {
     isGeneratingSinglePreview.value = true
-    return fetchPreview([youtubeContainer.value?.previewData[index]], { showNumbers: false })
+    return fetchPreview([thumbnailBoard.value?.previewData[index]], { showNumbers: false })
         .then(json => {
             previewUrl.value = json.previewUrl
             if (document) {
@@ -138,8 +138,7 @@ function download() {
                 </form>
             </dialog>
         </div>
-        <YouTubeContainer ref="youtubeContainer" :boardId="boardId"
-            :isGeneratingSinglePreview="isGeneratingSinglePreview"
+        <ThumbnailBoard ref="thumbnailBoard" :boardId="boardId" :isGeneratingSinglePreview="isGeneratingSinglePreview"
             @generateSinglePreview="(index) => generateSinglePreview(index)" />
     </div>
 </template>

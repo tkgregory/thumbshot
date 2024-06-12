@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { fetchPathWithAuth } from '../composables/api'
+import { realYouTubeVideos } from '../composables/data'
 import YouTubePreview from './YouTubePreview.vue'
 import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
 import { ref, watch } from 'vue'
@@ -10,54 +11,6 @@ type YouTubePreview = {
     fileName: string;
     channelName: string;
 }
-
-const realYouTubeVideos = [
-    {
-        videoId: 'XpN_Abd1RQc',
-        title: 'Batman: Arkham Shadow - Official Teaser Trailer',
-        channelName: 'Some Channel Name'
-    },
-    {
-        videoId: '2ya8Oww8xWo',
-        title: 'Godzilla Attacks Brawl Stars!!!',
-        channelName: 'Some Channel Name'
-    },
-    {
-        videoId: 'mEIJxaJLGUE',
-        title: 'British Students’ Last Meal before Military: Korea’s #1 BBQ',
-        channelName: 'Some Channel Name'
-    },
-    {
-        videoId: 'HJqYoQBXXxs',
-        title: "Finding out I'm pregnant & telling my family | BABY 3",
-        channelName: 'Some Channel Name'
-    },
-    {
-        videoId: 'TiMuT2BhwO0',
-        title: 'Gracie Abrams - Risk (Official Music Video)',
-        channelName: 'Some Channel Name'
-    },
-    {
-        videoId: '4TU3EqSHLr4',
-        title: 'YOUTUBER GUESS WHO: REAL LIFE EDITION',
-        channelName: 'Some Channel Name'
-    },
-    {
-        videoId: 'WBoWd991ClI',
-        title: 'We Built an Actual WATER SLIDE in our House!',
-        channelName: 'Some Channel Name'
-    },
-    {
-        videoId: 'y6bJd27xoks',
-        title: 'THE BOOGEYMAN CAME OUT TO PLAY! | Kendrick Lamar - Euphoria (Drake diss) (REACTION!!!)',
-        channelName: 'Some Channel Name'
-    },
-    {
-        videoId: 'hDTorbKavfI',
-        title: 'Alter | Based on a True Story',
-        channelName: 'Some Channel Name'
-    }
-]
 
 const validExtensions = ['jpg', 'jpeg', 'png']
 const previewData = ref<YouTubePreview[]>([])
@@ -120,27 +73,35 @@ function moveRight(index: number) {
     previewData.value[index + 1] = firstElement
 }
 
-async function getPresignedUploadURL() {
-    return fetchPathWithAuth('POST', '/presigned-upload-url').then((response) => {
+async function preSign(fileExtension: string) {
+    const body = {
+        fileExtension: fileExtension
+    }
+    return fetchPathWithAuth('POST', '/presigned-upload-url', body).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
         return response.json()
-    }).then((json) => {
-        return json.presignedUploadURL
     })
 }
 
-async function uploadThumbnail(imageData: string) {
-    const presignedUploadURL = await getPresignedUploadURL()
+async function uploadThumbnail(imageData: string, fileName: string) {
+    const fileExtension = fileName.split('.').pop()?.toLowerCase()
+    if (!fileExtension || validExtensions.indexOf(fileExtension) == -1) {
+        throw new Error('Invalid file extension')
+    }
+
+    const preSignResponse = await preSign(fileExtension)
     const requestHeaders: HeadersInit = new Headers();
     requestHeaders.set("Content-Type", 'multipart/form-data')
     const blob = await fetch(imageData).then((r) => r.blob());
-    return fetch(presignedUploadURL, {
+    await fetch(preSignResponse.presignedUploadURL, {
         method: 'PUT',
         headers: requestHeaders,
         body: blob
-    });
+    })
+
+    return preSignResponse.objectKey;
 }
 
 async function saveServer() {
@@ -266,7 +227,7 @@ function showError(errorMessage: string) {
                     :isGeneratingPreview="isGeneratingSinglePreview"
                     @changeTitle="(title) => { preview.title = title; saveServer(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; saveServer(); }"
-                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { preview.imageSrc = imageSrc; preview.fileName = fileName; uploadThumbnail(imageSrc); saveServer(); })"
+                    @changeImage="(event) => onChangeImage(event, async (imageSrc, fileName) => { preview.imageSrc = await uploadThumbnail(imageSrc, fileName); preview.fileName = fileName; saveServer(); })"
                     @deletePreview="deletePreview(index); saveServer();"
                     @duplicatePreview="duplicatePreview(index); saveServer();"
                     @moveLeft="moveLeft(index); saveServer();" @moveRight="moveRight(index); saveServer();"
@@ -274,7 +235,7 @@ function showError(errorMessage: string) {
             </template>
             <template v-if="previewData.length != maxPreviewCount">
                 <YouTubeThumbnailTeaser @randomize="randomize(); saveServer();"
-                    @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { buildPreviewFromTeaser(imageSrc, fileName); saveServer(); })" />
+                    @changeImage="(event) => onChangeImage(event, async (imageSrc, fileName) => { const objectKey = await uploadThumbnail(imageSrc, fileName); buildPreviewFromTeaser(objectKey, fileName); saveServer(); })" />
             </template>
             <template v-else>
                 <div class="aspect-video flex flex-col justify-center items-center text-xl">

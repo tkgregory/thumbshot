@@ -366,7 +366,7 @@ resources:
           CorsRules:
             - AllowedMethods:
                 - GET
-                - POST
+                - PUT
               AllowedOrigins:
                 - 'http://localhost:5173'
                 - 'https://${param:domainName}'

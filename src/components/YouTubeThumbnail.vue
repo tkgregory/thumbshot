@@ -5,14 +5,17 @@ import { CircleArrowLeft } from 'lucide-vue-next';
 import { CircleArrowRight } from 'lucide-vue-next';
 import { Upload } from 'lucide-vue-next';
 import { X } from 'lucide-vue-next';
+const thumbnailURL = import.meta.env.VITE_THUMBNAIL_URL
 
 defineProps(['imageSrc', 'moveLeftEnabled', 'moveRightEnabled', 'duplicateEnabled', 'isGeneratingPreview'])
 defineEmits(['changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight', 'generatePreview'])
+
 </script>
 <template>
     <youtube-thumbnail class="relative group">
         <img class="rounded-xl object-cover group-hover:brightness-[.30] transition duration-200 cursor-pointer"
-            :src="imageSrc" id="output" />
+            :src="imageSrc.startsWith('data:') || imageSrc.startsWith('https:') ? imageSrc : `${thumbnailURL}/${imageSrc}`"
+            id="output" />
         <div class="absolute bottom-0 right-0 rounded bg-[#00000099] m-[8px] px-[4px] py-[1px] text-white">
             10:08
         </div>
