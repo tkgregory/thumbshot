@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import ScreenshotYouTubeContainer from '../components/SreenshotYouTubeContainer.vue'
+import ScreenshotThumbnailBoard from '../components/ScreenshotThumbnailBoard.vue'
+import { useRoute } from "vue-router";
+
+const route = useRoute()
 </script>
 
 <template>
     <main class="max-w-screen-xl min-h-screen mx-auto px-8">
         <screenshot-container class="block p-[16px]">
-            <ScreenshotYouTubeContainer />
+            <div class="flex flex-col gap-8">
+                <ScreenshotThumbnailBoard :boardId="route.params.boardId" />
+            </div>
 
             <div class="flex items-center justify-start gap-1 mt-8">
                 <img src="/logo.png" alt="logo" width="15" height="15" class="object-fill" />

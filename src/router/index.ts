@@ -12,7 +12,7 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/screenshot',
+      path: '/screenshot/:boardId',
       component: ScreenShotView
     },
     {

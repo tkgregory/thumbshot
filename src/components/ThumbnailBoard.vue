@@ -110,26 +110,15 @@ async function saveServer() {
         previews: previewData.value,
     }
 
-    await fetchPathWithAuth('PUT', `/boards/${props.boardId}`, body).then((response) => {
+    await fetchPathWithAuth('PUT', `/user/boards/${props.boardId}`, body).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
     })
 }
 
-function saveLocalStorage() {
-    try {
-        localStorage.setItem('previewData', JSON.stringify(previewData.value))
-    } catch (e) {
-        console.error(e)
-        if (e instanceof DOMException) {
-            showError("Thumbnail images too large. \n\nYou can add more thumbnails, but they won't be available when you reload the page. \n\nPlease use smaller thumbnail images e.g. 1280x720 JPG files.")
-        }
-    }
-}
-
 async function loadServer() {
-    fetchPathWithAuth('GET', `/boards/${props.boardId}`).then((response) => {
+    fetchPathWithAuth('GET', `/user/boards/${props.boardId}`).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
@@ -140,16 +129,6 @@ async function loadServer() {
     })
 }
 
-function loadLocalStorage() {
-    try {
-        const localStoragePreviewData = localStorage.getItem('previewData') as string
-        if (localStoragePreviewData) {
-            previewData.value = JSON.parse(localStoragePreviewData);
-        }
-    } catch (e) {
-        console.error('Failed to load from local storage', e)
-    }
-}
 
 async function loadBoard() {
     await loadServer();

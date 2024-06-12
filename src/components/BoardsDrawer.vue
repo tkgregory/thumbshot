@@ -18,7 +18,7 @@ const emits = defineEmits(['selectedBoardUpdated'])
 listBoards()
 
 async function listBoards() {
-    return fetchPathWithAuth('GET', '/boards').then((response) => {
+    return fetchPathWithAuth('GET', '/user/boards').then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
@@ -34,7 +34,7 @@ function hasBoard(boardId: string) {
 
 async function deleteBoard(deleteBoardId: string) {
     if (confirm('Are you sure you want to delete this board?')) {
-        await fetchPathWithAuth('DELETE', `/boards/${deleteBoardId}`).then((response) => {
+        await fetchPathWithAuth('DELETE', `/user/boards/${deleteBoardId}`).then((response) => {
             if (response.status !== 204) {
                 throw new Error(`Invalid response with status ${response.status}`)
             }
@@ -62,7 +62,7 @@ async function createBoard() {
         name: newBoardName.value,
         previews: []
     }
-    await fetchPathWithAuth('POST', `/boards`, body).then((response) => {
+    await fetchPathWithAuth('POST', `/user/boards`, body).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
@@ -78,7 +78,7 @@ async function renameBoard() {
     const body = {
         name: renamedBoardName.value,
     }
-    await fetchPathWithAuth('PUT', `/boards/${renamedBoardId.value}`, body).then((response) => {
+    await fetchPathWithAuth('PUT', `/user/boards/${renamedBoardId.value}`, body).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }

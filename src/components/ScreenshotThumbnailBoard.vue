@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import YouTubePreview from './YouTubePreview.vue'
 import { ref } from 'vue'
-import { loadSettings } from '../composables/settings'
 
 type YouTubePreview = {
     title: string;
@@ -11,18 +10,20 @@ type YouTubePreview = {
 }
 
 const previewData = ref<YouTubePreview[]>([])
+const boardName = ref()
+const props = defineProps(['boardId'])
 
-loadStorage()
-
-function loadStorage() {
-    try {
-        const localStoragePreviewData = localStorage.getItem('previewData') as string
-        if (localStoragePreviewData) {
-            previewData.value = JSON.parse(localStoragePreviewData);
+loadServer()
+async function loadServer() {
+    fetch(`${import.meta.env.VITE_API_URL}/boards/${props.boardId}`).then((response) => {
+        if (response.status !== 200) {
+            throw new Error(`Invalid response with status ${response.status}`)
         }
-    } catch (e) {
-        console.error('Failed to load from local storage', e)
-    }
+        return response.json()
+    }).then((json) => {
+        boardName.value = json.name
+        previewData.value = json.previews
+    })
 }
 </script>
 
@@ -31,9 +32,8 @@ function loadStorage() {
         class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
         <template v-for="(preview, index) in previewData">
             <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
-                :duplicateEnabled="false" :moveLeftEnabled="false" :moveRightEnabled="false"
-                :fileName="preview.fileName" :index="index"
-                :showNumbers="loadSettings().showNumbers && previewData.length > 1" />
+                :duplicateEnabled="false" :moveLeftEnabled="index != 0"
+                :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index" />
         </template>
     </youtube-container>
 </template>

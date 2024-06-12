@@ -21,7 +21,7 @@ export async function fetchPathWithAuth(method: string, path: string, body?: any
     return fetchAuthSession().then((session) => {
         const token = session.tokens?.idToken?.toString()
         if (!token) {
-            return Promise.reject('No token found')
+            return Promise.reject('No user token found')
         }
 
         const requestHeaders: HeadersInit = new Headers();

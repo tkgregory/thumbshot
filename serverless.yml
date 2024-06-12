@@ -141,7 +141,7 @@ functions:
     runtime: nodejs18.x
     events:
       - httpApi:
-          path: /boards/{id}
+          path: /user/boards/{id}
           method: delete
           authorizer: serviceAuthorizer
     environment:
@@ -158,7 +158,7 @@ functions:
     runtime: nodejs18.x
     events:
       - httpApi:
-          path: /boards/{id}
+          path: /user/boards/{id}
           method: get
           authorizer: serviceAuthorizer
     environment:
@@ -175,7 +175,7 @@ functions:
     runtime: nodejs18.x
     events:
       - httpApi:
-          path: /boards
+          path: /user/boards
           method: get
           authorizer: serviceAuthorizer
     environment:
@@ -192,7 +192,7 @@ functions:
     runtime: nodejs18.x
     events:
       - httpApi:
-          path: /boards
+          path: /user/boards
           method: post
           authorizer: serviceAuthorizer
     environment:
@@ -209,7 +209,7 @@ functions:
     runtime: nodejs18.x
     events:
       - httpApi:
-          path: /boards/{id}
+          path: /user/boards/{id}
           method: put
           authorizer: serviceAuthorizer
     environment:
@@ -218,6 +218,22 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:UpdateItem
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+  getAnyBoard:
+    handler: functions/get/get-any-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /boards/{id}
+          method: get
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
         Resource:
           - !GetAtt BoardsTable.Arn
           - !Sub '${BoardsTable.Arn}/index/userIdIndex'
