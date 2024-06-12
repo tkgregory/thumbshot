@@ -3,24 +3,19 @@ import { fetchPathWithAuth } from '../composables/api'
 import { Pencil } from 'lucide-vue-next';
 import { Trash2 } from 'lucide-vue-next';
 import { Plus } from 'lucide-vue-next';
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
+import { useRoute, useRouter } from "vue-router";
 
+const route = useRoute()
+const router = useRouter()
 const boards = ref()
-const selectedBoardId = ref()
 const newBoardName = ref()
 const renamedBoardId = ref()
 const renamedBoardName = ref()
-defineExpose({ selectedBoardId, boards })
+defineExpose({ boards })
 const emits = defineEmits(['selectedBoardUpdated'])
 
-listBoards().then(() => {
-    const storedSelectedBoard = localStorage.getItem('selectedBoardId')
-    if (storedSelectedBoard && hasBoard(storedSelectedBoard)) {
-        selectedBoardId.value = storedSelectedBoard
-    } else if (boards.value.length > 0) {
-        selectedBoardId.value = boards.value[0].id
-    }
-})
+listBoards()
 
 async function listBoards() {
     return fetchPathWithAuth('GET', '/boards').then((response) => {
@@ -44,8 +39,8 @@ async function deleteBoard(deleteBoardId: string) {
                 throw new Error(`Invalid response with status ${response.status}`)
             }
         })
-        if (selectedBoardId.value === deleteBoardId) {
-            selectedBoardId.value = null
+        if (deleteBoardId == route.params.boardId) {
+            router.push('/')
         }
         listBoards()
     }
@@ -73,8 +68,7 @@ async function createBoard() {
         }
         return response.json()
     }).then((json) => {
-        console.log(JSON.stringify(json, null, 2));
-        selectedBoardId.value = json.id;
+        router.push(`/boards/${json.id}`);
         (document.getElementById('create_board_modal') as HTMLFormElement).close();
         return listBoards();
     })
@@ -90,20 +84,12 @@ async function renameBoard() {
         }
         (document.getElementById('rename_board_modal') as HTMLFormElement).close();
 
-        if (renamedBoardId.value == selectedBoardId.value) {
+        if (renamedBoardId.value == route.params.boardId) {
             emits('selectedBoardUpdated')
         }
         return listBoards();
     })
 }
-
-watch(selectedBoardId, async (newBoardId) => {
-    if (newBoardId) {
-        localStorage.setItem('selectedBoardId', newBoardId)
-    } else {
-        localStorage.removeItem('selectedBoardId')
-    }
-})
 </script>
 
 <template>
@@ -126,7 +112,7 @@ watch(selectedBoardId, async (newBoardId) => {
                 </div>
                 <ul>
                     <li v-for="board in boards" class="group">
-                        <div class="flex py-0 pr-0 h-12" @click="selectedBoardId = board.id">
+                        <RouterLink class="flex py-0 pr-0 h-12" :to="`/boards/${board.id}`">
                             <div class="w-full">{{ board.name }}&nbsp;</div>
                             <div class="hidden group-hover:flex">
                                 <div class="tooltip" data-tip="Rename"
@@ -141,7 +127,7 @@ watch(selectedBoardId, async (newBoardId) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </RouterLink>
                     </li>
                 </ul>
             </div>

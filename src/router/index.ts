@@ -22,6 +22,10 @@ const router = createRouter({
     {
       path: '/sign-in',
       component: SignInView
+    },
+    {
+      path: '/boards/:boardId',
+      component: HomeView
     }
   ]
 })
