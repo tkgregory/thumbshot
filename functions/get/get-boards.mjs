@@ -11,7 +11,7 @@ export const handler = async (event) => {
 
     const queryJSON = {
         TableName: process.env.BOARDS_TABLE_NAME,
-        IndexName: "userIdIndex",
+        IndexName: "userIdSortByNameIndex",
         KeyConditionExpression: "userId = :userId",
         ProjectionExpression: "id, userId, #boardName",
         ExpressionAttributeValues: {

@@ -152,7 +152,8 @@ functions:
           - dynamodb:DeleteItem
         Resource:
           - !GetAtt BoardsTable.Arn
-          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
   getBoard:
     handler: functions/get/get-board.handler
     runtime: nodejs18.x
@@ -169,7 +170,8 @@ functions:
           - dynamodb:GetItem
         Resource:
           - !GetAtt BoardsTable.Arn
-          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
   getBoards:
     handler: functions/get/get-boards.handler
     runtime: nodejs18.x
@@ -186,7 +188,8 @@ functions:
           - dynamodb:Query
         Resource:
           - !GetAtt BoardsTable.Arn
-          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
   createBoard:
     handler: functions/post/create-board.handler
     runtime: nodejs18.x
@@ -203,7 +206,8 @@ functions:
           - dynamodb:PutItem
         Resource:
           - !GetAtt BoardsTable.Arn
-          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
   updateBoard:
     handler: functions/put/update-board.handler
     runtime: nodejs18.x
@@ -220,7 +224,8 @@ functions:
           - dynamodb:UpdateItem
         Resource:
           - !GetAtt BoardsTable.Arn
-          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
   getAnyBoard:
     handler: functions/get/get-any-board.handler
     runtime: nodejs18.x
@@ -236,7 +241,8 @@ functions:
           - dynamodb:GetItem
         Resource:
           - !GetAtt BoardsTable.Arn
-          - !Sub '${BoardsTable.Arn}/index/userIdIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
 layers:
   chromium:
     package:
@@ -516,14 +522,29 @@ resources:
             AttributeType: S
           - AttributeName: userId
             AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+          - AttributeName: created
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: userIdIndex
+          - IndexName: userIdSortByNameIndex
             KeySchema:
               - AttributeName: userId
                 KeyType: HASH
+              - AttributeName: name
+                KeyType: RANGE
+            Projection:
+              NonKeyAttributes: []
+              ProjectionType: "ALL"
+          - IndexName: userIdSortByCreatedIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: created
+                KeyType: RANGE
             Projection:
               NonKeyAttributes: []
               ProjectionType: "ALL"

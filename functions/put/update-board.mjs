@@ -23,10 +23,11 @@ export const handler = async (event) => {
         }
     }
 
-    let updateExpression = "SET #boardName = :name";
+    let updateExpression = "SET #boardName = :name, updated = :updated";
     let expressionAttributeValues = {
         ":userId": userId,
         ":name": name,
+        ":updated": new Date().toISOString(),
     };
 
     if (previews) {

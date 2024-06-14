@@ -17,12 +17,14 @@ export const handler = async (event) => {
                 "content-type": "application/json"
             }
         }
-    }
 
+    }
     const board = {
         'id': uuid(),
         'userId': event.requestContext.authorizer.jwt.claims.sub,
         'name': body.name,
+        'created': new Date().toISOString(),
+        'updated': new Date().toISOString(),
         'previews': body.previews,
     }
     const putJSON = {
