@@ -38,7 +38,7 @@ Hub.listen('auth', (data) => {
                 thumbshot.io</a>
         </div>
         <div class="navbar-end flex gap-4">
-            <BoardsDrawer ref="boardsDrawer" @selectedBoardUpdated="$emit('selectedBoardUpdated')" />
+            <BoardsDrawer v-if="isSignedIn" ref="boardsDrawer" @selectedBoardUpdated="$emit('selectedBoardUpdated')" />
 
             <div v-if="isSignedIn" class="btn" @click="signOut(); checkSignInStatus();">Sign out</div>
             <RouterLink v-else to="/sign-in" class="btn">Sign in</RouterLink>
