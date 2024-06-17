@@ -183,6 +183,14 @@ function showError(errorMessage: string) {
         (document.getElementById('youtube_container_error_modal') as HTMLFormElement).showModal();
     }
 }
+
+function onChangeTeaserImage(event: any) {
+    onChangeImage(event, async (imageSrc, fileName) => {
+        const objectKey = await uploadThumbnail(imageSrc, fileName);
+        buildPreviewFromTeaser(objectKey, fileName);
+        saveServer();
+    })
+}
 </script>
 
 <template>
@@ -190,7 +198,7 @@ function showError(errorMessage: string) {
     <template v-if="previewData.length === 0">
         <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
             <YouTubeThumbnailTeaser @randomize="randomize(); saveServer();"
-                @changeImage="(event) => onChangeImage(event, (imageSrc, fileName) => { buildPreviewFromTeaser(imageSrc, fileName); saveServer(); })" />
+                @changeImage="event => onChangeTeaserImage(event)" />
             <div class="hidden md:block relative">
                 <img src="/visualisation.png" class="absolute -translate-x-16" />
             </div>
@@ -214,7 +222,7 @@ function showError(errorMessage: string) {
             </template>
             <template v-if="previewData.length != maxPreviewCount">
                 <YouTubeThumbnailTeaser @randomize="randomize(); saveServer();"
-                    @changeImage="(event) => onChangeImage(event, async (imageSrc, fileName) => { const objectKey = await uploadThumbnail(imageSrc, fileName); buildPreviewFromTeaser(objectKey, fileName); saveServer(); })" />
+                    @changeImage="event => onChangeTeaserImage(event)" />
             </template>
             <template v-else>
                 <div class="aspect-video flex flex-col justify-center items-center text-xl">
