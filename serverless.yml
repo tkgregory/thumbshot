@@ -93,11 +93,11 @@ package:
     - '!**'
     - 'functions/**'
 functions:
-  generatePreviewImage:
-    handler: functions/post/generate-preview-image.handler
+  screenshotBoard:
+    handler: functions/post/screenshot-board.handler
     events:
       - httpApi:
-          path: /preview
+          path: /boards/{id}/screenshot
           method: post
     layers:
       - !Ref ChromiumLambdaLayer

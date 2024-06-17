@@ -11,7 +11,15 @@ type YouTubePreview = {
 
 const previewData = ref<YouTubePreview[]>([])
 const boardName = ref()
-const props = defineProps(['boardId'])
+const props = defineProps({
+    boardId: {
+        required: true,
+        type: String
+    },
+    boardIndex: {
+        type: Number
+    }
+})
 
 loadServer()
 async function loadServer() {
@@ -30,10 +38,19 @@ async function loadServer() {
 <template>
     <youtube-container
         class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
-        <template v-for="(preview, index) in previewData">
+        <template v-if="boardIndex != null">
+            <template v-if="previewData.length >= boardIndex + 1">
+                <YouTubePreview :imageSrc="previewData[boardIndex].imageSrc" :title="previewData[boardIndex].title"
+                    :channelName="previewData[boardIndex].channelName" :fileName="previewData[boardIndex].fileName"
+                    :index="boardIndex" />
+            </template>
+            <template v-else>
+                Invalid index
+            </template>
+        </template>
+        <template v-else v-for="(preview, index) in previewData">
             <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
-                :duplicateEnabled="false" :moveLeftEnabled="index != 0"
-                :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index" />
+                :fileName="preview.fileName" :index="index" />
         </template>
     </youtube-container>
 </template>

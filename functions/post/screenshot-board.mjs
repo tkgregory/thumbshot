@@ -9,19 +9,18 @@ const s3Client = new S3Client({});
 
 export const handler = async (event) => {
   let browser = null;
+  const id = event.pathParameters.id
 
   const body = JSON.parse(event.body)
-  if (Object.keys(body).length === 0 || Object.keys(body.previewData).length === 0) {
+  if (!id || !body.settings) {
     return {
       statusCode: 400,
+      body: JSON.stringify({ "error": "Bad request" }),
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(
-        { "error": "Invalid request body" },
-        null,
-        2
-      ),
     };
   }
+
+  const boardURL = `https://${process.env.DOMAIN_NAME}/#/screenshot/${id}` + (typeof (body.index) !== 'undefined' ? `/${body.index}` : '')
 
   try {
     browser = await puppeteer.launch({
@@ -34,18 +33,13 @@ export const handler = async (event) => {
     let page = await browser.newPage();
     await page.evaluateOnNewDocument((body) => {
       localStorage.setItem('showInstructions', false);
-      if (body.previewData) {
-        localStorage.setItem('previewData', JSON.stringify(body.previewData));
-        localStorage.setItem('settings', JSON.stringify(body.settings));
-      } else { // handle legacy API body format
-        localStorage.setItem('previewData', JSON.stringify(body))
-      }
+      localStorage.setItem('settings', JSON.stringify(body.settings));
     }, body);
 
     if (process.env.SET_NGROK_HEADER === 'true') {
       page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' })
     }
-    await page.goto(`https://${process.env.DOMAIN_NAME}/#/screenshot`);
+    await page.goto(boardURL);
 
     async function getBoundingRectangle(element) {
       return page.evaluate(element => {
@@ -84,7 +78,7 @@ export const handler = async (event) => {
     };
   }
   catch (error) {
-    console.log("Error with request body: ", JSON.stringify(event.body))
+    console.log(`Error generating board at ${boardURL}. Original request body was: ${JSON.stringify(event.body)}`)
     throw error;
   } finally {
     if (browser !== null) {

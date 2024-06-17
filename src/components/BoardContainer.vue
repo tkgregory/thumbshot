@@ -10,7 +10,7 @@ import { Download } from 'lucide-vue-next';
 import { ref } from 'vue'
 import { computed } from 'vue'
 import { loadSettings } from '../composables/settings'
-import { fetchPreview } from '../composables/api'
+import { fetchScreenshot } from '../composables/api'
 
 const isGeneratingPreview = ref(false);
 const isGeneratingSinglePreview = ref(false);
@@ -20,7 +20,7 @@ const isJustDownloaded = ref(false)
 const thumbnailBoard = ref<InstanceType<typeof ThumbnailBoard>>()
 const error = ref()
 
-defineProps(['boardId'])
+const props = defineProps(['boardId'])
 defineExpose({ thumbnailBoard: thumbnailBoard })
 
 const isEmpty = computed(() => {
@@ -33,7 +33,7 @@ function reset() {
 
 function generatePreview() {
     isGeneratingPreview.value = true
-    return fetchPreview(thumbnailBoard.value?.previewData, { showNumbers: loadSettings().showNumbers })
+    return fetchScreenshot(props.boardId, { showNumbers: loadSettings().showNumbers })
         .then(json => {
             previewUrl.value = json.previewUrl
             if (document) {
@@ -46,7 +46,7 @@ function generatePreview() {
 
 function generateSinglePreview(index: number) {
     isGeneratingSinglePreview.value = true
-    return fetchPreview([thumbnailBoard.value?.previewData[index]], { showNumbers: false })
+    return fetchScreenshot(props.boardId, { showNumbers: false }, index)
         .then(json => {
             previewUrl.value = json.previewUrl
             if (document) {

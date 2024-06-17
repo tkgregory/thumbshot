@@ -20,16 +20,16 @@ defineProps({
     type: String
   },
   duplicateEnabled: {
-    required: true,
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   moveLeftEnabled: {
-    required: true,
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   moveRightEnabled: {
-    required: true,
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   index: {
     required: true,

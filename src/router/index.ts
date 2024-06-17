@@ -16,6 +16,10 @@ const router = createRouter({
       component: ScreenShotView
     },
     {
+      path: '/screenshot/:boardId/:boardIndex',
+      component: ScreenShotView
+    },
+    {
       path: '/terms-and-conditions',
       component: TermsAndConditionsView
     },
