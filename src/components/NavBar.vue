@@ -34,7 +34,8 @@ Hub.listen('auth', (data) => {
 <template>
     <div class="navbar bg-base-100">
         <div class="navbar-start">
-            <a class="btn btn-ghost text-xl"> <img src="/logo.png" alt="logo" width="30" height="30" /> thumbshot.io</a>
+            <a class="btn btn-ghost text-xl" href="/"> <img src="/logo.png" alt="logo" width="30" height="30" />
+                thumbshot.io</a>
         </div>
         <div class="navbar-end flex gap-4">
             <BoardsDrawer ref="boardsDrawer" @selectedBoardUpdated="$emit('selectedBoardUpdated')" />
