@@ -18,14 +18,29 @@ const maxPreviewCount = ref(9)
 const error = ref()
 const boardName = ref()
 
-defineExpose({ reset, previewData, loadBoard })
+defineExpose({ reset, previewData, load })
 defineEmits(['generateSinglePreview'])
-const props = defineProps(['isGeneratingSinglePreview', 'boardId'])
+const props = defineProps({
+    boardId: {
+        type: String,
+        required: false
+    },
+    isTrial: {
+        type: Boolean,
+    },
+    isGeneratingSinglePreview: {
+        type: Boolean,
+    },
+    isSinglePreviewEnabled: {
+        type: Boolean,
+        default: true
+    }
+})
 
-loadServer()
+load()
 
 watch(() => props.boardId, () => {
-    loadServer()
+    load()
 });
 
 function randomize() {
@@ -104,7 +119,11 @@ async function uploadThumbnail(imageData: string, fileName: string) {
     return preSignResponse.objectKey;
 }
 
-async function saveServer() {
+async function save() {
+    if (props.isTrial) {
+        return
+    }
+
     const body = {
         name: boardName.value,
         previews: previewData.value,
@@ -117,7 +136,11 @@ async function saveServer() {
     })
 }
 
-async function loadServer() {
+async function load() {
+    if (props.isTrial) {
+        return
+    }
+
     fetchPathWithAuth('GET', `/user/boards/${props.boardId}`).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
@@ -129,14 +152,9 @@ async function loadServer() {
     })
 }
 
-
-async function loadBoard() {
-    await loadServer();
-}
-
 function reset() {
     previewData.value.length = 0
-    saveServer()
+    save()
 }
 
 type MyCallback = (imageSrc: string, fileName: string) => void;
@@ -184,11 +202,30 @@ function showError(errorMessage: string) {
     }
 }
 
+function onChangeExistingImage(event: any, preview: YouTubePreview) {
+    onChangeImage(event, async (imageSrc, fileName) => {
+        if (props.isTrial) {
+            preview.imageSrc = imageSrc;
+            preview.fileName = fileName;
+            return
+        }
+
+        preview.imageSrc = await uploadThumbnail(imageSrc, fileName);
+        preview.fileName = fileName;
+        save();
+    })
+}
+
 function onChangeTeaserImage(event: any) {
     onChangeImage(event, async (imageSrc, fileName) => {
+        if (props.isTrial) {
+            buildPreviewFromTeaser(imageSrc, fileName);
+            return
+        }
+
         const objectKey = await uploadThumbnail(imageSrc, fileName);
         buildPreviewFromTeaser(objectKey, fileName);
-        saveServer();
+        save();
     })
 }
 </script>
@@ -197,7 +234,7 @@ function onChangeTeaserImage(event: any) {
     <h2 class="text-2xl">{{ boardName }}</h2>
     <template v-if="previewData.length === 0">
         <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
-            <YouTubeThumbnailTeaser @randomize="randomize(); saveServer();"
+            <YouTubeThumbnailTeaser @randomize="randomize(); save();"
                 @changeImage="event => onChangeTeaserImage(event)" />
             <div class="hidden md:block relative">
                 <img src="/visualisation.png" class="absolute -translate-x-16" />
@@ -211,17 +248,16 @@ function onChangeTeaserImage(event: any) {
                 <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
                     :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
                     :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index"
-                    :isGeneratingPreview="isGeneratingSinglePreview"
-                    @changeTitle="(title) => { preview.title = title; saveServer(); }"
-                    @changeChannelName="(channelName) => { preview.channelName = channelName; saveServer(); }"
-                    @changeImage="(event) => onChangeImage(event, async (imageSrc, fileName) => { preview.imageSrc = await uploadThumbnail(imageSrc, fileName); preview.fileName = fileName; saveServer(); })"
-                    @deletePreview="deletePreview(index); saveServer();"
-                    @duplicatePreview="duplicatePreview(index); saveServer();"
-                    @moveLeft="moveLeft(index); saveServer();" @moveRight="moveRight(index); saveServer();"
+                    :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="isSinglePreviewEnabled"
+                    @changeTitle="(title) => { preview.title = title; save(); }"
+                    @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
+                    @changeImage="(event) => onChangeExistingImage(event, preview)"
+                    @deletePreview="deletePreview(index); save();" @duplicatePreview="duplicatePreview(index); save();"
+                    @moveLeft="moveLeft(index); save();" @moveRight="moveRight(index); save();"
                     @generatePreview="$emit('generateSinglePreview', index);" />
             </template>
             <template v-if="previewData.length != maxPreviewCount">
-                <YouTubeThumbnailTeaser @randomize="randomize(); saveServer();"
+                <YouTubeThumbnailTeaser @randomize="randomize(); save();"
                     @changeImage="event => onChangeTeaserImage(event)" />
             </template>
             <template v-else>

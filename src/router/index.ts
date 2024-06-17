@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import TrialView from '../views/TrialView.vue'
 import ScreenShotView from '../views/ScreenShotView.vue'
 import TermsAndConditionsView from '../views/TermsAndConditionsView.vue'
 import SignInView from '../views/SignInView.vue'
@@ -10,6 +11,10 @@ const router = createRouter({
     {
       path: '/',
       component: HomeView
+    },
+    {
+      path: '/trial',
+      component: TrialView
     },
     {
       path: '/screenshot/:boardId',

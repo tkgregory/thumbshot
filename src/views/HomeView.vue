@@ -13,7 +13,7 @@ const boardContainer = ref<InstanceType<typeof BoardContainer>>()
 </script>
 
 <template>
-  <NavBar ref="navBar" @selectedBoardUpdated="boardContainer?.thumbnailBoard?.loadBoard()" />
+  <NavBar ref="navBar" @selectedBoardUpdated="boardContainer?.thumbnailBoard?.load()" />
 
   <main class="max-w-screen-xl min-h-[calc(100vh-4rem)] mx-auto py-4 px-8">
     <template v-if="navBar?.isSignedIn">
@@ -33,7 +33,9 @@ const boardContainer = ref<InstanceType<typeof BoardContainer>>()
           <RouterLink to="/sign-in">
             <button class="btn btn-accent lg:btn-lg lg:min-w-40">Sign up</button>
           </RouterLink>
-          <button class="btn btn-primary lg:btn-lg lg:min-w-40">Try it for free</button>
+          <RouterLink to="/trial">
+            <button class="btn btn-primary lg:btn-lg lg:min-w-40">Try it for free</button>
+          </RouterLink>
         </div>
       </div>
     </template>

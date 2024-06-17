@@ -4,12 +4,14 @@ import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import { ref } from 'vue'
 import { Hub } from 'aws-amplify/utils';
 import { Amplify } from 'aws-amplify';
+import { useRouter } from "vue-router";
 import awsconfig from '../aws-exports';
 
 const isSignedIn = ref(false)
 defineExpose({ isSignedIn })
 defineEmits(['selectedBoardUpdated'])
 
+const router = useRouter()
 Amplify.configure(awsconfig);
 checkSignInStatus()
 function checkSignInStatus() {
@@ -40,7 +42,7 @@ Hub.listen('auth', (data) => {
         <div class="navbar-end flex gap-4">
             <BoardsDrawer v-if="isSignedIn" ref="boardsDrawer" @selectedBoardUpdated="$emit('selectedBoardUpdated')" />
 
-            <div v-if="isSignedIn" class="btn" @click="signOut(); checkSignInStatus();">Sign out</div>
+            <div v-if="isSignedIn" class="btn" @click="signOut(); checkSignInStatus(); router.push('/');">Sign out</div>
             <RouterLink v-else to="/sign-in" class="btn">Sign in</RouterLink>
         </div>
     </div>
