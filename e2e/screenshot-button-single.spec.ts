@@ -1,9 +1,8 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({ page, createAccountPage, boardsPage }) => {
+test.beforeEach(async ({ page, boardsPage }) => {
   test.slow();
   await page.goto('/')
-  await createAccountPage.signIn()
   await boardsPage.useNewBoard()
   await page.locator('div[data-tip="Randomize"]').click()
 });

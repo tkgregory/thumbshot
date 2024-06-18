@@ -1,9 +1,7 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({ page, createAccountPage }) => {
-    test.slow();
+test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await createAccountPage.signIn()
 });
 
 test('Prompted to create new board on login', async ({ page }) => {
