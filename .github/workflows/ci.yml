@@ -30,6 +30,7 @@ jobs:
     - run: npm run test:unit && npm run test:e2e
       env:
         THUMBSHOT_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_TEST_USER_PASSWORD }}
+        THUMBSHOT_PRO_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_PRO_TEST_USER_PASSWORD }}
     - uses: actions/upload-artifact@v4
       if: always()
       with:
