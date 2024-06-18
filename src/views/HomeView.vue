@@ -42,5 +42,4 @@ const boardContainer = ref<InstanceType<typeof BoardContainer>>()
   </main>
 
   <FooterBar />
-  <Instructions />
 </template>

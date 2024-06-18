@@ -17,11 +17,11 @@ const router = createRouter({
       component: TrialView
     },
     {
-      path: '/screenshot/:boardId',
+      path: '/boards/:boardId/screenshot',
       component: ScreenShotView
     },
     {
-      path: '/screenshot/:boardId/:boardIndex',
+      path: '/boards/:boardId/screenshot/:boardIndex',
       component: ScreenShotView
     },
     {

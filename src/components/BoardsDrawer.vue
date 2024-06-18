@@ -28,10 +28,6 @@ async function listBoards() {
     })
 }
 
-function hasBoard(boardId: string) {
-    return boards.value.some((board: any) => board.id === boardId)
-}
-
 async function deleteBoard(deleteBoardId: string) {
     if (confirm('Are you sure you want to delete this board?')) {
         await fetchPathWithAuth('DELETE', `/user/boards/${deleteBoardId}`).then((response) => {

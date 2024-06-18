@@ -31,10 +31,6 @@ const props = defineProps({
     isGeneratingSinglePreview: {
         type: Boolean,
     },
-    isSinglePreviewEnabled: {
-        type: Boolean,
-        default: true
-    }
 })
 
 load()
@@ -248,7 +244,7 @@ function onChangeTeaserImage(event: any) {
                 <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
                     :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
                     :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index"
-                    :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="isSinglePreviewEnabled"
+                    :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!isTrial"
                     @changeTitle="(title) => { preview.title = title; save(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
                     @changeImage="(event) => onChangeExistingImage(event, preview)"

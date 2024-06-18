@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import YouTubePreview from './YouTubePreview.vue'
 import { ref } from 'vue'
+import { loadSettings } from '../composables/settings'
 
 type YouTubePreview = {
     title: string;
@@ -50,7 +51,8 @@ async function loadServer() {
         </template>
         <template v-else v-for="(preview, index) in previewData">
             <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
-                :fileName="preview.fileName" :index="index" />
+                :fileName="preview.fileName" :index="index"
+                :showNumbers="loadSettings().showNumbers && previewData.length > 1" />
         </template>
     </youtube-container>
 </template>

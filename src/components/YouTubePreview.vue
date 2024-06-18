@@ -56,7 +56,7 @@ const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'de
     <div v-if="showNumbers" class="text-youtube mb-1">Option {{ index + 1 }}</div>
     <YouTubeThumbnail :imageSrc="imageSrc" :moveLeftEnabled="moveLeftEnabled" :moveRightEnabled="moveRightEnabled"
       :duplicateEnabled="duplicateEnabled" :isGeneratingPreview="isGeneratingPreview"
-      :generateSinglePreviewEnabled="isSinglePreviewEnabled" @duplicatePreview="$emit('duplicatePreview')"
+      :isSinglePreviewEnabled="isSinglePreviewEnabled" @duplicatePreview="$emit('duplicatePreview')"
       @deletePreview="$emit('deletePreview')" @changeImage="(event) => emit('changeImage', event)" @moveLeft="
         $emit('moveLeft')" @moveRight="$emit('moveRight')" @generatePreview="$emit('generatePreview')" />
     <youtube-metadata class="flex">

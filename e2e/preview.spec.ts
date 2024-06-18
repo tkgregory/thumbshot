@@ -1,11 +1,11 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({page}) => {
-    await page.goto('/')
+test.beforeEach(async ({ page, createAccountPage }) => {
+    await page.goto('/#/trial')
     await page.locator('button:has-text("Compare My Thumbnails")').click()
 });
 
-test('Can add a thumbnail', async ({page, thumbshotPage}) => {
+test('Can add a thumbnail', async ({ page, thumbshotPage }) => {
     thumbshotPage.addThumbnail('oversized.png')
 
     const image = await page.locator('youtube-thumbnail > img:first-child').first()
@@ -13,14 +13,14 @@ test('Can add a thumbnail', async ({page, thumbshotPage}) => {
     await expect(src).toMatch(/data:image\/png;base64,iVB/)
 });
 
-test('Can update title', async ({page, thumbshotPage}) => {
+test('Can update title', async ({ page, thumbshotPage }) => {
     thumbshotPage.addThumbnail('oversized.png')
 
     await thumbshotPage.updateTitle(0, 'Updated title')
     await expect(page.locator('span >> text="Updated title"')).toHaveCount(1)
 });
 
-test('Can update 2nd title', async ({page, thumbshotPage}) => {
+test('Can update 2nd title', async ({ page, thumbshotPage }) => {
     thumbshotPage.addThumbnail('oversized.png')
     await thumbshotPage.updateTitle(0, 'Preview 1')
 
@@ -32,14 +32,14 @@ test('Can update 2nd title', async ({page, thumbshotPage}) => {
     await expect(thumbshotPage.getPreviewTitle(1)).toHaveText('Preview 2')
 });
 
-test('Can update channel name', async ({page, thumbshotPage}) => {
+test('Can update channel name', async ({ page, thumbshotPage }) => {
     thumbshotPage.addThumbnail('oversized.png')
 
     await thumbshotPage.updateChannelName(0, 'Updated channel name')
     await expect(page.locator('span >> text="Updated channel name"')).toHaveCount(1)
 });
 
-test('Can delete preview', async ({page, thumbshotPage}) => {
+test('Can delete preview', async ({ page, thumbshotPage }) => {
     thumbshotPage.addThumbnail('oversized.png')
     await thumbshotPage.updateTitle(0, 'Preview 1')
 

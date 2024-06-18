@@ -19,6 +19,12 @@ export class CreateAccountPage {
         await this.adminSetPassword()
     }
 
+    async signInAsExistingUser() {
+        await this.useExistingUser()
+        await this.signIn()
+        await this.changePassword()
+    }
+
     async changePassword() {
         this.newPassword()
         await this.page.locator('input[name="password"]').fill(this.password)

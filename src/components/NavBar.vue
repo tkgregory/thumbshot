@@ -4,8 +4,8 @@ import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import { ref } from 'vue'
 import { Hub } from 'aws-amplify/utils';
 import { Amplify } from 'aws-amplify';
-import { useRouter } from "vue-router";
 import awsconfig from '../aws-exports';
+import { useRouter } from "vue-router";
 
 const isSignedIn = ref(false)
 defineExpose({ isSignedIn })

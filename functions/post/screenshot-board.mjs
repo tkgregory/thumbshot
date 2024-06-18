@@ -20,7 +20,7 @@ export const handler = async (event) => {
     };
   }
 
-  const boardURL = `https://${process.env.DOMAIN_NAME}/#/screenshot/${id}` + (typeof (body.index) !== 'undefined' ? `/${body.index}` : '')
+  const boardURL = `https://${process.env.DOMAIN_NAME}/#/boards/${id}/screenshot` + (typeof (body.index) !== 'undefined' ? `/${body.index}` : '')
 
   try {
     browser = await puppeteer.launch({

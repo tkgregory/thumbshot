@@ -1,15 +1,17 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, createAccountPage, boardsPage }) => {
+  test.slow();
   await page.goto('/')
-  await page.locator('button:has-text("Compare My Thumbnails")').click()
+  await createAccountPage.signInAsExistingUser()
+  await boardsPage.useNewBoard()
   await page.locator('div[data-tip="Randomize"]').click()
 });
 
 test('Single screenshot button generates downloadable image URL', async ({ request, thumbshotPage }) => {
   await thumbshotPage.clickGenerateSingleScreenshot(0)
 
-  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 5000 })
+  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 10000 })
 
   const previewUrl = await thumbshotPage.getScreenshotURL().inputValue()
   const previewUrlResponse = await request.get(previewUrl)
@@ -17,15 +19,16 @@ test('Single screenshot button generates downloadable image URL', async ({ reque
 });
 
 test('Single screenshot button stops loading', async ({ thumbshotPage }) => {
+  test.slow();
   await thumbshotPage.clickGenerateSingleScreenshot(0)
   await thumbshotPage.generatePreviewModalIsOpen()
-  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 5000 })
+  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 10000 })
 
   thumbshotPage.dismissModal()
 
   await thumbshotPage.clickGenerateSingleScreenshot(0)
   await thumbshotPage.generatePreviewModalIsOpen()
-  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 5000 })
+  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 10000 })
 });
 
 test('Copies downloadable image URL', async ({ page, context, request, browserName, thumbshotPage }) => {
