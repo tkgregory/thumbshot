@@ -34,10 +34,11 @@ export const test = base.extend<MyFixtures, { workerStorageState: string }>({
 
         if (fs.existsSync(fileName)) {
             await use(fileName);
-            console.log('using saved storage stage')
+            console.log(`Using saved local storage from ${fileName}`)
             return;
         }
-        console.log('logging in')
+
+        console.log('Logging in')
         const page = await browser.newPage({ storageState: undefined });
 
         await page.goto('http://localhost:5173/')
@@ -50,7 +51,7 @@ export const test = base.extend<MyFixtures, { workerStorageState: string }>({
         }
         await page.locator('input[name="password"]').fill(password)
         await page.locator('form button:text("Sign in")').first().click()
-        await expect(page.locator('.btn >> text="Sign out"')).toHaveCount(1)
+        await expect(page.locator('.btn >> text="Sign out"')).toHaveCount(1, { timeout: 5000 })
 
         await page.context().storageState({ path: fileName });
         await page.close();

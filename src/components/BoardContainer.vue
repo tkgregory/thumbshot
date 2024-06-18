@@ -11,6 +11,7 @@ import { ref } from 'vue'
 import { computed } from 'vue'
 import { loadSettings } from '../composables/settings'
 import { fetchScreenshot } from '../composables/api'
+import { accountLimits } from '../composables/data'
 
 const isGeneratingPreview = ref(false);
 const isGeneratingSinglePreview = ref(false);
@@ -139,6 +140,14 @@ function download() {
             </dialog>
         </div>
         <ThumbnailBoard ref="thumbnailBoard" :boardId="boardId" :isGeneratingSinglePreview="isGeneratingSinglePreview"
-            @generateSinglePreview="(index) => generateSinglePreview(index)" />
+            @generateSinglePreview="(index) => generateSinglePreview(index)"
+            :max-preview-count="accountLimits.free.previewLimit">
+            <template #previewLimit>
+                <p>You reached the {{ accountLimits.free.previewLimit }} thumbnail limit.</p>
+                <p>Upgrade to <RouterLink to="sign-in" class="link-primary">Thumbshot Pro</RouterLink> to add up to {{
+                    accountLimits.pro.previewLimit }} thumbnails.
+                </p>
+            </template>
+        </ThumbnailBoard>
     </div>
 </template>

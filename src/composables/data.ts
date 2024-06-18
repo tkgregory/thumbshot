@@ -1,3 +1,15 @@
+export const accountLimits = {
+    trial: {
+        previewLimit: 3
+    },
+    free: {
+        previewLimit: 9
+    },
+    pro: {
+        previewLimit: 100
+    }
+}
+
 export const realYouTubeVideos = [
     {
         videoId: 'XpN_Abd1RQc',

@@ -14,7 +14,6 @@ type YouTubePreview = {
 
 const validExtensions = ['jpg', 'jpeg', 'png']
 const previewData = ref<YouTubePreview[]>([])
-const maxPreviewCount = ref(9)
 const error = ref()
 const boardName = ref()
 
@@ -25,11 +24,15 @@ const props = defineProps({
         type: String,
         required: false
     },
-    isTrial: {
+    frontEndOnly: {
         type: Boolean,
     },
     isGeneratingSinglePreview: {
         type: Boolean,
+    },
+    maxPreviewCount: {
+        type: Number,
+        default: 9
     },
 })
 
@@ -116,7 +119,7 @@ async function uploadThumbnail(imageData: string, fileName: string) {
 }
 
 async function save() {
-    if (props.isTrial) {
+    if (props.frontEndOnly) {
         return
     }
 
@@ -133,7 +136,7 @@ async function save() {
 }
 
 async function load() {
-    if (props.isTrial) {
+    if (props.frontEndOnly) {
         return
     }
 
@@ -200,7 +203,7 @@ function showError(errorMessage: string) {
 
 function onChangeExistingImage(event: any, preview: YouTubePreview) {
     onChangeImage(event, async (imageSrc, fileName) => {
-        if (props.isTrial) {
+        if (props.frontEndOnly) {
             preview.imageSrc = imageSrc;
             preview.fileName = fileName;
             return
@@ -214,7 +217,7 @@ function onChangeExistingImage(event: any, preview: YouTubePreview) {
 
 function onChangeTeaserImage(event: any) {
     onChangeImage(event, async (imageSrc, fileName) => {
-        if (props.isTrial) {
+        if (props.frontEndOnly) {
             buildPreviewFromTeaser(imageSrc, fileName);
             return
         }
@@ -244,7 +247,7 @@ function onChangeTeaserImage(event: any) {
                 <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
                     :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
                     :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index"
-                    :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!isTrial"
+                    :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
                     @changeTitle="(title) => { preview.title = title; save(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
                     @changeImage="(event) => onChangeExistingImage(event, preview)"
@@ -258,8 +261,15 @@ function onChangeTeaserImage(event: any) {
             </template>
             <template v-else>
                 <div class="aspect-video flex flex-col justify-center items-center text-xl">
-                    <p>Preview limit reached.</p>
-                    <p>Remove previews to add more.</p>
+                    <div class="w-full">
+                        <template v-if="$slots.previewLimit">
+                            <slot name="previewLimit" />
+                        </template>
+                        <template v-else>
+                            <p>Preview limit reached.</p>
+                            <p>Remove previews to add up.</p>
+                        </template>
+                    </div>
                 </div>
             </template>
         </youtube-container>

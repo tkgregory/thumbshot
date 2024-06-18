@@ -53,4 +53,8 @@ export class ThumbShotPage {
     async dismissModal() {
         await this.page.mouse.click(10, 10)
     }
+
+    async clickRandom() {
+        await this.page.locator('div[data-tip="Randomize"]').click()
+    }
 }
