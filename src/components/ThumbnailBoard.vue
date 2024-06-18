@@ -255,7 +255,7 @@ function onChangeTeaserImage(event: any) {
                     @moveLeft="moveLeft(index); save();" @moveRight="moveRight(index); save();"
                     @generatePreview="$emit('generateSinglePreview', index);" />
             </template>
-            <template v-if="previewData.length != maxPreviewCount">
+            <template v-if="previewData.length < maxPreviewCount">
                 <YouTubeThumbnailTeaser @randomize="randomize(); save();"
                     @changeImage="event => onChangeTeaserImage(event)" />
             </template>

@@ -11,6 +11,7 @@ import { ref } from 'vue'
 import { computed } from 'vue'
 import { loadSettings } from '../composables/settings'
 import { fetchScreenshot } from '../composables/api'
+import { isPro } from '../composables/user'
 import { accountLimits } from '../composables/data'
 
 const isGeneratingPreview = ref(false);
@@ -20,6 +21,8 @@ const isJustCopied = ref(false)
 const isJustDownloaded = ref(false)
 const thumbnailBoard = ref<InstanceType<typeof ThumbnailBoard>>()
 const error = ref()
+const pro = ref()
+isPro().then(value => pro.value = value)
 
 const props = defineProps(['boardId'])
 defineExpose({ thumbnailBoard: thumbnailBoard })
@@ -141,12 +144,18 @@ function download() {
         </div>
         <ThumbnailBoard ref="thumbnailBoard" :boardId="boardId" :isGeneratingSinglePreview="isGeneratingSinglePreview"
             @generateSinglePreview="(index) => generateSinglePreview(index)"
-            :max-preview-count="accountLimits.free.previewLimit">
+            :max-preview-count="accountLimits[pro ? 'pro' : 'free'].previewLimit">
             <template #previewLimit>
-                <p>You reached the {{ accountLimits.free.previewLimit }} thumbnail limit.</p>
-                <p>Upgrade to <RouterLink to="sign-in" class="link-primary">Thumbshot Pro</RouterLink> to add up to {{
-                    accountLimits.pro.previewLimit }} thumbnails.
-                </p>
+                <template v-if="pro">
+                    <p>You reached the {{ accountLimits.pro.previewLimit }} thumbnail limit.</p>
+                </template>
+                <template v-else>
+                    <p>You reached the {{ accountLimits.free.previewLimit }} thumbnail limit.</p>
+                    <p>Upgrade to <RouterLink to="sign-in" class="link-primary">Thumbshot Pro</RouterLink> to add up to
+                        {{
+                            accountLimits.pro.previewLimit }} thumbnails.
+                    </p>
+                </template>
             </template>
         </ThumbnailBoard>
     </div>
