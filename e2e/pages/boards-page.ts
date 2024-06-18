@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 import crypto from 'crypto'
 
 export class BoardsPage {
@@ -53,6 +53,7 @@ export class BoardsPage {
             throw new Error('Board ID not found')
         }
         await this.page.goto(`/#/boards/${match[1]}/screenshot`)
+        await expect(this.page.locator('screenshot-container')).toHaveCount(1)
     }
 
     listSelector(name: string) {
