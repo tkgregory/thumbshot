@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 rm -rf playwright-report
 mkdir playwright-report

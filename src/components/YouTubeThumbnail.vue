@@ -12,7 +12,7 @@ defineEmits(['changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'mo
 
 </script>
 <template>
-    <youtube-thumbnail class="relative group">
+    <youtube-thumbnail class="relative group block">
         <img class="rounded-xl object-cover group-hover:brightness-[.30] transition duration-200 cursor-pointer"
             :src="imageSrc.startsWith('data:') || imageSrc.startsWith('https:') ? imageSrc : `${thumbnailURL}/${imageSrc}`"
             id="output" />
