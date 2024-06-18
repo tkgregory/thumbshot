@@ -17,6 +17,8 @@ jobs:
     - run: npm ci
     - run: npx playwright install --with-deps
     - run: npm run test:unit && npm run test:e2e
+      env:
+        THUMBSHOT_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_TEST_USER_PASSWORD }}
     - run: npm run build:dev
     - uses: aws-actions/configure-aws-credentials@v4
       with:

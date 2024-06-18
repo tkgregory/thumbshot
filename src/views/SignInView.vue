@@ -4,10 +4,6 @@ import { Hub } from 'aws-amplify/utils';
 import { useRouter } from 'vue-router'
 import "@aws-amplify/ui-vue/styles.css";
 
-import { Amplify } from 'aws-amplify';
-import awsconfig from '../aws-exports';
-Amplify.configure(awsconfig);
-
 const router = useRouter()
 Hub.listen('auth', (data) => {
     switch (data.payload.event) {

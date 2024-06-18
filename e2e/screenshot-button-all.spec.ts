@@ -3,20 +3,20 @@ import { test, expect } from './pages/fixtures';
 test.beforeEach(async ({ page, createAccountPage, boardsPage }) => {
   test.slow();
   await page.goto('/')
-  await createAccountPage.signInAsExistingUser()
+  await createAccountPage.signIn()
   await boardsPage.useNewBoard()
 });
 
-test('Screenshot button is disabled when no previews', async ({ page }) => {
+test('Screenshot all button is disabled when no previews', async ({ page }) => {
   await expect(page.locator('div[data-tip="Generate shareable preview image"] > button')).toHaveCount(0)
 });
 
-test('Screenshot button is enabled when has previews', async ({ page }) => {
+test('Screenshot all button is enabled when has previews', async ({ page }) => {
   await page.locator('div[data-tip="Randomize"]').click()
   await expect(page.locator('div[data-tip="Generate shareable preview image"] > button')).toHaveCount(1)
 });
 
-test('Screenshot button generates downloadable image URL', async ({ page, request, thumbshotPage }) => {
+test('Screenshot all button generates downloadable image URL', async ({ page, request, thumbshotPage }) => {
   await page.locator('div[data-tip="Randomize"]').click()
   await page.locator('div[data-tip="Generate shareable preview image"] > button').click()
 

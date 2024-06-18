@@ -3,7 +3,7 @@ import { test, expect } from './pages/fixtures';
 test.beforeEach(async ({ page, createAccountPage, boardsPage }) => {
   test.slow();
   await page.goto('/')
-  await createAccountPage.signInAsExistingUser()
+  await createAccountPage.signIn()
   await boardsPage.useNewBoard()
 
   await page.locator('div[data-tip="Randomize"]').click()

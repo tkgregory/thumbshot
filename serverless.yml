@@ -81,7 +81,7 @@ custom:
     dev: true
     prod: false
   amplify:
-    - filename: ./src/aws-exports.js
+    - filename: ./src/aws-exports.ts
       type: javascript
       appClient: WebUserPoolClient
       s3bucket: disabled

@@ -33,4 +33,4 @@ test-results/
 playwright-report/
 .serverless
 .webpack
-src/aws-exports.js
+src/aws-exports.ts

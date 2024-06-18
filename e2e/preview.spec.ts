@@ -1,6 +1,6 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({ page, createAccountPage }) => {
+test.beforeEach(async ({ page }) => {
     await page.goto('/#/trial')
     await page.locator('button:has-text("Compare My Thumbnails")').click()
 });

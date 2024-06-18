@@ -20,6 +20,7 @@ export const handler = async (event) => {
     };
   }
 
+  let screenshot;
   const boardURL = `https://${process.env.DOMAIN_NAME}/#/boards/${id}/screenshot` + (typeof (body.index) !== 'undefined' ? `/${body.index}` : '')
 
   try {
@@ -41,48 +42,58 @@ export const handler = async (event) => {
     }
     await page.goto(boardURL);
 
-    async function getBoundingRectangle(element) {
-      return page.evaluate(element => {
-        const { x, y, width, height } = element.getBoundingClientRect();
-        return { left: x, top: y, width, height };
-      }, element);
-    }
+    const firstChildSelector = 'youtube-container > youtube-preview:first-child'
+    await page.waitForSelector(firstChildSelector)
+    const first = await getBoundingRectangle(page, firstChildSelector);
 
-    const first = await getBoundingRectangle(await page.$('youtube-container > youtube-preview:first-child'));
-    const last = await getBoundingRectangle(await page.$('youtube-container > youtube-preview:last-child'));
-    const screenshotContainer = await page.$('screenshot-container');
-    const screenshotContainerStats = await getBoundingRectangle(screenshotContainer);
+    const lastChildSelector = 'youtube-container > youtube-preview:last-child'
+    await page.waitForSelector(lastChildSelector)
+    const last = await getBoundingRectangle(page, lastChildSelector);
+
+    const screenshotContainerSelector = 'screenshot-container'
+    const screenshotContainerStats = await getBoundingRectangle(page, screenshotContainerSelector);
 
     const isSingleRow = first.top === last.top
     const padding = first.left - screenshotContainerStats.left
     const width = last.left + last.width - first.left + padding * 2
     const options = isSingleRow ? { clip: { x: 0, y: 0, width: width, height: screenshotContainerStats.height } } : {}
-    const screenshot = await screenshotContainer.screenshot(options);
-
-    const objectKey = `${uuid()}.png`
-    const s3putObjectCommand = new PutObjectCommand({
-      Bucket: process.env.BUCKET_NAME,
-      Key: objectKey,
-      Body: screenshot,
-    });
-
-    await s3Client.send(s3putObjectCommand);
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(
-        { "previewUrl": `https://${process.env.BUCKET_DOMAIN_NAME}/${objectKey}` },
-        null,
-        2
-      ),
-    };
+    const screenshotContainerElement = await page.$(screenshotContainerSelector);
+    screenshot = await screenshotContainerElement.screenshot(options);
   }
   catch (error) {
-    console.log(`Error generating board at ${boardURL}. Original request body was: ${JSON.stringify(event.body)}`)
+    console.log(`Error generating screenshot of ${boardURL}. Original request body was: ${JSON.stringify(event.body)}`)
     throw error;
   } finally {
-    if (browser !== null) {
-      await browser.close();
-    }
+    await browser.close();
   }
+
+  const objectKey = `${uuid()}.png`
+  const s3putObjectCommand = new PutObjectCommand({
+    Bucket: process.env.BUCKET_NAME,
+    Key: objectKey,
+    Body: screenshot,
+  });
+
+  await s3Client.send(s3putObjectCommand);
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(
+      { "previewUrl": `https://${process.env.BUCKET_DOMAIN_NAME}/${objectKey}` },
+      null,
+      2
+    ),
+  };
 };
+
+async function getBoundingRectangle(page, selector) {
+  const element = await page.$(selector);
+  if (element === null) {
+    throw new Error(`Element selector not found '${selector}'`)
+  }
+
+  return page.evaluate(element => {
+    const { x, y, width, height } = element.getBoundingClientRect();
+    return { left: x, top: y, width, height };
+  }, element);
+}

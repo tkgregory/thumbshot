@@ -3,7 +3,7 @@ import { test, expect } from './pages/fixtures';
 test.beforeEach(async ({ page, createAccountPage }) => {
     test.slow();
     await page.goto('/')
-    await createAccountPage.signInAsExistingUser()
+    await createAccountPage.signIn()
 });
 
 test('Prompted to create new board on login', async ({ page }) => {
