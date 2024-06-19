@@ -7,10 +7,11 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from "vue-router";
 import { isPro } from '../composables/user'
 import { accountLimits } from '../composables/data'
+import type { Board } from '../types/Board.type'
 
 const route = useRoute()
 const router = useRouter()
-const boards = ref([])
+const boards = ref([] as Board[])
 const newBoardName = ref()
 const renamedBoardId = ref()
 const renamedBoardName = ref()
