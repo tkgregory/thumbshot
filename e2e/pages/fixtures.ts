@@ -1,9 +1,8 @@
-import { Page, test as base } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 import { ThumbShotPage } from './thumbshot-page';
 import { SettingsPage } from './settings-page';
 import { CreateAccountPage } from './create-account-page';
 import { BoardsPage } from './boards-page';
-import { login } from '../utils/user';
 import path from 'path';
 import fs from 'fs';
 
@@ -40,26 +39,22 @@ export const test = base.extend<MyFixtures, { workerStorageState: string }>({
 
         const page = await browser.newPage({ storageState: undefined });
 
-        if (id === 0) {
-            await getCredentialsAndLogin('t.k.gregory+proautomatedtestuser@gmail.com', 'THUMBSHOT_PRO_TEST_USER_PASSWORD', page)
-        } else if (id === 1) {
-            await getCredentialsAndLogin('t.k.gregory+proautomatedtestuser2@gmail.com', 'THUMBSHOT_PRO_TEST_USER_PASSWORD_2', page)
-        } else {
-            throw Error(`Unknown test worker index ${id}`)
+        await page.goto('http://localhost:5173/')
+        await page.locator('a >> text="Sign in"').first().click()
+        await page.locator('input[name="username"]').fill('t.k.gregory+proautomatedtestuser@gmail.com')
+
+        const password = process.env.THUMBSHOT_PRO_TEST_USER_PASSWORD
+        if (!password) {
+            throw new Error('Supply test user password using `THUMBSHOT_TEST_USER_PASSWORD` environment variable.')
         }
+        await page.locator('input[name="password"]').fill(password)
+        await page.locator('form button:text("Sign in")').first().click()
+        await expect(page.locator('.btn >> text="Sign out"')).toHaveCount(1, { timeout: 5000 })
 
         await page.context().storageState({ path: fileName });
         await page.close();
         await use(fileName);
     }, { scope: 'worker' }]
 });
-
-async function getCredentialsAndLogin(email: string, passwordEnvVariableName: string, page: Page) {
-    const password = process.env[passwordEnvVariableName]
-    if (!password) {
-        throw new Error(`Supply test user password using '${passwordEnvVariableName}' environment variable.`)
-    }
-    await login(email, password, page)
-}
 
 export { expect } from '@playwright/test';
