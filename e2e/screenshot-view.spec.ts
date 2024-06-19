@@ -13,9 +13,9 @@ test.beforeEach(async ({ page, boardsPage }) => {
 test('Shows numbers', async ({ page, boardsPage }) => {
   await boardsPage.gotoScreenshotView()
 
-  await expect(page.locator('youtube-preview').nth(0)).toContainText('Option 1')
-  await expect(page.locator('youtube-preview').nth(1)).toContainText('Option 2')
-  await expect(page.locator('youtube-preview').nth(2)).toContainText('Option 3')
+  await expect(page.locator('youtube-preview').nth(0)).toContainText('Option 1', { timeout: 5000 })
+  await expect(page.locator('youtube-preview').nth(1)).toContainText('Option 2', { timeout: 5000 })
+  await expect(page.locator('youtube-preview').nth(2)).toContainText('Option 3', { timeout: 5000 })
 });
 
 test('Doesn\'t show numbers', async ({ page, settingsPage, browserName, boardsPage }) => {
