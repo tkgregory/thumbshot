@@ -1,6 +1,7 @@
 import { test, expect } from './pages/fixtures';
 
 test.beforeEach(async ({ page, boardsPage }) => {
+  test.slow()
   await page.goto('/')
   await boardsPage.useNewBoard()
 
@@ -25,9 +26,9 @@ test('Doesn\'t show numbers', async ({ page, settingsPage, browserName, boardsPa
 
   await boardsPage.gotoScreenshotView()
 
-  expect(page.locator('youtube-preview').nth(0)).not.toContainText('Option 1')
-  expect(page.locator('youtube-preview').nth(1)).not.toContainText('Option 2')
-  expect(page.locator('youtube-preview').nth(2)).not.toContainText('Option 3')
+  await expect(page.locator('youtube-preview').nth(0)).not.toContainText('Option 1')
+  await expect(page.locator('youtube-preview').nth(1)).not.toContainText('Option 2')
+  await expect(page.locator('youtube-preview').nth(2)).not.toContainText('Option 3')
 });
 
 test('Doesn\'t show numbers for single screenshot', async ({ page, browserName, thumbshotPage, boardsPage }) => {
@@ -38,5 +39,5 @@ test('Doesn\'t show numbers for single screenshot', async ({ page, browserName, 
 
   await boardsPage.gotoScreenshotView()
 
-  expect(page.locator('youtube-preview').nth(0)).not.toContainText('Option 1')
+  await expect(page.locator('youtube-preview').nth(0)).not.toContainText('Option 1')
 });

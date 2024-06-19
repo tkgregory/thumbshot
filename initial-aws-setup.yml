@@ -193,8 +193,8 @@ Resources:
                   - dynamodb:BatchWriteItem
                   - dynamodb:Query
                 Resource:
-                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/dev-boards'
-                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/prod-boards'
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/dev-boards*'
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/prod-boards*'
 Outputs:
   GitHubRole:
     Value: !GetAtt GitHubRole.Arn
