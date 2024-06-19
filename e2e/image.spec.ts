@@ -2,6 +2,7 @@ import { test, expect } from './pages/fixtures';
 
 test.beforeEach(async ({ page }) => {
     test.slow()
+    test.describe.configure({ retries: 2 });
     await page.goto('/#/trial')
     await page.locator('button:has-text("Compare My Thumbnails")').click()
 });

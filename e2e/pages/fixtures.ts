@@ -34,7 +34,6 @@ export const test = base.extend<MyFixtures, { workerStorageState: string }>({
 
         if (fs.existsSync(fileName)) {
             await use(fileName);
-            console.log(`Using saved local storage from ${fileName}`)
             return;
         }
 
