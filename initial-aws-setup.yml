@@ -188,6 +188,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - dynamodb:Describe*
+                  - dynamodb:List*
                   - dynamodb:CreateTable
                   - dynamodb:UpdateTable
                   - dynamodb:DeleteTable
