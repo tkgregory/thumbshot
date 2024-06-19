@@ -29,6 +29,7 @@ jobs:
       env:
         THUMBSHOT_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_TEST_USER_PASSWORD }}
         THUMBSHOT_PRO_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_PRO_TEST_USER_PASSWORD }}
+        THUMBSHOT_PRO_TEST_USER_PASSWORD_2: ${{ secrets.THUMBSHOT_PRO_TEST_USER_PASSWORD_2 }}
     - uses: actions/upload-artifact@v4
       if: always()
       with:
