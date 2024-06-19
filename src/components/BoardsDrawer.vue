@@ -7,6 +7,7 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from "vue-router";
 import { isPro } from '../composables/user'
 import { accountLimits } from '../composables/data'
+import { config } from '../composables/data'
 import type { Board } from '../types/Board.type'
 
 const route = useRoute()
@@ -143,9 +144,9 @@ async function renameBoard() {
                 <div v-if="boards.length >= accountLimits.free.boardsLimit && !pro" class="mt-8">
                     <p class="mb-1">You reached the {{ accountLimits.free.boardsLimit }} board limit.</p>
                     <p>
-                        <RouterLink to="sign-in" class="link-primary">
+                        <a :href="config.stripePaymentLink" class="link-primary">
                             <button class="btn btn-primary btn-xs">Get Pro</button>
-                        </RouterLink>
+                        </a>
                         to add unlimited boards.
                     </p>
                 </div>

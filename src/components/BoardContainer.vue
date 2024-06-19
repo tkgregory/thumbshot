@@ -13,6 +13,7 @@ import { loadSettings } from '../composables/settings'
 import { fetchScreenshot } from '../composables/api'
 import { isPro } from '../composables/user'
 import { accountLimits } from '../composables/data'
+import { config } from '../composables/data'
 
 const isGeneratingPreview = ref(false);
 const isGeneratingSinglePreview = ref(false);
@@ -152,9 +153,9 @@ function download() {
                 <template v-else>
                     <p class="mb-1">You reached the {{ accountLimits.free.previewLimit }} thumbnail limit.</p>
                     <p>
-                        <RouterLink to="sign-in" class="link-primary">
+                        <a :href="config.stripePaymentLink" class="link-primary">
                             <button class="btn btn-primary btn-sm">Get Pro</button>
-                        </RouterLink>
+                        </a>
                         to add {{ accountLimits.pro.previewLimit }} thumbnails per board.
                     </p>
                 </template>

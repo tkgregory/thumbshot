@@ -11,6 +11,10 @@ export const accountLimits = {
     }
 }
 
+export const config = {
+    stripePaymentLink: 'https://buy.stripe.com/fZe6os3pF0xU4w0bII'
+}
+
 export const realYouTubeVideos = [
     {
         videoId: 'XpN_Abd1RQc',

@@ -14,7 +14,7 @@ import { accountLimits } from '../composables/data'
     <ThumbnailBoard :frontEndOnly="true" :maxPreviewCount="accountLimits.trial.previewLimit">
       <template #previewLimit>
         <p>You reached the {{ accountLimits.trial.previewLimit }} thumbnail limit.</p>
-        <p>Create a <RouterLink to="sign-in" class="link-primary">free account</RouterLink> to add more.</p>
+        <p>Create a <RouterLink to="/sign-in" class="link-primary">free account</RouterLink> to add more.</p>
       </template>
     </ThumbnailBoard>
   </main>
