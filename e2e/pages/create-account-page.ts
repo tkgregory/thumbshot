@@ -12,13 +12,13 @@ export class CreateAccountPage {
         return this.page.locator('a >> text="Sign in"').first()
     }
 
-    async signInAsProUser() {
+    async signInAsFreeUser() {
         await this.signOutButton().click()
         await expect(this.page.locator('.btn >> text="Sign in"')).toHaveCount(1)
 
         await this.signInButton().click()
-        await this.page.locator('input[name="username"]').fill('t.k.gregory+proautomatedtestuser@gmail.com')
-        const password = process.env.THUMBSHOT_PRO_TEST_USER_PASSWORD
+        await this.page.locator('input[name="username"]').fill('t.k.gregory+automatedtestuser@gmail.com')
+        const password = process.env.THUMBSHOT_TEST_USER_PASSWORD
         if (!password) {
             throw new Error('Supply test user password using `THUMBSHOT_PRO_TEST_USER_PASSWORD` environment variable.')
         }

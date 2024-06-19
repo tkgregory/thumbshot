@@ -3,10 +3,11 @@ export const accountLimits = {
         previewLimit: 3
     },
     free: {
-        previewLimit: 9
+        previewLimit: 9,
+        boardsLimit: 3
     },
     pro: {
-        previewLimit: 100
+        previewLimit: 100,
     }
 }
 

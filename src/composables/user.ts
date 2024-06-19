@@ -8,6 +8,10 @@ export async function isPro() {
 
 async function getGroups() {
     return fetchAuthSession().then((session) => {
-        return session.tokens?.idToken?.payload['cognito:groups'] as string[]
+        const groups = session.tokens?.idToken?.payload['cognito:groups'] as string[]
+        if (groups == undefined) {
+            return []
+        }
+        return groups
     })
 }

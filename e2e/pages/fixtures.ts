@@ -38,14 +38,13 @@ export const test = base.extend<MyFixtures, { workerStorageState: string }>({
             return;
         }
 
-        console.log('Logging in')
         const page = await browser.newPage({ storageState: undefined });
 
         await page.goto('http://localhost:5173/')
         await page.locator('a >> text="Sign in"').first().click()
-        await page.locator('input[name="username"]').fill('t.k.gregory+automatedtestuser@gmail.com')
+        await page.locator('input[name="username"]').fill('t.k.gregory+proautomatedtestuser@gmail.com')
 
-        const password = process.env.THUMBSHOT_TEST_USER_PASSWORD
+        const password = process.env.THUMBSHOT_PRO_TEST_USER_PASSWORD
         if (!password) {
             throw new Error('Supply test user password using `THUMBSHOT_TEST_USER_PASSWORD` environment variable.')
         }

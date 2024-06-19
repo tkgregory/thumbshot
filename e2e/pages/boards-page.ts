@@ -28,8 +28,13 @@ export class BoardsPage {
         await this.page.locator(this.listSelectorString(name)).click()
     }
 
+    async createBoardWithRandomName() {
+        const name = this.randomName()
+        await this.createBoard(name)
+    }
+
     async createBoard(name: string) {
-        await this.page.locator('div[data-tip="Create new board"]').click()
+        await this.createBoardButton().click()
         await this.page.locator('#create_board_modal input[placeholder="New board name"]').fill(name)
         await this.page.locator('button:has-text("Create Board")').click()
     }
@@ -62,6 +67,10 @@ export class BoardsPage {
 
     listSelectorString(name: string) {
         return `.drawer-side ul li:has-text("${name}")`
+    }
+
+    createBoardButton() {
+        return this.page.locator('div[data-tip="Create new board"]')
     }
 
     randomName() {

@@ -5,15 +5,19 @@ import { Trash2 } from 'lucide-vue-next';
 import { Plus } from 'lucide-vue-next';
 import { ref } from 'vue'
 import { useRoute, useRouter } from "vue-router";
+import { isPro } from '../composables/user'
+import { accountLimits } from '../composables/data'
 
 const route = useRoute()
 const router = useRouter()
-const boards = ref()
+const boards = ref([])
 const newBoardName = ref()
 const renamedBoardId = ref()
 const renamedBoardName = ref()
 defineExpose({ boards })
 const emits = defineEmits(['selectedBoardUpdated'])
+const pro = ref()
+isPro().then(value => pro.value = value)
 
 listBoards()
 
@@ -99,12 +103,21 @@ async function renameBoard() {
 
             <div class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
                 <div class="text-xl mb-4 flex gap-4 items-center">
-                    Thumbnail boards
-                    <div class="tooltip tooltip-bottom" data-tip="Create new board" @click="showCreateBoard()">
-                        <div class="btn btn-ghost">
-                            <Plus />
+                    Boards
+                    <template v-if="boards.length < accountLimits.free.boardsLimit || pro">
+                        <div class="tooltip tooltip-left" data-tip="Create new board" @click="showCreateBoard()">
+                            <div class="btn btn-ghost">
+                                <Plus />
+                            </div>
                         </div>
-                    </div>
+                    </template>
+                    <template v-else>
+                        <div class="tooltip tooltip-left tooltip-accent" data-tip="Get Pro to add unlimited boards">
+                            <div class="btn btn-disabled">
+                                <Plus />
+                            </div>
+                        </div>
+                    </template>
                 </div>
                 <ul>
                     <li v-for="board in boards" class="group">
@@ -126,6 +139,15 @@ async function renameBoard() {
                         </RouterLink>
                     </li>
                 </ul>
+                <div v-if="boards.length >= accountLimits.free.boardsLimit && !pro" class="mt-8">
+                    <p class="mb-1">You reached the {{ accountLimits.free.boardsLimit }} board limit.</p>
+                    <p>
+                        <RouterLink to="sign-in" class="link-primary">
+                            <button class="btn btn-primary btn-xs">Get Pro</button>
+                        </RouterLink>
+                        to add unlimited boards.
+                    </p>
+                </div>
             </div>
         </div>
     </div>

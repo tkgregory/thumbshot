@@ -150,10 +150,12 @@ function download() {
                     <p>You reached the {{ accountLimits.pro.previewLimit }} thumbnail limit.</p>
                 </template>
                 <template v-else>
-                    <p>You reached the {{ accountLimits.free.previewLimit }} thumbnail limit.</p>
-                    <p>Upgrade to <RouterLink to="sign-in" class="link-primary">Thumbshot Pro</RouterLink> to add up to
-                        {{
-                            accountLimits.pro.previewLimit }} thumbnails.
+                    <p class="mb-1">You reached the {{ accountLimits.free.previewLimit }} thumbnail limit.</p>
+                    <p>
+                        <RouterLink to="sign-in" class="link-primary">
+                            <button class="btn btn-primary btn-sm">Get Pro</button>
+                        </RouterLink>
+                        to add {{ accountLimits.pro.previewLimit }} thumbnails per board.
                     </p>
                 </template>
             </template>
