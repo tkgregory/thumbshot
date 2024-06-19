@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import YouTubeContainer from './YouTubeContainer.vue'
+import ThumbnailBoard from './ThumbnailBoard.vue'
 import LoadingButton from './LoadingButton.vue'
 import Settings from './Settings.vue'
 import { Camera } from 'lucide-vue-next';
@@ -10,27 +10,35 @@ import { Download } from 'lucide-vue-next';
 import { ref } from 'vue'
 import { computed } from 'vue'
 import { loadSettings } from '../composables/settings'
-import { fetchPreview } from '../composables/api'
+import { fetchScreenshot } from '../composables/api'
+import { isPro } from '../composables/user'
+import { accountLimits } from '../composables/data'
+import { config } from '../composables/data'
 
 const isGeneratingPreview = ref(false);
 const isGeneratingSinglePreview = ref(false);
 const previewUrl = ref()
 const isJustCopied = ref(false)
 const isJustDownloaded = ref(false)
-const youtubeContainer = ref<InstanceType<typeof YouTubeContainer>>()
+const thumbnailBoard = ref<InstanceType<typeof ThumbnailBoard>>()
 const error = ref()
+const pro = ref()
+isPro().then(value => pro.value = value)
+
+const props = defineProps(['boardId'])
+defineExpose({ thumbnailBoard: thumbnailBoard })
 
 const isEmpty = computed(() => {
-    return youtubeContainer.value?.previewData.length == 0
+    return thumbnailBoard.value?.previewData.length == 0
 })
 
 function reset() {
-    youtubeContainer.value?.reset()
+    thumbnailBoard.value?.reset()
 }
 
 function generatePreview() {
     isGeneratingPreview.value = true
-    return fetchPreview(youtubeContainer.value?.previewData, { showNumbers: loadSettings().showNumbers })
+    return fetchScreenshot(props.boardId, { showNumbers: loadSettings().showNumbers })
         .then(json => {
             previewUrl.value = json.previewUrl
             if (document) {
@@ -43,7 +51,7 @@ function generatePreview() {
 
 function generateSinglePreview(index: number) {
     isGeneratingSinglePreview.value = true
-    return fetchPreview([youtubeContainer.value?.previewData[index]], { showNumbers: false })
+    return fetchScreenshot(props.boardId, { showNumbers: false }, index)
         .then(json => {
             previewUrl.value = json.previewUrl
             if (document) {
@@ -135,7 +143,23 @@ function download() {
                 </form>
             </dialog>
         </div>
-        <YouTubeContainer ref="youtubeContainer" :isGeneratingSinglePreview="isGeneratingSinglePreview"
-            @generateSinglePreview="(index) => generateSinglePreview(index)" />
+        <ThumbnailBoard ref="thumbnailBoard" :boardId="boardId" :isGeneratingSinglePreview="isGeneratingSinglePreview"
+            @generateSinglePreview="(index) => generateSinglePreview(index)"
+            :max-preview-count="accountLimits[pro ? 'pro' : 'free'].previewLimit">
+            <template #previewLimit>
+                <template v-if="pro">
+                    <p>You reached the {{ accountLimits.pro.previewLimit }} thumbnail limit.</p>
+                </template>
+                <template v-else>
+                    <p class="mb-1">You reached the {{ accountLimits.free.previewLimit }} thumbnail limit.</p>
+                    <p>
+                        <a :href="config.stripePaymentLink" class="link-primary">
+                            <button class="btn btn-primary btn-sm">Get Pro</button>
+                        </a>
+                        to add {{ accountLimits.pro.previewLimit }} thumbnails per board.
+                    </p>
+                </template>
+            </template>
+        </ThumbnailBoard>
     </div>
 </template>

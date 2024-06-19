@@ -47,10 +47,14 @@ export class ThumbShotPage {
     }
 
     async generatePreviewModalIsOpen() {
-        await expect(this.page.locator('#generate_preview_modal[open]')).toHaveCount(1)
+        await expect(this.page.locator('#generate_preview_modal[open]')).toHaveCount(1, { timeout: 10000 })
     }
 
     async dismissModal() {
         await this.page.mouse.click(10, 10)
+    }
+
+    async clickRandom() {
+        await this.page.locator('div[data-tip="Randomize"]').click()
     }
 }

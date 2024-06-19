@@ -15,9 +15,8 @@ jobs:
       with:
         node-version: 20
     - run: npm ci
+    - run: npm run test:unit
     - run: npx playwright install --with-deps
-    - run: npx playwright test
-    - run: npm run build:dev
     - uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
@@ -25,6 +24,14 @@ jobs:
     - uses: serverless/github-action@v3.2
       with:
         args: deploy --stage dev
+    - run: npm run build:dev
+    - uses: serverless/github-action@v3.2
+      with:
+        args: s3sync --stage dev
+    - run: npm run test:e2e
+      env:
+        THUMBSHOT_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_TEST_USER_PASSWORD }}
+        THUMBSHOT_PRO_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_PRO_TEST_USER_PASSWORD }}
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -44,7 +51,6 @@ jobs:
       with:
         node-version: 20
     - run: npm ci
-    - run: npm run build
     - uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
@@ -52,3 +58,7 @@ jobs:
     - uses: serverless/github-action@v3.2
       with:
         args: deploy --stage prod
+    - run: npm run build
+    - uses: serverless/github-action@v3.2
+      with:
+        args: s3sync --stage prod

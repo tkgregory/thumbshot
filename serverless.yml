@@ -4,8 +4,10 @@ params:
   default:
     domainName: ${sls:stage}.thumbshot.io
     apiDomainName: api.${param:domainName}
+    amplifyOrigin: https://${param:domainName}
     websiteBucketName: thumbshot-${sls:stage}-website
     websiteHostedZoneId: Z084235213DTZ50AT2VLL
+    dynamoDBTablePrefix: ${sls:stage}-
   prod:
     domainName: thumbshot.io
 provider:
@@ -20,19 +22,37 @@ provider:
         - 'https://${param:domainName}'
       allowedHeaders:
         - Content-Type
+        - Authorization
       allowedMethods:
         - POST
+        - PUT
+        - GET
+        - DELETE
+    authorizers:
+      serviceAuthorizer:
+        identitySource: $request.header.Authorization
+        issuerUrl:
+          Fn::Join:
+          - ''
+          - - 'https://cognito-idp.'
+            - '${opt:region, self:provider.region}'
+            - '.amazonaws.com/'
+            - !Ref UserPool
+        audience: !Ref WebUserPoolClient
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-s3-sync
   - serverless-certificate-creator
   - serverless-plugin-aws-alerts
+  - aws-amplify-serverless-plugin
 custom:
   s3Sync:
-    - bucketName: ${param:websiteBucketName}
-      localDir: ./dist
-      deleteRemoved: true
+    noSync: true
+    buckets:
+      - bucketName: ${param:websiteBucketName}
+        localDir: ./dist
+        deleteRemoved: true
   customCertificate:
     certificateName: '${param:domainName}'
     hostedZoneIds: ${param:websiteHostedZoneId}
@@ -44,6 +64,10 @@ custom:
       forceExclude:
         - '@sparticuz/chromium'
         - '@aws-sdk/client-s3'
+        - '@aws-sdk/client-cognito-identity-provider'
+        - '@aws-sdk/client-dynamodb'
+        - '@aws-sdk/lib-dynamodb'
+        - '@aws-sdk/s3-request-presigner'
   alerts:
     topics:
       alarm:
@@ -56,16 +80,24 @@ custom:
   setNgrokHeader:
     dev: true
     prod: false
+  amplify:
+    - filename: ./src/aws-exports.ts
+      type: javascript
+      appClient: WebUserPoolClient
+      s3bucket: disabled
+      oauthDomain: 'auth.${param:domainName}'
+      redirectSignIn: '${param:amplifyOrigin}/'
+      redirectSignOut: '${param:amplifyOrigin}/'
 package:
   patterns:
     - '!**'
     - 'functions/**'
 functions:
-  generatePreviewImage:
-    handler: functions/post/generate-preview-image.handler
+  screenshotBoard:
+    handler: functions/post/screenshot-board.handler
     events:
       - httpApi:
-          path: /preview
+          path: /boards/{id}/screenshot
           method: post
     layers:
       - !Ref ChromiumLambdaLayer
@@ -81,12 +113,265 @@ functions:
         Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
     timeout: 25
     memorySize: 4096
+  createPresignedUploadUrl:
+    handler: functions/post/create-presigned-upload-url.handler
+    events:
+      - httpApi:
+          path: /presigned-upload-url
+          method: post
+          authorizer: serviceAuthorizer
+    environment:
+      BUCKET_NAME: !Ref ThumbnailsBucket
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: !Sub 'arn:aws:s3:::${ThumbnailsBucket}/*'
+  preSignUp:
+    handler: functions/cognito/pre-sign-up.handler
+    runtime: nodejs18.x
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - cognito-idp:AdminLinkProviderForUser
+          - cognito-idp:ListUsers
+        Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+  deleteBoard:
+    handler: functions/delete/delete-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /user/boards/{id}
+          method: delete
+          authorizer: serviceAuthorizer
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
+  getBoard:
+    handler: functions/get/get-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /user/boards/{id}
+          method: get
+          authorizer: serviceAuthorizer
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
+  getBoards:
+    handler: functions/get/get-boards.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /user/boards
+          method: get
+          authorizer: serviceAuthorizer
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
+  createBoard:
+    handler: functions/post/create-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /user/boards
+          method: post
+          authorizer: serviceAuthorizer
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
+  updateBoard:
+    handler: functions/put/update-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /user/boards/{id}
+          method: put
+          authorizer: serviceAuthorizer
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
+  getAnyBoard:
+    handler: functions/get/get-any-board.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /boards/{id}
+          method: get
+    environment:
+      BOARDS_TABLE_NAME: !Ref BoardsTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          - !GetAtt BoardsTable.Arn
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
+          - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
 layers:
   chromium:
     package:
       artifact: layer/chromium-v123.0.1-layer.zip
 resources:
+  Conditions:
+    IsNonProd:
+      !Not [!Equals ['${sls:stage}', prod]]
   Resources:
+    WebUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: !Sub '${AWS::StackName}-UserPoolClient'
+        UserPoolId: !Ref UserPool
+        PreventUserExistenceErrors: ENABLED
+        AllowedOAuthFlowsUserPoolClient: true
+        SupportedIdentityProviders:
+          - Google
+        AllowedOAuthFlows:
+          - code
+        AllowedOAuthScopes:
+          - openid
+          - email
+          - profile
+        CallbackURLs:
+          - 'https://${param:domainName}/'
+          - !If [IsNonProd, 'http://localhost:5173/', !Ref "AWS::NoValue"]
+        LogoutURLs:
+          - 'https://${param:domainName}/'
+          - !If [IsNonProd, 'http://localhost:5173/', !Ref "AWS::NoValue"]
+    GoogleUserPoolIdentityProvider:
+      Type: AWS::Cognito::UserPoolIdentityProvider
+      Properties:
+        UserPoolId: !Ref UserPool
+        ProviderName: Google
+        ProviderDetails:
+          client_id: "358520425714-542p2gto6uj4lmfeedmggtjrk2dvplku.apps.googleusercontent.com"
+          client_secret: ${ssm:/aws/reference/secretsmanager/GOOGLE_CLIENT_SECRET}
+          authorize_scopes: "profile email openid"
+        ProviderType: Google
+        AttributeMapping:
+          email: email
+          email_verified: email_verified
+    PreSignUpLambdaFunctionPolicy:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !GetAtt PreSignUpLambdaFunction.Arn
+        Action: lambda:InvokeFunction
+        Principal: cognito-idp.amazonaws.com
+        SourceAccount: !Ref 'AWS::AccountId'
+        SourceArn: !GetAtt UserPool.Arn
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: !Sub '${AWS::StackName}-UserPool'
+        DeletionProtection: ACTIVE
+        UsernameAttributes:
+          - email
+        AutoVerifiedAttributes: ['email']
+        UserAttributeUpdateSettings:
+          AttributesRequireVerificationBeforeUpdate: ['email']
+        Schema:
+          - Name: email
+            Mutable: true
+            Required: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: false
+            RequireNumbers: false
+            RequireSymbols: false
+            RequireUppercase: false
+        LambdaConfig:
+          PreSignUp: !GetAtt PreSignUpLambdaFunction.Arn
+        EmailConfiguration:
+          EmailSendingAccount: DEVELOPER
+          From: !Sub 'Tom Gregory <no-reply@${SESEmailIdentity}>'
+          SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/${SESEmailIdentity}'
+    UserPoolDomain:
+      Type: AWS::Cognito::UserPoolDomain
+      Properties:
+        UserPoolId: !Ref UserPool
+        Domain: 'auth.${param:domainName}'
+        CustomDomainConfig:
+          CertificateArn: ${certificate(${self:custom.customCertificate.certificateName}):CertificateArn}
+    UserPoolDomainDNSRecord:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneId: ${param:websiteHostedZoneId}
+        Name: 'auth.${param:domainName}'
+        Type: A
+        AliasTarget:
+          DNSName: !GetAtt UserPoolDomain.CloudFrontDistribution
+          HostedZoneId: Z2FDTNDATAQYW2 # value as described in AWS docs
+    ProUserPoolGroup:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        GroupName: pro
+        UserPoolId: !Ref UserPool
+    AutomatedTestUser:
+      Type: AWS::Cognito::UserPoolUser
+      Properties:
+        Username: t.k.gregory+automatedtestuser@gmail.com
+        DesiredDeliveryMediums:
+          - EMAIL
+        UserPoolId: !Ref UserPool
+        UserAttributes:
+          - Name: email
+            Value: t.k.gregory+automatedtestuser@gmail.com
+          - Name: email_verified
+            Value: true
+    ProAutomatedTestUser:
+      Type: AWS::Cognito::UserPoolUser
+      Properties:
+        Username: t.k.gregory+proautomatedtestuser@gmail.com
+        DesiredDeliveryMediums:
+          - EMAIL
+        UserPoolId: !Ref UserPool
+        UserAttributes:
+          - Name: email
+            Value: t.k.gregory+proautomatedtestuser@gmail.com
+          - Name: email_verified
+            Value: true
+    ProAutomatedTestUserGroupAttachment:
+      Type: AWS::Cognito::UserPoolUserToGroupAttachment
+      Properties:
+        GroupName: !Ref ProUserPoolGroup
+        Username: !Ref ProAutomatedTestUser
+        UserPoolId: !Ref UserPool
     PreviewsBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -112,6 +397,35 @@ resources:
                 - s3:GetObject
               Effect: Allow
               Resource: !Sub 'arn:aws:s3:::${PreviewsBucket}/*'
+              Principal: '*'
+    ThumbnailsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: thumbshot-${sls:stage}-thumbnails
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - PUT
+              AllowedOrigins:
+                - 'http://localhost:5173'
+                - 'https://${param:domainName}'
+    ThumbnailsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref ThumbnailsBucket
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action:
+                - s3:GetObject
+              Effect: Allow
+              Resource: !Sub 'arn:aws:s3:::${ThumbnailsBucket}/*'
               Principal: '*'
     WebsiteBucket:
       Type: AWS::S3::Bucket
@@ -217,3 +531,45 @@ resources:
             AliasTarget:
               HostedZoneId: !GetAtt ApiDomainName.RegionalHostedZoneId
               DNSName: !GetAtt ApiDomainName.RegionalDomainName
+    SESEmailIdentity:
+      Type: AWS::SES::EmailIdentity
+      Properties:
+        EmailIdentity: '${param:domainName}'
+    BoardsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${param:dynamoDBTablePrefix}boards
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+          - AttributeName: created
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: userIdSortByNameIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: name
+                KeyType: RANGE
+            Projection:
+              NonKeyAttributes: []
+              ProjectionType: "ALL"
+          - IndexName: userIdSortByCreatedIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: created
+                KeyType: RANGE
+            Projection:
+              NonKeyAttributes: []
+              ProjectionType: "ALL"
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true

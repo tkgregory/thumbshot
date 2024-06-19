@@ -140,6 +140,61 @@ Resources:
                   - sns:*
                 Resource:
                   - '*'
+              - Sid: SSM
+                Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/aws/reference/secretsmanager/GOOGLE_CLIENT_SECRET'
+              - Sid: SecretsManager
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:GOOGLE_CLIENT_SECRET-*'
+              - Effect: Allow
+                Action:
+                - cognito-idp:CreateUserPool
+                - cognito-idp:CreateUserPoolClient
+                - cognito-idp:ListUserPools
+                - cognito-idp:DescribeUserPoolDomain
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - cognito-idp:DescribeUserPool
+                  - cognito-idp:UpdateUserPool
+                  - cognito-idp:DeleteUserPool
+                  - cognito-idp:DescribeUserPoolClient
+                  - cognito-idp:UpdateUserPoolClient
+                  - cognito-idp:DeleteUserPoolClient
+                  - cognito-idp:AdminSetUserPassword
+                  - cognito-idp:AdminAddUserToGroup
+                  - cognito-idp:AdminCreateUser
+                  - cognito-idp:ListTagsForResource
+                  - cognito-idp:GetGroup
+                  - cognito-idp:CreateGroup
+                  - cognito-idp:UpdateGroup
+                  - cognito-idp:DeleteGroup
+                  - cognito-idp:CreateIdentityProvider
+                  - cognito-idp:DescribeIdentityProvider
+                  - cognito-idp:UpdateIdentityProvider
+                  - cognito-idp:DeleteIdentityProvider
+                  - cognito-idp:CreateUserPoolDomain
+                  - cognito-idp:UpdateUserPoolDomain
+                  - cognito-idp:DeleteUserPoolDomain
+                Resource: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:Describe*
+                  - dynamodb:CreateTable
+                  - dynamodb:UpdateTable
+                  - dynamodb:DeleteTable
+                  - dynamodb:UpdateContinuousBackups
+                  - dynamodb:BatchWriteItem
+                  - dynamodb:Query
+                Resource:
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/dev-boards*'
+                  - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/prod-boards*'
 Outputs:
   GitHubRole:
     Value: !GetAtt GitHubRole.Arn

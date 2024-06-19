@@ -20,16 +20,16 @@ defineProps({
     type: String
   },
   duplicateEnabled: {
-    required: true,
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   moveLeftEnabled: {
-    required: true,
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   moveRightEnabled: {
-    required: true,
-    type: Boolean
+    type: Boolean,
+    default: false
   },
   index: {
     required: true,
@@ -42,6 +42,10 @@ defineProps({
   isGeneratingPreview: {
     type: Boolean,
     default: false
+  },
+  isSinglePreviewEnabled: {
+    type: Boolean,
+    default: true
   }
 })
 const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight', 'generatePreview'])
@@ -52,8 +56,8 @@ const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'de
     <div v-if="showNumbers" class="text-youtube mb-1">Option {{ index + 1 }}</div>
     <YouTubeThumbnail :imageSrc="imageSrc" :moveLeftEnabled="moveLeftEnabled" :moveRightEnabled="moveRightEnabled"
       :duplicateEnabled="duplicateEnabled" :isGeneratingPreview="isGeneratingPreview"
-      @duplicatePreview="$emit('duplicatePreview')" @deletePreview="$emit('deletePreview')"
-      @changeImage="(event) => emit('changeImage', event)" @moveLeft="
+      :isSinglePreviewEnabled="isSinglePreviewEnabled" @duplicatePreview="$emit('duplicatePreview')"
+      @deletePreview="$emit('deletePreview')" @changeImage="(event) => emit('changeImage', event)" @moveLeft="
         $emit('moveLeft')" @moveRight="$emit('moveRight')" @generatePreview="$emit('generatePreview')" />
     <youtube-metadata class="flex">
       <youtube-channel-image class="mt-[12px] mr-[12px] shrink-0">

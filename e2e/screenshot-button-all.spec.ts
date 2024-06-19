@@ -1,24 +1,25 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, boardsPage }) => {
+  test.slow();
   await page.goto('/')
-  await page.locator('button:has-text("Compare My Thumbnails")').click()
+  await boardsPage.useNewBoard()
 });
 
-test('Screenshot button is disabled when no previews', async ({ page }) => {
+test('Screenshot all button is disabled when no previews', async ({ page }) => {
   await expect(page.locator('div[data-tip="Generate shareable preview image"] > button')).toHaveCount(0)
 });
 
-test('Screenshot button is enabled when has previews', async ({ page }) => {
+test('Screenshot all button is enabled when has previews', async ({ page }) => {
   await page.locator('div[data-tip="Randomize"]').click()
   await expect(page.locator('div[data-tip="Generate shareable preview image"] > button')).toHaveCount(1)
 });
 
-test('Screenshot button generates downloadable image URL', async ({ page, request, thumbshotPage }) => {
+test('Screenshot all button generates downloadable image URL', async ({ page, request, thumbshotPage }) => {
   await page.locator('div[data-tip="Randomize"]').click()
   await page.locator('div[data-tip="Generate shareable preview image"] > button').click()
 
-  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 5000 })
+  await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 10000 })
   const previewUrl = await thumbshotPage.getScreenshotURL().inputValue()
 
   const previewUrlResponse = await request.get(previewUrl)

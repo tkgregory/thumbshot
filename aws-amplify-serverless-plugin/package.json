@@ -1,0 +1,20 @@
+{
+  "name": "aws-amplify-serverless-plugin",
+  "version": "1.4.0",
+  "description": "A plugin for the Serverless Framework that outputs AWS Amplify artifacts based on the deployed resources.",
+  "keywords": [
+    "serverless",
+    "plugin",
+    "aws",
+    "cloudformation",
+    "amplify"
+  ],
+  "main": "./index.js",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "json-stable-stringify-pretty": "^1.2.0"
+  },
+  "peerDependencies": {
+    "serverless": "3.x"
+  }
+}

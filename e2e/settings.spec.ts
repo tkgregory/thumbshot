@@ -1,16 +1,16 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({page}) => {
+test.beforeEach(async ({ page, boardsPage }) => {
     await page.goto('/')
-    await page.locator('button:has-text("Don\'t show again")').click()
-  });
+    await boardsPage.useNewBoard()
+});
 
-test('Numbering setting defaults to false', async ({page, settingsPage}) => {
+test('Numbering setting defaults to false', async ({ settingsPage }) => {
     await settingsPage.open()
     await expect(settingsPage.numberingSetting()).not.toBeChecked
 });
 
-test('Saves numbering setting true', async ({page, settingsPage, browserName}) => {
+test('Saves numbering setting true', async ({ page, settingsPage, browserName }) => {
     test.skip(browserName === 'webkit', 'Reported flakiness');
     await settingsPage.open()
     await settingsPage.numberingSetting().check()
@@ -19,7 +19,7 @@ test('Saves numbering setting true', async ({page, settingsPage, browserName}) =
     await expect(settingsPage.numberingSetting()).toBeChecked
 });
 
-test('Saves numbering setting false', async ({page, settingsPage, browserName}) => {
+test('Saves numbering setting false', async ({ page, settingsPage, browserName }) => {
     test.skip(browserName === 'webkit', 'Reported flakiness');
     await settingsPage.open()
     await settingsPage.numberingSetting().check()

@@ -34,12 +34,12 @@ export default defineConfig({
         ...devices['Desktop Safari']
       }
     }] : [
-      {
-        name: 'chromium',
-        use: {
-          ...devices['Desktop Chrome']
-        }
-      }],
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome']
+      }
+    }],
   webServer: {
     command: 'vite dev',
     port: 5173,
