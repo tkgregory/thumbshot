@@ -15,6 +15,7 @@ jobs:
       with:
         node-version: 20
     - run: npm ci
+    - run: npm run test:unit
     - run: npx playwright install --with-deps
     - uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -27,7 +28,7 @@ jobs:
     - uses: serverless/github-action@v3.2
       with:
         args: s3sync --stage dev
-    - run: npm run test:unit && npm run test:e2e
+    - run: npm run test:e2e
       env:
         THUMBSHOT_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_TEST_USER_PASSWORD }}
         THUMBSHOT_PRO_TEST_USER_PASSWORD: ${{ secrets.THUMBSHOT_PRO_TEST_USER_PASSWORD }}
