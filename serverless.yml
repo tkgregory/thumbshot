@@ -366,6 +366,18 @@ resources:
             Value: t.k.gregory+proautomatedtestuser@gmail.com
           - Name: email_verified
             Value: true
+    ProAutomatedTestUser2:
+      Type: AWS::Cognito::UserPoolUser
+      Properties:
+        Username: t.k.gregory+proautomatedtestuser2@gmail.com
+        DesiredDeliveryMediums:
+          - EMAIL
+        UserPoolId: !Ref UserPool
+        UserAttributes:
+          - Name: email
+            Value: t.k.gregory+proautomatedtestuser2@gmail.com
+          - Name: email_verified
+            Value: true
     ProAutomatedTestUserGroupAttachment:
       Type: AWS::Cognito::UserPoolUserToGroupAttachment
       Properties:

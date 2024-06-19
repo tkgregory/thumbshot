@@ -8,7 +8,7 @@ export default defineConfig({
     timeout: 2 * 1000
   },
   forbidOnly: !!process.env.CI,
-  workers: 1,
+  workers: 2,
   reporter: 'html',
   use: {
     actionTimeout: 0,

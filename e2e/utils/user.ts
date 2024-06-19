@@ -1,6 +1,19 @@
 import { exec } from 'child_process';
+import { Page, expect } from '@playwright/test';
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
 import { BatchWriteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb"
+
+export async function login(username: string, password: string, page: Page) {
+    await page.goto('http://localhost:5173/')
+    await page.locator('a >> text="Sign in"').first().click()
+    await page.locator('input[name="username"]').fill(username)
+
+    await page.locator('input[name="password"]').fill(password)
+    await page.locator('form button:text("Sign in")').first().click()
+    await expect(page.locator('.btn >> text="Sign out"')).toHaveCount(1, { timeout: 5000 })
+
+    return page
+}
 
 export async function deleteUserBoards(userId: string) {
     const dynamoDbQueryCommand = `aws dynamodb query --table-name dev-boards --index userIdSortByNameIndex --key-condition-expression \"userId = :userId\" --expression-attribute-values \"{\\\":userId\\\":{\\\"S\\\":\\\"${userId}\\\"}}\" --select SPECIFIC_ATTRIBUTES --projection-expression \"id\" --query \"Items[*].id.S\" --region us-east-1`
