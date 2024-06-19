@@ -170,6 +170,8 @@ Resources:
                   - cognito-idp:AdminSetUserPassword
                   - cognito-idp:AdminAddUserToGroup
                   - cognito-idp:AdminCreateUser
+                  - cognito-idp:AdminGetUser
+                  - cognito-idp:AdminDeleteUser
                   - cognito-idp:ListTagsForResource
                   - cognito-idp:GetGroup
                   - cognito-idp:CreateGroup
@@ -192,9 +194,17 @@ Resources:
                   - dynamodb:UpdateContinuousBackups
                   - dynamodb:BatchWriteItem
                   - dynamodb:Query
+                  - dynamodb:TagResource
                 Resource:
                   - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/dev-boards*'
                   - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/prod-boards*'
+              - Effect: Allow
+                Action:
+                  - ses:CreateEmailIdentity
+                  - ses:GetEmailIdentity
+                  - ses:DeleteEmailIdentity
+                Resource:
+                  - !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/thumbshot.io'
 Outputs:
   GitHubRole:
     Value: !GetAtt GitHubRole.Arn

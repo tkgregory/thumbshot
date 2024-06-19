@@ -260,7 +260,7 @@ resources:
         PreventUserExistenceErrors: ENABLED
         AllowedOAuthFlowsUserPoolClient: true
         SupportedIdentityProviders:
-          - Google
+          - !Ref GoogleUserPoolIdentityProvider
         AllowedOAuthFlows:
           - code
         AllowedOAuthScopes:
@@ -344,6 +344,7 @@ resources:
         UserPoolId: !Ref UserPool
     AutomatedTestUser:
       Type: AWS::Cognito::UserPoolUser
+      Condition: IsNonProd
       Properties:
         Username: t.k.gregory+automatedtestuser@gmail.com
         DesiredDeliveryMediums:
@@ -356,6 +357,7 @@ resources:
             Value: true
     ProAutomatedTestUser:
       Type: AWS::Cognito::UserPoolUser
+      Condition: IsNonProd
       Properties:
         Username: t.k.gregory+proautomatedtestuser@gmail.com
         DesiredDeliveryMediums:
@@ -368,6 +370,7 @@ resources:
             Value: true
     ProAutomatedTestUserGroupAttachment:
       Type: AWS::Cognito::UserPoolUserToGroupAttachment
+      Condition: IsNonProd
       Properties:
         GroupName: !Ref ProUserPoolGroup
         Username: !Ref ProAutomatedTestUser
@@ -540,6 +543,7 @@ resources:
       Properties:
         TableName: ${param:dynamoDBTablePrefix}boards
         BillingMode: PAY_PER_REQUEST
+        DeletionProtectionEnabled: true
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
