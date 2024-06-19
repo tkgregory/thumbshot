@@ -167,7 +167,6 @@ Resources:
                   - cognito-idp:DescribeUserPoolClient
                   - cognito-idp:UpdateUserPoolClient
                   - cognito-idp:DeleteUserPoolClient
-                  - cognito-idp:AdminGetUser
                   - cognito-idp:AdminSetUserPassword
                   - cognito-idp:AdminAddUserToGroup
                   - cognito-idp:AdminCreateUser
