@@ -22,27 +22,31 @@ export async function deleteUserBoards(userId: string) {
     const client = new DynamoDBClient({ region: 'us-east-1' });
     const docClient = DynamoDBDocumentClient.from(client)
 
-    const deleteRequests = [] as Record<string, any>[]
-    for (const id of ids) {
-        deleteRequests.push(
-            {
-                DeleteRequest: {
-                    Key: {
-                        id: id
+    while (ids.length > 0) {
+        const batchSize = Math.min(25, ids.length)
+        const deleteRequests = [] as Record<string, any>[]
+
+        for (let i = 0; i < batchSize; i++) {
+            deleteRequests.push(
+                {
+                    DeleteRequest: {
+                        Key: {
+                            id: ids.shift()
+                        }
                     }
-                }
-            })
-    }
-
-    const command = new BatchWriteCommand({
-        RequestItems: {
-            'dev-boards': deleteRequests
+                })
         }
-    });
 
-    try {
-        await docClient.send(command);
-    } catch (err) {
-        console.log(err);
+        const command = new BatchWriteCommand({
+            RequestItems: {
+                'dev-boards': deleteRequests
+            }
+        });
+
+        try {
+            await docClient.send(command);
+        } catch (err) {
+            throw err;
+        }
     }
 }

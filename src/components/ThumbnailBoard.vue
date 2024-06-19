@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import { fetchPathWithAuth } from '../composables/api'
 import { realYouTubeVideos } from '../composables/data'
+import { getImageSrc } from '../composables/image'
+import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
 import YouTubePreview from './YouTubePreview.vue'
 import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
 import { ref, watch } from 'vue'
 
-type YouTubePreview = {
-    title: string;
-    imageSrc: string;
-    fileName: string;
-    channelName: string;
-}
-
 const validExtensions = ['jpg', 'jpeg', 'png']
-const previewData = ref<YouTubePreview[]>([])
+
+const previewData = ref<YouTubePreviewData[]>([])
 const error = ref()
 const boardName = ref()
+const defaultTitle = 'Enter your video title'
+const defaultChannelName = 'Enter your channel name'
 
 defineExpose({ reset, previewData, load })
 defineEmits(['generateSinglePreview'])
@@ -48,20 +46,9 @@ function randomize() {
 
     previewData.value.splice(index, 0, {
         title: realYouTubeVideos[random].title,
-        imageSrc: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`,
+        imageURL: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`,
         fileName: '',
         channelName: realYouTubeVideos[random].channelName
-    })
-}
-
-async function buildPreviewFromTeaser(imageSrc: string, fileName: string) {
-    const index = previewData.value.length
-
-    previewData.value.splice(index, 0, {
-        title: 'Enter your video title',
-        imageSrc: imageSrc,
-        fileName: fileName,
-        channelName: 'Enter your channel name'
     })
 }
 
@@ -121,6 +108,15 @@ async function uploadThumbnail(imageData: string, fileName: string) {
 async function save() {
     if (props.frontEndOnly) {
         return
+    }
+
+    for (const preview of previewData.value) {
+        if (preview.imageData !== undefined) {
+            throw Error('Cannot save entire images to the server.')
+        }
+        if (preview.s3ObjectKey !== undefined && preview.imageURL !== undefined) {
+            throw Error('Cannot save both s3ObjectKey and imageURL to the server.')
+        }
     }
 
     const body = {
@@ -201,29 +197,44 @@ function showError(errorMessage: string) {
     }
 }
 
-function onChangeExistingImage(event: any, preview: YouTubePreview) {
-    onChangeImage(event, async (imageSrc, fileName) => {
+function onChangeExistingImage(event: any, preview: YouTubePreviewData) {
+    onChangeImage(event, async (imageData, fileName) => {
         if (props.frontEndOnly) {
-            preview.imageSrc = imageSrc;
+            preview.imageData = imageData;
             preview.fileName = fileName;
             return
         }
 
-        preview.imageSrc = await uploadThumbnail(imageSrc, fileName);
+        preview.s3ObjectKey = await uploadThumbnail(imageData, fileName);
+        preview.imageURL = undefined;
         preview.fileName = fileName;
         save();
     })
 }
 
 function onChangeTeaserImage(event: any) {
-    onChangeImage(event, async (imageSrc, fileName) => {
+    onChangeImage(event, async (imageData, fileName) => {
         if (props.frontEndOnly) {
-            buildPreviewFromTeaser(imageSrc, fileName);
+            const index = previewData.value.length
+
+            previewData.value.splice(index, 0, {
+                title: defaultTitle,
+                imageData: imageData,
+                fileName: fileName,
+                channelName: defaultChannelName
+            })
             return
         }
 
-        const objectKey = await uploadThumbnail(imageSrc, fileName);
-        buildPreviewFromTeaser(objectKey, fileName);
+        const s3ObjectKey = await uploadThumbnail(imageData, fileName);
+        const index = previewData.value.length
+
+        previewData.value.splice(index, 0, {
+            title: defaultTitle,
+            s3ObjectKey: s3ObjectKey,
+            fileName: fileName,
+            channelName: defaultChannelName
+        })
         save();
     })
 }
@@ -244,11 +255,11 @@ function onChangeTeaserImage(event: any) {
         <youtube-container
             class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
             <template v-for="(preview, index) in previewData">
-                <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
-                    :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
-                    :moveRightEnabled="index != previewData.length - 1" :fileName="preview.fileName" :index="index"
-                    :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
-                    @changeTitle="(title) => { preview.title = title; save(); }"
+                <YouTubePreview :imageSrc="getImageSrc(preview)" :title="preview.title"
+                    :channelName="preview.channelName" :duplicateEnabled="previewData.length != maxPreviewCount"
+                    :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1"
+                    :fileName="preview.fileName" :index="index" :isGeneratingPreview="isGeneratingSinglePreview"
+                    :isSinglePreviewEnabled="!frontEndOnly" @changeTitle="(title) => { preview.title = title; save(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
                     @changeImage="(event) => onChangeExistingImage(event, preview)"
                     @deletePreview="deletePreview(index); save();" @duplicatePreview="duplicatePreview(index); save();"

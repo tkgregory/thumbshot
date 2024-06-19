@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import YouTubePreview from './YouTubePreview.vue'
 import { ref } from 'vue'
 import { loadSettings } from '../composables/settings'
+import { getImageSrc } from '../composables/image'
+import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
+import YouTubePreview from './YouTubePreview.vue'
 
-type YouTubePreview = {
-    title: string;
-    imageSrc: string;
-    fileName: string;
-    channelName: string;
-}
-
-const previewData = ref<YouTubePreview[]>([])
+const previewData = ref<YouTubePreviewData[]>([])
 const boardName = ref()
 const props = defineProps({
     boardId: {
@@ -41,7 +36,7 @@ async function loadServer() {
         class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
         <template v-if="boardIndex != null">
             <template v-if="previewData.length >= boardIndex + 1">
-                <YouTubePreview :imageSrc="previewData[boardIndex].imageSrc" :title="previewData[boardIndex].title"
+                <YouTubePreview :imageSrc="getImageSrc(previewData[boardIndex])" :title="previewData[boardIndex].title"
                     :channelName="previewData[boardIndex].channelName" :fileName="previewData[boardIndex].fileName"
                     :index="boardIndex" />
             </template>
@@ -50,7 +45,7 @@ async function loadServer() {
             </template>
         </template>
         <template v-else v-for="(preview, index) in previewData">
-            <YouTubePreview :imageSrc="preview.imageSrc" :title="preview.title" :channelName="preview.channelName"
+            <YouTubePreview :imageSrc="getImageSrc(preview)" :title="preview.title" :channelName="preview.channelName"
                 :fileName="preview.fileName" :index="index"
                 :showNumbers="loadSettings().showNumbers && previewData.length > 1" />
         </template>
