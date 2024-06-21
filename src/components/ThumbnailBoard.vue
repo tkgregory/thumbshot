@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { fetchPathWithAuth } from '../composables/api'
 import { realYouTubeVideos } from '../composables/data'
 import { getImageSrc } from '../composables/image'
 import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
 import YouTubePreview from './YouTubePreview.vue'
 import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
-import { ref, watch } from 'vue'
 
 const validExtensions = ['jpg', 'jpeg', 'png']
 
@@ -86,7 +86,7 @@ async function preSign(fileExtension: string) {
     })
 }
 
-async function uploadThumbnail(imageData: string, fileName: string) {
+async function uploadThumbnail(imageBlob: Blob, fileName: string) {
     const fileExtension = fileName.split('.').pop()?.toLowerCase()
     if (!fileExtension || validExtensions.indexOf(fileExtension) == -1) {
         throw new Error('Invalid file extension')
@@ -95,11 +95,10 @@ async function uploadThumbnail(imageData: string, fileName: string) {
     const preSignResponse = await preSign(fileExtension)
     const requestHeaders: HeadersInit = new Headers();
     requestHeaders.set("Content-Type", 'multipart/form-data')
-    const blob = await fetch(imageData).then((r) => r.blob());
     await fetch(preSignResponse.presignedUploadURL, {
         method: 'PUT',
         headers: requestHeaders,
-        body: blob
+        body: imageBlob
     })
 
     return preSignResponse.objectKey;
@@ -111,9 +110,6 @@ async function save() {
     }
 
     for (const preview of previewData.value) {
-        if (preview.imageData !== undefined) {
-            throw Error('Cannot save entire images to the server.')
-        }
         if (preview.s3ObjectKey !== undefined && preview.imageURL !== undefined) {
             throw Error('Cannot save both s3ObjectKey and imageURL to the server.')
         }
@@ -152,38 +148,41 @@ function reset() {
     save()
 }
 
-type MyCallback = (imageSrc: string, fileName: string) => void;
-
-function onChangeImage(event: any, callback: MyCallback) {
+async function validateImage(event: any) {
     if (!event.target.files[0]) {
-        return
+        return Promise.reject()
     }
 
     const fileName = event.target.files[0].name
     if (validExtensions.indexOf(fileName.split('.').pop().toLowerCase()) == -1) {
         showError(`Image must be one of these types: ${validExtensions.join(", ")}`)
-        return
+        return Promise.reject()
     } else {
-        const reader = new FileReader()
-        reader.onloadend = function () {
-            var image = new Image()
-            image.src = reader.result as string
-            image.onload = function () {
-                if (image.width / image.height != 16 / 9) {
-                    showError("Image aspect ratio must be 16:9")
-                    return
-                }
-                if (image.width < 1280 || image.height < 720) {
-                    showError("Image size must be at least 1280x720 pixels")
-                    return
-                }
-                callback(reader.result as string, fileName)
-            }
-        }
-        reader.readAsDataURL(event.target.files[0])
-    }
+        const url = URL.createObjectURL(event.target.files[0])
+        resetImageInput(event)
 
-    resetImageInput(event)
+        return getImage(url).then((image) => {
+            if (image.width / image.height != 16 / 9) {
+                showError("Image aspect ratio must be 16:9")
+                return Promise.reject()
+            }
+            if (image.width < 1280 || image.height < 720) {
+                showError("Image size must be at least 1280x720 pixels")
+                return Promise.reject()
+            }
+
+            return url
+        })
+    }
+}
+
+function getImage(url: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+        let image = new Image()
+        image.onload = () => resolve(image)
+        image.onerror = reject
+        image.src = url
+    })
 }
 
 function resetImageInput(event: any) {
@@ -197,45 +196,53 @@ function showError(errorMessage: string) {
     }
 }
 
-function onChangeExistingImage(event: any, preview: YouTubePreviewData) {
-    onChangeImage(event, async (imageData, fileName) => {
+async function onChangeExistingImage(event: any, preview: YouTubePreviewData) {
+    const fileName = event.target.files[0].name
+
+    validateImage(event).then((imageURL) => {
         if (props.frontEndOnly) {
-            preview.imageData = imageData;
+            preview.imageURL = imageURL;
             preview.fileName = fileName;
-            return
+            return Promise.resolve()
         }
 
-        preview.s3ObjectKey = await uploadThumbnail(imageData, fileName);
-        preview.imageURL = undefined;
-        preview.fileName = fileName;
-        save();
+        return fetch(imageURL).then((response) => response.blob()).then(async (blob) => {
+            preview.s3ObjectKey = await uploadThumbnail(blob, fileName);
+            preview.imageURL = undefined;
+            preview.fileName = fileName;
+            save();
+        })
     })
 }
 
 function onChangeTeaserImage(event: any) {
-    onChangeImage(event, async (imageData, fileName) => {
+    const fileName = event.target.files[0].name
+
+    validateImage(event).then((imageURL) => {
         if (props.frontEndOnly) {
             const index = previewData.value.length
 
             previewData.value.splice(index, 0, {
                 title: defaultTitle,
-                imageData: imageData,
+                imageURL: imageURL,
                 fileName: fileName,
                 channelName: defaultChannelName
             })
             return
         }
 
-        const s3ObjectKey = await uploadThumbnail(imageData, fileName);
-        const index = previewData.value.length
+        return fetch(imageURL).then((response) => response.blob()).then(async (blob) => {
+            const index = previewData.value.length
+            const s3ObjectKey = await uploadThumbnail(blob, fileName);
 
-        previewData.value.splice(index, 0, {
-            title: defaultTitle,
-            s3ObjectKey: s3ObjectKey,
-            fileName: fileName,
-            channelName: defaultChannelName
+            previewData.value.splice(index, 0, {
+                title: defaultTitle,
+                s3ObjectKey: s3ObjectKey,
+                fileName: fileName,
+                channelName: defaultChannelName
+            })
+            save();
         })
-        save();
     })
 }
 </script>
