@@ -10,7 +10,7 @@ test('Can add a thumbnail', async ({ page, thumbshotPage }) => {
 
     const image = page.locator('youtube-thumbnail > img:first-child').first()
     const src = await image.getAttribute('src')
-    expect(src).toMatch(/data:image\/png;base64,iVB/)
+    expect(src).toMatch(/blob:http/)
 });
 
 test('Can add up to 3 thumbnails', async ({ page, thumbshotPage }) => {
