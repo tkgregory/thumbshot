@@ -7,8 +7,6 @@ export function getImageSrc(youtubePreview: YouTubePreviewData) {
         return `${thumbnailURL}/${youtubePreview.s3ObjectKey}`
     } else if (youtubePreview.imageURL !== undefined) {
         return youtubePreview.imageURL
-    } else if (youtubePreview.imageData !== undefined) {
-        return youtubePreview.imageData
     }
 
     throw Error("No image to return")
