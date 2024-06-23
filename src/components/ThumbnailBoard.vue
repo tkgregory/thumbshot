@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { fetchPathWithAuth } from '../composables/api'
 import { realYouTubeVideos } from '../composables/data'
+import { compressImage } from '../composables/image'
 import { getImageSrc } from '../composables/image'
 import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
 import YouTubePreview from './YouTubePreview.vue'
@@ -86,12 +87,7 @@ async function preSign(fileExtension: string) {
     })
 }
 
-async function uploadThumbnail(imageBlob: Blob, fileName: string) {
-    const fileExtension = fileName.split('.').pop()?.toLowerCase()
-    if (!fileExtension || validExtensions.indexOf(fileExtension) == -1) {
-        throw new Error('Invalid file extension')
-    }
-
+async function uploadThumbnail(imageBlob: Blob, fileExtension: string) {
     const preSignResponse = await preSign(fileExtension)
     const requestHeaders: HeadersInit = new Headers();
     requestHeaders.set("Content-Type", 'multipart/form-data')
@@ -196,54 +192,54 @@ function showError(errorMessage: string) {
     }
 }
 
-async function onChangeExistingImage(event: any, preview: YouTubePreviewData) {
+async function onChangeExistingImage(event: any, preview: YouTubePreviewData, finishLoading: () => void) {
     const fileName = event.target.files[0].name
+    const imageURL = await validateImage(event)
+    if (props.frontEndOnly) {
+        preview.imageURL = imageURL;
+        preview.fileName = fileName;
+        return Promise.resolve()
+    }
 
-    validateImage(event).then((imageURL) => {
-        if (props.frontEndOnly) {
-            preview.imageURL = imageURL;
-            preview.fileName = fileName;
-            return Promise.resolve()
-        }
-
-        return fetch(imageURL).then((response) => response.blob()).then(async (blob) => {
-            preview.s3ObjectKey = await uploadThumbnail(blob, fileName);
-            preview.imageURL = undefined;
-            preview.fileName = fileName;
-            save();
-        })
-    })
+    const response = await fetch(imageURL)
+    const blob = await response.blob()
+    const compressedBlob = await compressImage(blob)
+    const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
+    preview.s3ObjectKey = s3ObjectKey
+    preview.imageURL = undefined
+    preview.fileName = fileName
+    await save()
+    finishLoading()
 }
 
-function onChangeTeaserImage(event: any) {
+async function onChangeTeaserImage(event: any, finishLoading: () => void) {
     const fileName = event.target.files[0].name
 
-    validateImage(event).then((imageURL) => {
-        if (props.frontEndOnly) {
-            const index = previewData.value.length
+    const imageURL = await validateImage(event)
+    if (props.frontEndOnly) {
+        const index = previewData.value.length
 
-            previewData.value.splice(index, 0, {
-                title: defaultTitle,
-                imageURL: imageURL,
-                fileName: fileName,
-                channelName: defaultChannelName
-            })
-            return
-        }
-
-        return fetch(imageURL).then((response) => response.blob()).then(async (blob) => {
-            const index = previewData.value.length
-            const s3ObjectKey = await uploadThumbnail(blob, fileName);
-
-            previewData.value.splice(index, 0, {
-                title: defaultTitle,
-                s3ObjectKey: s3ObjectKey,
-                fileName: fileName,
-                channelName: defaultChannelName
-            })
-            save();
+        previewData.value.splice(index, 0, {
+            title: defaultTitle,
+            imageURL: imageURL,
+            fileName: fileName,
+            channelName: defaultChannelName
         })
+        return
+    }
+    const response = await fetch(imageURL)
+    const blob = await response.blob()
+    const compressedBlob = await compressImage(blob)
+    const index_1 = previewData.value.length
+    const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
+    previewData.value.splice(index_1, 0, {
+        title: defaultTitle,
+        s3ObjectKey: s3ObjectKey,
+        fileName: fileName,
+        channelName: defaultChannelName
     })
+    await save()
+    finishLoading()
 }
 </script>
 
@@ -252,7 +248,7 @@ function onChangeTeaserImage(event: any) {
     <template v-if="previewData.length === 0">
         <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
             <YouTubeThumbnailTeaser @randomize="randomize(); save();"
-                @changeImage="event => onChangeTeaserImage(event)" />
+                @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)" />
             <div class="hidden md:block relative">
                 <img src="/visualisation.png" class="absolute -translate-x-16" />
             </div>
@@ -268,14 +264,14 @@ function onChangeTeaserImage(event: any) {
                     :fileName="preview.fileName" :index="index" :isGeneratingPreview="isGeneratingSinglePreview"
                     :isSinglePreviewEnabled="!frontEndOnly" @changeTitle="(title) => { preview.title = title; save(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
-                    @changeImage="(event) => onChangeExistingImage(event, preview)"
+                    @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
                     @deletePreview="deletePreview(index); save();" @duplicatePreview="duplicatePreview(index); save();"
                     @moveLeft="moveLeft(index); save();" @moveRight="moveRight(index); save();"
                     @generatePreview="$emit('generateSinglePreview', index);" />
             </template>
             <template v-if="previewData.length < maxPreviewCount">
                 <YouTubeThumbnailTeaser @randomize="randomize(); save();"
-                    @changeImage="event => onChangeTeaserImage(event)" />
+                    @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)" />
             </template>
             <template v-else>
                 <div class="aspect-video flex flex-col justify-center items-center text-xl">

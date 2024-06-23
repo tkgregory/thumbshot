@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import EditableText from './EditableText.vue';
 import YouTubeThumbnail from './YouTubeThumbnail.vue';
+import { ref } from 'vue'
 
 defineProps({
   title: {
@@ -57,8 +58,10 @@ const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'de
     <YouTubeThumbnail :imageSrc="imageSrc" :moveLeftEnabled="moveLeftEnabled" :moveRightEnabled="moveRightEnabled"
       :duplicateEnabled="duplicateEnabled" :isGeneratingPreview="isGeneratingPreview"
       :isSinglePreviewEnabled="isSinglePreviewEnabled" @duplicatePreview="$emit('duplicatePreview')"
-      @deletePreview="$emit('deletePreview')" @changeImage="(event) => emit('changeImage', event)" @moveLeft="
-        $emit('moveLeft')" @moveRight="$emit('moveRight')" @generatePreview="$emit('generatePreview')" />
+      @deletePreview="$emit('deletePreview')"
+      @changeImage="(event, finishLoading) => emit('changeImage', event, finishLoading)" @moveLeft="
+        $emit('moveLeft')" @moveRight="$emit('moveRight')" @generatePreview="$emit('generatePreview')"
+      ref="youtubeThumbnail" />
     <youtube-metadata class="flex">
       <youtube-channel-image class="mt-[12px] mr-[12px] shrink-0">
         <div class="rounded-full bg-gray-400 w-[48px] h-[48px]"></div>

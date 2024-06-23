@@ -1,6 +1,6 @@
 import { test, expect } from './pages/fixtures';
 
-test.describe(() => {
+test.describe("Free trial image validation tests", () => {
     test.describe.configure({ retries: 2 });
 
     test.beforeEach(async ({ page }) => {
@@ -9,6 +9,22 @@ test.describe(() => {
         await page.locator('button:has-text("Compare My Thumbnails")').click()
     });
 
+    validationTests()
+});
+
+test.describe("Main app image validation tests", () => {
+    test.describe.configure({ retries: 2 });
+
+    test.beforeEach(async ({ page, boardsPage }) => {
+        test.slow()
+        await page.goto('/')
+        await boardsPage.useNewBoard()
+    });
+
+    validationTests()
+});
+
+function validationTests() {
     test('Thumbnail too small', async ({ page }) => {
         const fileChooserPromise = page.waitForEvent('filechooser');
         await page.locator('div[data-tip="Add thumbnail"] > label').click()
@@ -65,4 +81,4 @@ test.describe(() => {
         const src2 = await image2.getAttribute('src')
         expect(src2).not.toBe(src1)
     });
-});
+}

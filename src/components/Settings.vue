@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SettingsIcon } from 'lucide-vue-next';
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
 import { loadSettings } from '../composables/settings'
 
 const showNumbers = defineModel('showNumbers', { default: true })
