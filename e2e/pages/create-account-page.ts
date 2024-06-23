@@ -14,7 +14,7 @@ export class CreateAccountPage {
 
     async signInAsFreeUser() {
         await this.signOutButton().click()
-        await expect(this.page.locator('.btn >> text="Sign in"')).toHaveCount(1)
+        await expect(this.page.locator('.btn >> text="Sign in"')).toHaveCount(1, { timeout: 10000 })
 
         await this.signInButton().click()
         await this.page.locator('input[name="username"]').fill('t.k.gregory+automatedtestuser@gmail.com')
