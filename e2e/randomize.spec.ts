@@ -13,7 +13,7 @@ test('Randomize shows default YouTube preview', async ({ page, thumbshotPage }) 
 test('Can change randomized thumbnail', async ({ page, thumbshotPage }) => {
     await thumbshotPage.clickRandom()
 
-    await page.locator('input[name="thumbnail"]').first().setInputFiles(['./e2e/images/oversized.png']);
+    await page.locator('input[name="thumbnail"]').first().setInputFiles(['./e2e/images/correct-dimensions.png']);
     await expect(page.locator('div[role="alert"]')).toHaveCount(0)
 });
 
