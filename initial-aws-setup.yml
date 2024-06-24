@@ -146,6 +146,7 @@ Resources:
                   - ssm:GetParameter
                 Resource:
                   - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/aws/reference/secretsmanager/GOOGLE_CLIENT_SECRET'
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/aws/reference/secretsmanager/YOUTUBE_API_KEY'
               - Sid: SecretsManager
                 Effect: Allow
                 Action:
