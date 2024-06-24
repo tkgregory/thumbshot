@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import EditableText from './EditableText.vue';
 import YouTubeThumbnail from './YouTubeThumbnail.vue';
-import { ref } from 'vue'
 
 defineProps({
   title: {
@@ -13,10 +12,6 @@ defineProps({
     type: String
   },
   imageSrc: {
-    required: true,
-    type: String
-  },
-  fileName: {
     required: true,
     type: String
   },
@@ -49,7 +44,8 @@ defineProps({
     default: true
   }
 })
-const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight', 'generatePreview'])
+
+const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight', 'generatePreview', 'getFromYouTube'])
 </script>
 
 <template>
@@ -61,7 +57,7 @@ const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'de
       @deletePreview="$emit('deletePreview')"
       @changeImage="(event, finishLoading) => emit('changeImage', event, finishLoading)" @moveLeft="
         $emit('moveLeft')" @moveRight="$emit('moveRight')" @generatePreview="$emit('generatePreview')"
-      ref="youtubeThumbnail" />
+      @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => $emit('getFromYouTube', youTubeVideoURL, closeModal, handleError)" />
     <youtube-metadata class="flex">
       <youtube-channel-image class="mt-[12px] mr-[12px] shrink-0">
         <div class="rounded-full bg-gray-400 w-[48px] h-[48px]"></div>

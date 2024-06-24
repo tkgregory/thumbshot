@@ -24,13 +24,19 @@ export const handler = async (event) => {
         TableName: process.env.BOARDS_TABLE_NAME,
         Key: {
             id: id,
-        },
-        ConditionExpression: "attribute_exists(id) AND userId = :userId",
-        ExpressionAttributeValues: {
-            ":userId": userId,
-        },
+        }
     }
     const response = await docClient.send(new GetCommand(getJSON));
+
+    if (response.Item.userId !== userId) {
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ message: "Not found" }),
+            headers: {
+                "content-type": "application/json"
+            }
+        }
+    }
 
     return {
         statusCode: 200,

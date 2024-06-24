@@ -243,6 +243,16 @@ functions:
           - !GetAtt BoardsTable.Arn
           - !Sub '${BoardsTable.Arn}/index/userIdSortByNameIndex'
           - !Sub '${BoardsTable.Arn}/index/userIdSortByCreatedIndex'
+  getYouTubeVideoDetails:
+    handler: functions/get/get-youtube-video-details.handler
+    runtime: nodejs18.x
+    events:
+      - httpApi:
+          path: /youtube/videos/{id}
+          method: get
+          authorizer: serviceAuthorizer
+    environment:
+      YOUTUBE_API_KEY: ${ssm:/aws/reference/secretsmanager/YOUTUBE_API_KEY}
 layers:
   chromium:
     package:

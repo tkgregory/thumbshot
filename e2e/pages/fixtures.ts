@@ -33,10 +33,11 @@ export const test = base.extend<MyFixtures, { workerStorageState: string }>({
         const fileName = path.resolve(test.info().project.outputDir, `.auth/${id}.json`);
 
         if (fs.existsSync(fileName)) {
+            console.log('Using saved login state')
             await use(fileName);
             return;
         }
-
+        console.log('Logging in')
         const page = await browser.newPage({ storageState: undefined });
 
         await page.goto('http://localhost:5173/')

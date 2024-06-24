@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { Upload } from 'lucide-vue-next';
 import { Shuffle } from 'lucide-vue-next';
+import { Youtube } from 'lucide-vue-next';
+import SimpleTextModal from './SimpleTextModal.vue';
 import { ref } from 'vue'
 
-defineEmits(['changeImage', 'randomize'])
+const emit = defineEmits(['changeImage', 'randomize', 'getFromYouTube'])
+defineProps({
+    isGetFromYouTubeEnabled: {
+        type: Boolean,
+        default: true
+    }
+})
+
 const isLoading = ref(false)
+const getFromYouTubeModal = ref()
 </script>
 
 <template>
@@ -29,10 +39,21 @@ const isLoading = ref(false)
                             class="hidden" />
                     </label>
                 </div>
+                <div class="tooltip w-[32px]"
+                    :data-tip="isGetFromYouTubeEnabled ? 'Get from YouTube' : 'Create a free account to Get from YouTube'">
+                    <Youtube :size="32"
+                        :class="{ [`clickable`]: isGetFromYouTubeEnabled, [`disabled`]: !isGetFromYouTubeEnabled }"
+                        @click="isGetFromYouTubeEnabled && getFromYouTubeModal.show()" />
+                </div>
                 <div class="tooltip w-[32px]" data-tip="Randomize">
                     <Shuffle :size="32" class="clickable" @click="$emit('randomize', $event)" />
                 </div>
             </div>
         </template>
     </div>
+    <Teleport to="body">
+        <SimpleTextModal title="Get from YouTube"
+            @submit="(text, handleSuccess, handleFailure) => $emit('getFromYouTube', text, handleSuccess, handleFailure)"
+            ref="getFromYouTubeModal" />
+    </Teleport>
 </template>

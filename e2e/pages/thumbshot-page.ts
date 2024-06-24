@@ -25,7 +25,15 @@ export class ThumbShotPage {
     }
 
     getPreviewTitle(index: number) {
-        return this.page.locator(`youtube-preview:nth-child(${index + 1}) span`).first()
+        return this.page.locator(`youtube-preview:nth-child(${index + 1}) youtube-metadata-text span`).first()
+    }
+
+    getChannelName(index: number) {
+        return this.page.locator(`youtube-preview:nth-child(${index + 1}) youtube-metadata-text span`).nth(1)
+    }
+
+    getThumbnailURL(index: number) {
+        return this.page.locator(`youtube-preview:nth-child(${index + 1}) youtube-thumbnail img`).first()
     }
 
     getScreenshotURL() {
@@ -46,6 +54,11 @@ export class ThumbShotPage {
         await this.page.locator('youtube-thumbnail div[data-tip="Generate single preview image"]').nth(index).click()
     }
 
+    async clickGetFromYouTube(index: number) {
+        await this.page.hover(`youtube-thumbnail:nth-child(${index + 1})`)
+        await this.page.locator('youtube-thumbnail div[data-tip="Get from YouTube"]').nth(index).click()
+    }
+
     async generatePreviewModalIsOpen() {
         await expect(this.page.locator('#generate_preview_modal[open]')).toHaveCount(1, { timeout: 10000 })
     }
@@ -56,5 +69,9 @@ export class ThumbShotPage {
 
     async clickRandom() {
         await this.page.locator('div[data-tip="Randomize"]').click()
+    }
+
+    async clickGetFromYouTubeForTeaser() {
+        await this.page.locator('div[data-tip="Get from YouTube"]:not(youtube-preview div)').click()
     }
 }

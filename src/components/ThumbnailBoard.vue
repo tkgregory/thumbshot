@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { fetchPathWithAuth } from '../composables/api'
 import { realYouTubeVideos } from '../composables/data'
+import { getVideoData } from '../composables/youtube'
 import { compressImage } from '../composables/image'
 import { getImageSrc } from '../composables/image'
 import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
@@ -15,6 +16,7 @@ const error = ref()
 const boardName = ref()
 const defaultTitle = 'Enter your video title'
 const defaultChannelName = 'Enter your channel name'
+const errorMessage = ref()
 
 defineExpose({ reset, previewData, load })
 defineEmits(['generateSinglePreview'])
@@ -48,7 +50,6 @@ function randomize() {
     previewData.value.splice(index, 0, {
         title: realYouTubeVideos[random].title,
         imageURL: `https://i.ytimg.com/vi/${realYouTubeVideos[random].videoId}/hq720.jpg`,
-        fileName: '',
         channelName: realYouTubeVideos[random].channelName
     })
 }
@@ -129,7 +130,10 @@ async function load() {
     }
 
     fetchPathWithAuth('GET', `/user/boards/${props.boardId}`).then((response) => {
-        if (response.status !== 200) {
+        if (response.status === 404) {
+            errorMessage.value = 'Board not found'
+        }
+        else if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
         return response.json()
@@ -193,11 +197,9 @@ function showError(errorMessage: string) {
 }
 
 async function onChangeExistingImage(event: any, preview: YouTubePreviewData, finishLoading: () => void) {
-    const fileName = event.target.files[0].name
     const imageURL = await validateImage(event)
     if (props.frontEndOnly) {
         preview.imageURL = imageURL;
-        preview.fileName = fileName;
         return Promise.resolve()
     }
 
@@ -207,14 +209,11 @@ async function onChangeExistingImage(event: any, preview: YouTubePreviewData, fi
     const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
     preview.s3ObjectKey = s3ObjectKey
     preview.imageURL = undefined
-    preview.fileName = fileName
     await save()
     finishLoading()
 }
 
 async function onChangeTeaserImage(event: any, finishLoading: () => void) {
-    const fileName = event.target.files[0].name
-
     const imageURL = await validateImage(event)
     if (props.frontEndOnly) {
         const index = previewData.value.length
@@ -222,7 +221,6 @@ async function onChangeTeaserImage(event: any, finishLoading: () => void) {
         previewData.value.splice(index, 0, {
             title: defaultTitle,
             imageURL: imageURL,
-            fileName: fileName,
             channelName: defaultChannelName
         })
         return
@@ -235,20 +233,51 @@ async function onChangeTeaserImage(event: any, finishLoading: () => void) {
     previewData.value.splice(index_1, 0, {
         title: defaultTitle,
         s3ObjectKey: s3ObjectKey,
-        fileName: fileName,
         channelName: defaultChannelName
     })
     await save()
     finishLoading()
 }
+
+async function getFromYouTubeForTeaser(youTubeVideoURL: any, closeModal: Function, handleError: Function) {
+    let videoData
+    try {
+        videoData = await getVideoData(youTubeVideoURL)
+    } catch (error: any) {
+        handleError(error.message)
+        return
+    }
+
+    previewData.value.splice(previewData.value.length, 0, videoData)
+    closeModal()
+}
+
+async function getFromYouTubeForPreview(preview: YouTubePreviewData, youTubeVideoURL: any, closeModal: Function, handleError: Function) {
+    let videoData
+    try {
+        videoData = await getVideoData(youTubeVideoURL)
+    } catch (error: any) {
+        handleError(error.message)
+        return
+    }
+
+    preview.title = videoData.title
+    preview.channelName = videoData.channelName
+    preview.imageURL = videoData.imageURL
+    closeModal()
+}
 </script>
 
 <template>
     <h2 class="text-2xl">{{ boardName }}</h2>
-    <template v-if="previewData.length === 0">
+    <template v-if="errorMessage">
+        {{ errorMessage }}
+    </template>
+    <template v-else-if="previewData.length === 0">
         <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
-            <YouTubeThumbnailTeaser @randomize="randomize(); save();"
-                @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)" />
+            <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"
+                @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)"
+                @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError)" />
             <div class="hidden md:block relative">
                 <img src="/visualisation.png" class="absolute -translate-x-16" />
             </div>
@@ -260,18 +289,20 @@ async function onChangeTeaserImage(event: any, finishLoading: () => void) {
             <template v-for="(preview, index) in previewData">
                 <YouTubePreview :imageSrc="getImageSrc(preview)" :title="preview.title"
                     :channelName="preview.channelName" :duplicateEnabled="previewData.length != maxPreviewCount"
-                    :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1"
-                    :fileName="preview.fileName" :index="index" :isGeneratingPreview="isGeneratingSinglePreview"
-                    :isSinglePreviewEnabled="!frontEndOnly" @changeTitle="(title) => { preview.title = title; save(); }"
+                    :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1" :index="index"
+                    :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
+                    @changeTitle="(title) => { preview.title = title; save(); }"
                     @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
                     @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
                     @deletePreview="deletePreview(index); save();" @duplicatePreview="duplicatePreview(index); save();"
                     @moveLeft="moveLeft(index); save();" @moveRight="moveRight(index); save();"
-                    @generatePreview="$emit('generateSinglePreview', index);" />
+                    @generatePreview="$emit('generateSinglePreview', index);"
+                    @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForPreview(preview, youTubeVideoURL, closeModal, handleError); save(); }" />
             </template>
             <template v-if="previewData.length < maxPreviewCount">
-                <YouTubeThumbnailTeaser @randomize="randomize(); save();"
-                    @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)" />
+                <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"
+                    @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)"
+                    @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
             </template>
             <template v-else>
                 <div class="aspect-video flex flex-col justify-center items-center text-xl">
