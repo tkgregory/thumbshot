@@ -37,8 +37,7 @@ async function loadServer() {
         <template v-if="boardIndex != null">
             <template v-if="previewData.length >= boardIndex + 1">
                 <YouTubePreview :imageSrc="getImageSrc(previewData[boardIndex])" :title="previewData[boardIndex].title"
-                    :channelName="previewData[boardIndex].channelName" :fileName="previewData[boardIndex].fileName"
-                    :index="boardIndex" />
+                    :channelName="previewData[boardIndex].channelName" :index="boardIndex" />
             </template>
             <template v-else>
                 Invalid index
@@ -46,8 +45,7 @@ async function loadServer() {
         </template>
         <template v-else v-for="(preview, index) in previewData">
             <YouTubePreview :imageSrc="getImageSrc(preview)" :title="preview.title" :channelName="preview.channelName"
-                :fileName="preview.fileName" :index="index"
-                :showNumbers="loadSettings().showNumbers && previewData.length > 1" />
+                :index="index" :showNumbers="loadSettings().showNumbers && previewData.length > 1" />
         </template>
     </youtube-container>
 </template>

@@ -8,6 +8,7 @@ import { getImageSrc } from '../composables/image'
 import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
 import YouTubePreview from './YouTubePreview.vue'
 import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
+import { CircleX } from 'lucide-vue-next';
 
 const validExtensions = ['jpg', 'jpeg', 'png']
 
@@ -270,9 +271,10 @@ async function getFromYouTubeForPreview(preview: YouTubePreviewData, youTubeVide
 
 <template>
     <h2 class="text-2xl">{{ boardName }}</h2>
-    <template v-if="errorMessage">
-        {{ errorMessage }}
-    </template>
+    <div v-if="errorMessage" role="alert" class="alert alert-error">
+        <CircleX />
+        <span>{{ errorMessage }}</span>
+    </div>
     <template v-else-if="previewData.length === 0">
         <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
             <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"

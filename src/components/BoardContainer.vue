@@ -29,7 +29,7 @@ const props = defineProps(['boardId'])
 defineExpose({ thumbnailBoard: thumbnailBoard })
 
 const isEmpty = computed(() => {
-    return thumbnailBoard.value?.previewData.length == 0
+    return thumbnailBoard.value?.previewData && thumbnailBoard.value.previewData.length == 0
 })
 
 function reset() {
