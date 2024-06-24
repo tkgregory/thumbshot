@@ -265,6 +265,7 @@ async function getFromYouTubeForPreview(preview: YouTubePreviewData, youTubeVide
     preview.title = videoData.title
     preview.channelName = videoData.channelName
     preview.imageURL = videoData.imageURL
+    preview.s3ObjectKey = undefined
     closeModal()
 }
 </script>
