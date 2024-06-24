@@ -39,3 +39,13 @@ test('Delete board', async ({ boardsPage }) => {
 
     await expect(boardsPage.listSelector(name)).toHaveCount(0, { timeout: 5000 })
 });
+
+test('Cannot access board of another user', async ({ page, boardsPage, createAccountPage }) => {
+    await boardsPage.useNewBoard()
+    await expect(page.getByText('Board not found')).toHaveCount(0)
+    const url = page.url()
+
+    await createAccountPage.signInAsFreeUser()
+    await page.goto(url)
+    await expect(page.getByText('Board not found')).toHaveCount(1)
+});
