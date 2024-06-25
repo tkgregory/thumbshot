@@ -335,9 +335,10 @@ function dragEnd() {
                 <draggable-element draggable="true" @drag="drag" @dragstart="(event: any) => dragStart(event, index)"
                     @dragend="dragEnd" @drop.preventDefault="(event: any) => { drop(event, index); save(); }"
                     @dragover.prevent>
-                    <YouTubePreview :imageSrc="getImageSrc(preview)" :title="preview.title"
-                        :channelName="preview.channelName" :duplicateEnabled="previewData.length != maxPreviewCount"
-                        :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1" :index="index"
+                    <YouTubePreview :isGetFromYouTubeEnabled="!frontEndOnly" :imageSrc="getImageSrc(preview)"
+                        :title="preview.title" :channelName="preview.channelName"
+                        :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
+                        :moveRightEnabled="index != previewData.length - 1" :index="index"
                         :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
                         :isHighlighted="isDragging && dragSourceIndexRef === index"
                         @changeTitle="(title) => { preview.title = title; save(); }"
