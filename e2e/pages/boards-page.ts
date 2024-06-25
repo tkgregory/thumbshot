@@ -20,6 +20,7 @@ export class BoardsPage {
         await this.createBoard(name)
         await this.selectBoard(name)
         await this.closeBoardsDrawer()
+        await expect(this.page.locator(`h2:has-text("${name}")`)).toHaveCount(1)
 
         return name
     }

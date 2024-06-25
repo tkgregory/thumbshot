@@ -18,6 +18,8 @@ const boardName = ref()
 const defaultTitle = 'Enter your video title'
 const defaultChannelName = 'Enter your channel name'
 const errorMessage = ref()
+const isDragging = ref(false)
+const dragSourceIndexRef = ref()
 
 defineExpose({ reset, previewData, load })
 defineEmits(['generateSinglePreview'])
@@ -268,6 +270,46 @@ async function getFromYouTubeForPreview(preview: YouTubePreviewData, youTubeVide
     preview.s3ObjectKey = undefined
     closeModal()
 }
+
+function drag() {
+    isDragging.value = true
+}
+
+function dragStart(event: any, index: number) {
+    if (event.dataTransfer) {
+        event.dataTransfer.setData("dragSourceIndex", index.toString());
+        dragSourceIndexRef.value = index
+    }
+}
+
+function drop(event: any, index: number) {
+    const dragSourceIndex = event.dataTransfer.getData("dragSourceIndex");
+
+    if (dragSourceIndex === undefined || dragSourceIndex === "") {
+        throw new Error('dragSourceIndex is undefined')
+    }
+    const dragTargetIndex = calculateTargetIndex(event, parseInt(dragSourceIndex), index)
+    const itemToInsert = previewData.value.splice(dragSourceIndex, 1)[0]
+    previewData.value.splice(dragTargetIndex, 0, itemToInsert);
+}
+
+function calculateTargetIndex(event: any, dragSourceIndex: number, dragTargetIndex: number) {
+    var boundingRectangle = event.target.getBoundingClientRect();
+    const xPosition = event.pageX - boundingRectangle.left
+    const left = xPosition < boundingRectangle.width / 2
+    if (left && dragSourceIndex < dragTargetIndex) {
+        return dragTargetIndex - 1
+    } else if (!left && dragSourceIndex > dragTargetIndex) {
+        return dragTargetIndex + 1
+    }
+
+    return dragTargetIndex
+}
+
+function dragEnd() {
+    isDragging.value = false
+}
+
 </script>
 
 <template>
@@ -290,17 +332,22 @@ async function getFromYouTubeForPreview(preview: YouTubePreviewData, youTubeVide
         <youtube-container
             class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
             <template v-for="(preview, index) in previewData">
-                <YouTubePreview :imageSrc="getImageSrc(preview)" :title="preview.title"
-                    :channelName="preview.channelName" :duplicateEnabled="previewData.length != maxPreviewCount"
-                    :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1" :index="index"
-                    :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
-                    @changeTitle="(title) => { preview.title = title; save(); }"
-                    @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
-                    @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
-                    @deletePreview="deletePreview(index); save();" @duplicatePreview="duplicatePreview(index); save();"
-                    @moveLeft="moveLeft(index); save();" @moveRight="moveRight(index); save();"
-                    @generatePreview="$emit('generateSinglePreview', index);"
-                    @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForPreview(preview, youTubeVideoURL, closeModal, handleError); save(); }" />
+                <draggable-element draggable="true" @drag="drag" @dragstart="(event: any) => dragStart(event, index)"
+                    @dragend="dragEnd" @drop.preventDefault="(event: any) => { drop(event, index); save(); }"
+                    @dragover.prevent>
+                    <YouTubePreview :imageSrc="getImageSrc(preview)" :title="preview.title"
+                        :channelName="preview.channelName" :duplicateEnabled="previewData.length != maxPreviewCount"
+                        :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1" :index="index"
+                        :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
+                        :isHighlighted="isDragging && dragSourceIndexRef === index"
+                        @changeTitle="(title) => { preview.title = title; save(); }"
+                        @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
+                        @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
+                        @deletePreview="deletePreview(index); save();"
+                        @duplicatePreview="duplicatePreview(index); save();" @moveLeft="moveLeft(index); save();"
+                        @moveRight="moveRight(index); save();" @generatePreview="$emit('generateSinglePreview', index);"
+                        @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForPreview(preview, youTubeVideoURL, closeModal, handleError); save(); }" />
+                </draggable-element>
             </template>
             <template v-if="previewData.length < maxPreviewCount">
                 <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"

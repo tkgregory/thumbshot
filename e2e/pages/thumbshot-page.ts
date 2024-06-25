@@ -13,27 +13,27 @@ export class ThumbShotPage {
     }
 
     async updateTitle(index: number, title: string) {
-        await this.page.locator(`youtube-preview:nth-child(${index + 1}) span[class="cursor-pointer"]`).first().click()
+        await this.page.locator(`draggable-element:nth-child(${index + 1}) span[class="cursor-pointer"]`).first().click()
         await this.page.locator('input[name="title"]').fill(title)
         await this.page.locator('input[name="title"]').blur()
     }
 
     async updateChannelName(index: number, channelName: string) {
-        await this.page.locator(`youtube-preview:nth-child(${index + 1}) span[class="cursor-pointer"]`).nth(1).click()
+        await this.page.locator(`draggable-element:nth-child(${index + 1}) span[class="cursor-pointer"]`).nth(1).click()
         await this.page.locator('input[name="channelName"]').fill(channelName)
         await this.page.locator('input[name="channelName"]').blur()
     }
 
     getPreviewTitle(index: number) {
-        return this.page.locator(`youtube-preview:nth-child(${index + 1}) youtube-metadata-text span`).first()
+        return this.page.locator(`draggable-element:nth-child(${index + 1}) youtube-metadata-text span`).first()
     }
 
     getChannelName(index: number) {
-        return this.page.locator(`youtube-preview:nth-child(${index + 1}) youtube-metadata-text span`).nth(1)
+        return this.page.locator(`draggable-element:nth-child(${index + 1}) youtube-metadata-text span`).nth(1)
     }
 
-    getThumbnailURL(index: number) {
-        return this.page.locator(`youtube-preview:nth-child(${index + 1}) youtube-thumbnail img`).first()
+    getThumbnailImage(index: number) {
+        return this.page.locator(`draggable-element:nth-child(${index + 1}) youtube-thumbnail img`).first()
     }
 
     getScreenshotURL() {

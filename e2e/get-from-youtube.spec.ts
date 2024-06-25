@@ -13,7 +13,7 @@ test('Get from YouTube - thumbnail teaser', async ({ page, thumbshotPage }) => {
 
     await expect(thumbshotPage.getPreviewTitle(0)).toContainText('PSY - GANGNAM STYLE(강남스타일) M/V')
     await expect(thumbshotPage.getChannelName(0)).toContainText('officialpsy')
-    await expect(thumbshotPage.getThumbnailURL(0)).toHaveAttribute('src', 'https://i.ytimg.com/vi/9bZkp7q19f0/maxresdefault.jpg')
+    await expect(thumbshotPage.getThumbnailImage(0)).toHaveAttribute('src', 'https://i.ytimg.com/vi/9bZkp7q19f0/maxresdefault.jpg')
 });
 
 test('Get from YouTube - update preview', async ({ page, thumbshotPage }) => {
@@ -25,7 +25,7 @@ test('Get from YouTube - update preview', async ({ page, thumbshotPage }) => {
 
     await expect(thumbshotPage.getPreviewTitle(0)).toContainText('PSY - GANGNAM STYLE(강남스타일) M/V')
     await expect(thumbshotPage.getChannelName(0)).toContainText('officialpsy')
-    await expect(thumbshotPage.getThumbnailURL(0)).toHaveAttribute('src', 'https://i.ytimg.com/vi/9bZkp7q19f0/maxresdefault.jpg')
+    await expect(thumbshotPage.getThumbnailImage(0)).toHaveAttribute('src', 'https://i.ytimg.com/vi/9bZkp7q19f0/maxresdefault.jpg')
 });
 
 test('Get from YouTube - update preview with custom thumbnail', async ({ page, thumbshotPage }) => {
@@ -41,5 +41,5 @@ test('Get from YouTube - update preview with custom thumbnail', async ({ page, t
 
     await expect(thumbshotPage.getPreviewTitle(0)).toContainText('PSY - GANGNAM STYLE(강남스타일) M/V')
     await expect(thumbshotPage.getChannelName(0)).toContainText('officialpsy')
-    await expect(thumbshotPage.getThumbnailURL(0)).toHaveAttribute('src', 'https://i.ytimg.com/vi/9bZkp7q19f0/maxresdefault.jpg')
+    await expect(thumbshotPage.getThumbnailImage(0)).toHaveAttribute('src', 'https://i.ytimg.com/vi/9bZkp7q19f0/maxresdefault.jpg')
 });

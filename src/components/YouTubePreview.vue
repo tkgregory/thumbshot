@@ -42,6 +42,10 @@ defineProps({
   isSinglePreviewEnabled: {
     type: Boolean,
     default: true
+  },
+  isHighlighted: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -49,7 +53,7 @@ const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'de
 </script>
 
 <template>
-  <youtube-preview class="block text-youtube-parent">
+  <youtube-preview class="block text-youtube-parent" :class="{ [`bg-base-100 rounded-xl`]: isHighlighted }">
     <div v-if="showNumbers" class="text-youtube mb-1">Option {{ index + 1 }}</div>
     <YouTubeThumbnail :imageSrc="imageSrc" :moveLeftEnabled="moveLeftEnabled" :moveRightEnabled="moveRightEnabled"
       :duplicateEnabled="duplicateEnabled" :isGeneratingPreview="isGeneratingPreview"
