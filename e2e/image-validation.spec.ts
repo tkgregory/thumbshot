@@ -61,22 +61,22 @@ function validationTests() {
     });
 
     test('Thumbnail can be the same as previous', async ({ page, thumbshotPage }) => {
-        thumbshotPage.addThumbnail('same-file/1.jpg')
+        await thumbshotPage.addThumbnail('same-file/1.jpg')
         const image1 = page.locator('youtube-thumbnail > img:first-child').first()
         const src1 = await image1.getAttribute('src')
 
-        thumbshotPage.addThumbnail('same-file/2.jpg')
+        await thumbshotPage.addThumbnail('same-file/2.jpg')
         const image2 = page.locator('youtube-thumbnail > img:first-child').first()
         const src2 = await image2.getAttribute('src')
         expect(src2).toBe(src1)
     });
 
     test('Thumbnail can have same name as previous', async ({ page, thumbshotPage }) => {
-        thumbshotPage.addThumbnail('same-name/1/quit.jpg')
+        await thumbshotPage.addThumbnail('same-name/1/quit.jpg')
         const image1 = page.locator('youtube-thumbnail > img:first-child').first()
         const src1 = await image1.getAttribute('src')
 
-        thumbshotPage.addThumbnail('same-name/2/quit.jpg')
+        await thumbshotPage.addThumbnail('same-name/2/quit.jpg')
         const image2 = page.locator('youtube-thumbnail > img:first-child').nth(1)
         const src2 = await image2.getAttribute('src')
         expect(src2).not.toBe(src1)
