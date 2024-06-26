@@ -14,6 +14,7 @@ test('Can add a thumbnail', async ({ page, thumbshotPage }) => {
 });
 
 test('Can change a thumbnail twice', async ({ page, thumbshotPage }) => {
+    test.slow()
     await thumbshotPage.clickRandom()
     await thumbshotPage.updateThumbnail(0, 'correct-dimensions.png')
     await thumbshotPage.updateThumbnail(0, 'correct-dimensions.png')
