@@ -27,15 +27,25 @@ const boardContainer = ref<InstanceType<typeof BoardContainer>>()
       </div>
     </template>
     <template v-else>
-      <div class="min-h-[calc(100vh-8rem)] flex flex-col gap-6 justify-center items-center">
-        <h1 class="text-4xl">Compare and share YouTube thumbnail ideas</h1>
-        <div class="flex gap-2">
-          <RouterLink to="/sign-in">
-            <button class="btn btn-accent lg:btn-lg lg:min-w-40">Sign up</button>
-          </RouterLink>
-          <RouterLink to="/trial">
-            <button class="btn btn-primary lg:btn-lg lg:min-w-40">Try it for free</button>
-          </RouterLink>
+      <div class="min-h-[calc(100vh-8rem)] flex items-center">
+        <div class="flex flex-wrap gap-12">
+          <div class="lg:basis-2/5 flex flex-col gap-4">
+            <h1 class="text-2xl sm:text-4xl font-bold line-clamp-2 text-accent">Compare and share YouTube thumbnail
+              ideas</h1>
+            <h2 class="text-lg sm:text-2xl line-clamp-3">View video ideas side-by-side, get feedback, & pick a
+              winner to make your next video pop.</h2>
+            <div class="flex gap-2 mt-1">
+              <RouterLink to="/sign-in">
+                <button class="btn btn-accent sm:btn-lg sm:min-w-40">Sign up</button>
+              </RouterLink>
+              <RouterLink to="/trial">
+                <button class="btn btn-primary sm:btn-lg sm:min-w-40">Try for free</button>
+              </RouterLink>
+            </div>
+          </div>
+          <div class="lg:basis-1/2 flex justify-center">
+            <img src="/plane-guy.png" class="max-w-3xl w-full object-contain" />
+          </div>
         </div>
       </div>
     </template>
