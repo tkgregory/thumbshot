@@ -5,6 +5,7 @@ import { CircleArrowLeft } from 'lucide-vue-next';
 import { CircleArrowRight } from 'lucide-vue-next';
 import { Upload } from 'lucide-vue-next';
 import { X } from 'lucide-vue-next';
+import { Grip } from 'lucide-vue-next';
 import { Youtube } from 'lucide-vue-next';
 import { ref } from 'vue'
 import SimpleTextModal from './SimpleTextModal.vue';
@@ -30,6 +31,10 @@ const getFromYouTubeModal = ref()
         <div class="absolute bottom-0 right-0 rounded bg-[#00000099] m-[8px] px-[4px] py-[1px] text-white">
             10:08
         </div>
+        <div class="absolute hidden sm:group-hover:flex top-0 left-0 translate-x-1/4 translate-y-1/4 tooltip w-[32px] cursor-pointer"
+            data-tip="Drag and drop to reorder">
+            <Grip :size="32" />
+        </div>
         <div class="absolute hidden group-hover:flex top-0 right-0 -translate-x-1/4 translate-y-1/4 tooltip w-[32px]"
             data-tip="Delete this preview">
             <X :size="32" class="clickable" @click="$emit('deletePreview')" />
@@ -43,7 +48,7 @@ const getFromYouTubeModal = ref()
         <template v-else>
             <div
                 class="w-full absolute hidden group-hover:flex justify-around gap-4 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div class="tooltip w-[32px]" :data-tip="moveLeftEnabled ? 'Move left' : undefined">
+                <div class="tooltip w-[32px] sm:hidden" :data-tip="moveLeftEnabled ? 'Move left' : undefined">
                     <CircleArrowLeft :size="32"
                         :class="{ [`clickable`]: moveLeftEnabled, [`disabled`]: !moveLeftEnabled }"
                         @click="moveLeftEnabled && $emit('moveLeft')" />
@@ -78,7 +83,7 @@ const getFromYouTubeModal = ref()
                         </div>
                     </div>
                 </div>
-                <div class="tooltip w-[32px]" :data-tip="moveRightEnabled ? 'Move right' : undefined">
+                <div class="tooltip w-[32px] sm:hidden" :data-tip="moveRightEnabled ? 'Move right' : undefined">
                     <CircleArrowRight :size="32"
                         :class="{ [`clickable`]: moveRightEnabled, [`disabled`]: !moveRightEnabled }"
                         @click="moveRightEnabled && $emit('moveRight')" />
