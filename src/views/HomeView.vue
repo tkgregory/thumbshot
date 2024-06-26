@@ -29,17 +29,17 @@ const boardContainer = ref<InstanceType<typeof BoardContainer>>()
     <template v-else>
       <div class="min-h-[calc(100vh-8rem)] flex items-center">
         <div class="flex flex-wrap gap-12">
-          <div class="lg:basis-2/5 flex flex-col gap-4">
+          <div class="grow lg:basis-2/5 flex flex-col gap-4">
             <h1 class="text-2xl sm:text-4xl font-bold line-clamp-2 text-accent">Compare and share YouTube thumbnail
               ideas</h1>
             <h2 class="text-lg sm:text-2xl line-clamp-3">View video ideas side-by-side, get feedback, & pick a
               winner to make your next video pop.</h2>
             <div class="flex gap-2 mt-1">
-              <RouterLink to="/sign-in">
-                <button class="btn btn-accent sm:btn-lg sm:min-w-40">Sign up</button>
+              <RouterLink to="/sign-in" class="lg:grow">
+                <button class="btn btn-accent sm:btn-lg sm:min-w-40 lg:w-full">Sign up</button>
               </RouterLink>
-              <RouterLink to="/trial">
-                <button class="btn btn-primary sm:btn-lg sm:min-w-40">Try for free</button>
+              <RouterLink to="/trial" class="lg:grow">
+                <button class="btn btn-primary sm:btn-lg sm:min-w-40 lg:w-full">Try for free</button>
               </RouterLink>
             </div>
           </div>
