@@ -26,6 +26,7 @@ export class BoardsPage {
     }
 
     async selectBoard(name: string) {
+        await this.page.locator(this.listSelectorString(name)).scrollIntoViewIfNeeded()
         await this.page.locator(this.listSelectorString(name)).click()
     }
 
@@ -41,6 +42,7 @@ export class BoardsPage {
     }
 
     async updateBoardName(originalName: string, newName: string) {
+        await this.page.locator(this.listSelectorString(originalName)).scrollIntoViewIfNeeded()
         await this.page.hover(this.listSelectorString(originalName))
         await this.page.locator(`${this.listSelectorString(originalName)} div[data-tip="Rename"]`).click()
         await this.page.locator('#rename_board_modal input[placeholder="New board name"]').fill(newName)
@@ -49,6 +51,7 @@ export class BoardsPage {
 
     async deleteBoard(name: string) {
         this.page.on('dialog', dialog => dialog.accept());
+        await this.page.locator(this.listSelectorString(name)).scrollIntoViewIfNeeded()
         await this.page.hover(this.listSelectorString(name))
         await this.page.locator(`${this.listSelectorString(name)} div[data-tip="Delete"]`).click()
     }
