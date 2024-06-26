@@ -203,16 +203,16 @@ async function onChangeExistingImage(event: any, preview: YouTubePreviewData, fi
     const imageURL = await validateImage(event)
     if (props.frontEndOnly) {
         preview.imageURL = imageURL;
-        return Promise.resolve()
+    } else {
+        const response = await fetch(imageURL)
+        const blob = await response.blob()
+        const compressedBlob = await compressImage(blob)
+        const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
+        preview.s3ObjectKey = s3ObjectKey
+        preview.imageURL = undefined
+        await save()
     }
 
-    const response = await fetch(imageURL)
-    const blob = await response.blob()
-    const compressedBlob = await compressImage(blob)
-    const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
-    preview.s3ObjectKey = s3ObjectKey
-    preview.imageURL = undefined
-    await save()
     finishLoading()
 }
 

@@ -63,6 +63,14 @@ export class ThumbShotPage {
         await this.page.locator('youtube-thumbnail div[data-tip="Get from YouTube"]').nth(index).click()
     }
 
+    async updateThumbnail(index: number, imageName: string) {
+        const fileChooserPromise = this.page.waitForEvent('filechooser');
+        await this.page.hover(`youtube-thumbnail:nth-child(${index + 1})`)
+        await this.page.locator('youtube-thumbnail div[data-tip="Change thumbnail"]').nth(index).click()
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles([`./e2e/images/${imageName}`]);
+    }
+
     async generatePreviewModalIsOpen() {
         await expect(this.page.locator('#generate_preview_modal[open]')).toHaveCount(1, { timeout: 10000 })
     }

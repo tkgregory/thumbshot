@@ -6,7 +6,17 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('Can add a thumbnail', async ({ page, thumbshotPage }) => {
-    thumbshotPage.addThumbnail('correct-dimensions.png')
+    await thumbshotPage.addThumbnail('correct-dimensions.png')
+
+    const image = page.locator('youtube-thumbnail > img:first-child').first()
+    const src = await image.getAttribute('src')
+    expect(src).toMatch(/blob:http/)
+});
+
+test('Can change a thumbnail twice', async ({ page, thumbshotPage }) => {
+    await thumbshotPage.clickRandom()
+    await thumbshotPage.updateThumbnail(0, 'correct-dimensions.png')
+    await thumbshotPage.updateThumbnail(0, 'correct-dimensions.png')
 
     const image = page.locator('youtube-thumbnail > img:first-child').first()
     const src = await image.getAttribute('src')
