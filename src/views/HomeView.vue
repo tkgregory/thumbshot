@@ -2,14 +2,24 @@
 
 import { ref } from 'vue'
 import BoardContainer from '../components/BoardContainer.vue'
-import Instructions from '../components/Instructions.vue'
 import FooterBar from '../components/FooterBar.vue'
 import NavBar from '../components/NavBar.vue'
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { getCurrentUser } from 'aws-amplify/auth';
 
-const navBar = ref()
+const navBar = ref<InstanceType<typeof NavBar>>()
 const route = useRoute()
+const router = useRouter()
+
 const boardContainer = ref<InstanceType<typeof BoardContainer>>()
+
+getCurrentUser()
+  .then((user) => {
+    console.log('user', user.username)
+    if (!route.params.boardId && localStorage.getItem(`selectedBoardId-${user.username}`)) {
+      router.push(`/boards/${localStorage.getItem(`selectedBoardId-${user.username}`)}`)
+    }
+  })
 </script>
 
 <template>

@@ -19,7 +19,7 @@ export class BoardsPage {
         await this.openBoardsDrawer()
         await this.createBoard(name)
         await this.closeBoardsDrawer()
-        await expect(this.page.locator(`h2:has-text("${name}")`)).toHaveCount(1)
+        await expect(this.boardTitle(name)).toHaveCount(1)
 
         return name
     }
@@ -56,12 +56,21 @@ export class BoardsPage {
     }
 
     async gotoScreenshotView() {
+        await this.page.goto(`/#/boards/${this.boardId()}/screenshot`)
+        await expect(this.page.locator('screenshot-container')).toHaveCount(1)
+    }
+
+    boardId() {
         const match = this.page.url().match(/\/boards\/(.*)/);
         if (!match) {
             throw new Error('Board ID not found')
         }
-        await this.page.goto(`/#/boards/${match[1]}/screenshot`)
-        await expect(this.page.locator('screenshot-container')).toHaveCount(1)
+
+        return match[1]
+    }
+
+    boardTitle(name: string) {
+        return this.page.locator(`h2:has-text("${name}")`)
     }
 
     listSelector(name: string) {

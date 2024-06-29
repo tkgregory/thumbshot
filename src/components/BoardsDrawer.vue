@@ -9,6 +9,7 @@ import { isPro } from '../composables/user'
 import { accountLimits } from '../composables/data'
 import { config } from '../composables/data'
 import type { Board } from '../types/Board.type'
+import { getCurrentUser } from 'aws-amplify/auth';
 
 const route = useRoute()
 const router = useRouter()
@@ -43,6 +44,7 @@ async function deleteBoard(deleteBoardId: string) {
         })
         if (deleteBoardId == route.params.boardId) {
             router.push('/')
+            await clearLocalStorage()
         }
         listBoards()
     }
@@ -71,8 +73,10 @@ async function createBoard() {
         return response.json()
     }).then((json) => {
         router.push(`/boards/${json.id}`);
-        (document.getElementById('create_board_modal') as HTMLFormElement).close();
-        return listBoards();
+        updateLocalStorage(json.id).then(() => {
+            (document.getElementById('create_board_modal') as HTMLFormElement).close();
+            return listBoards();
+        })
     })
 }
 
@@ -91,6 +95,20 @@ async function renameBoard() {
         }
         return listBoards();
     })
+}
+
+async function updateLocalStorage(boardId: string) {
+    return getCurrentUser()
+        .then((user) => {
+            localStorage.setItem(`selectedBoardId-${user.username}`, boardId);
+        })
+}
+
+async function clearLocalStorage() {
+    return getCurrentUser()
+        .then((user) => {
+            localStorage.removeItem(`selectedBoardId-${user.username}`);
+        })
 }
 </script>
 
@@ -123,7 +141,8 @@ async function renameBoard() {
                 </div>
                 <ul>
                     <li v-for="board in boards" class="group">
-                        <RouterLink class="flex py-0 pr-0 h-12" :to="`/boards/${board.id}`">
+                        <RouterLink class="flex py-0 pr-0 h-12" :to="`/boards/${board.id}`"
+                            @click="updateLocalStorage(board.id)">
                             <div class="w-full">{{ board.name }}&nbsp;</div>
                             <div class="hidden group-hover:flex">
                                 <div class="tooltip" data-tip="Rename"
