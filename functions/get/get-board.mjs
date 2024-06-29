@@ -28,7 +28,7 @@ export const handler = async (event) => {
     }
     const response = await docClient.send(new GetCommand(getJSON));
 
-    if (response.Item.userId !== userId) {
+    if (!response.Item || response.Item.userId !== userId) {
         return {
             statusCode: 404,
             body: JSON.stringify({ message: "Not found" }),
