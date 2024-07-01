@@ -164,6 +164,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - cognito-idp:ListUsers
+                  - cognito-idp:AdminConfirmSignUp
                   - cognito-idp:DescribeUserPool
                   - cognito-idp:UpdateUserPool
                   - cognito-idp:DeleteUserPool
