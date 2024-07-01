@@ -30,7 +30,13 @@ export const handler = async (event) => {
             ":userId": userId,
         },
     }
-    const response = await docClient.send(new DeleteCommand(deleteJSON));
+
+    try {
+        await docClient.send(new DeleteCommand(deleteJSON));
+    } catch (error) {
+        console.error("Error deleting board with delete command: " + JSON.stringify(deleteJSON, null, 2))
+        throw error
+    }
 
     return {
         statusCode: 204
