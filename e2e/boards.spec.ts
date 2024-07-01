@@ -33,8 +33,6 @@ test('Delete board', async ({ boardsPage }) => {
     const name = boardsPage.randomName()
 
     await boardsPage.createBoard(name)
-    await expect(boardsPage.listSelector(name)).toHaveCount(1, { timeout: 5000 })
-
     await boardsPage.deleteBoard(name)
 
     await expect(boardsPage.listSelector(name)).toHaveCount(0, { timeout: 5000 })

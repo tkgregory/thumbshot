@@ -13,7 +13,7 @@ export const handler = async (event) => {
         TableName: process.env.BOARDS_TABLE_NAME,
         IndexName: "userIdSortByNameIndex",
         KeyConditionExpression: "userId = :userId",
-        ProjectionExpression: "id, #boardName",
+        ProjectionExpression: "id, #boardName, updated",
         ExpressionAttributeValues: {
             ":userId": userId,
         },

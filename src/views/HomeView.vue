@@ -15,7 +15,6 @@ const boardContainer = ref<InstanceType<typeof BoardContainer>>()
 
 getCurrentUser()
   .then((user) => {
-    console.log('user', user.username)
     if (!route.params.boardId && localStorage.getItem(`selectedBoardId-${user.username}`)) {
       router.push(`/boards/${localStorage.getItem(`selectedBoardId-${user.username}`)}`)
     }

@@ -20,6 +20,10 @@ const renamedBoardName = ref()
 defineExpose({ boards })
 const emits = defineEmits(['selectedBoardUpdated'])
 const pro = ref()
+const sortBy = ref('Name')
+const sortDirection = ref('ascending')
+import { ArrowUp } from 'lucide-vue-next';
+import { ArrowDown } from 'lucide-vue-next';
 isPro().then(value => pro.value = value)
 
 listBoards()
@@ -32,7 +36,28 @@ async function listBoards() {
         return response.json()
     }).then((json) => {
         boards.value = json
+        sort()
     })
+}
+
+function sortByUpdated(a: Board, b: Board) {
+    if (a.updated < b.updated) {
+        return -1;
+    }
+    if (a.updated > b.updated) {
+        return 1;
+    }
+    return 0;
+}
+
+function sortByName(a: Board, b: Board) {
+    if (a.name < b.name) {
+        return -1;
+    }
+    if (a.name > b.name) {
+        return 1;
+    }
+    return 0;
 }
 
 async function deleteBoard(deleteBoardId: string) {
@@ -110,6 +135,24 @@ async function clearLocalStorage() {
             localStorage.removeItem(`selectedBoardId-${user.username}`);
         })
 }
+
+function selectSortBy(event: any) {
+    sortBy.value = event.target.value
+    sort()
+}
+
+function sort() {
+    if (sortBy.value === 'Name') {
+        boards.value.sort(sortByName)
+    }
+    else if (sortBy.value === 'Updated') {
+        boards.value.sort(sortByUpdated)
+    }
+
+    if (sortDirection.value === 'descending') {
+        boards.value.reverse()
+    }
+}
 </script>
 
 <template>
@@ -122,22 +165,38 @@ async function clearLocalStorage() {
             <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
 
             <div class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-                <div class="text-xl mb-4 flex gap-4 items-center">
-                    Boards
-                    <template v-if="boards.length < accountLimits.free.boardsLimit || pro">
-                        <div class="tooltip tooltip-left" data-tip="Create new board" @click="showCreateBoard()">
+                <div class="text-xl mb-4 flex gap-4 items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        Boards
+                        <div v-if="boards.length < accountLimits.free.boardsLimit || pro" class="tooltip tooltip-left"
+                            data-tip="Create new board" @click="showCreateBoard()">
                             <div class="btn btn-ghost">
                                 <Plus />
                             </div>
                         </div>
-                    </template>
-                    <template v-else>
-                        <div class="tooltip tooltip-left tooltip-accent" data-tip="Get Pro to add unlimited boards">
-                            <div class="btn btn-disabled">
-                                <Plus />
+                        <div v-else class="tooltip tooltip-left tooltip-accent"
+                            data-tip="Get Pro to add unlimited boards">
+                            <div class="btn btn-sm btn-square btn-disabled">
+                                <Plus :size="16" />
                             </div>
                         </div>
-                    </template>
+                    </div>
+                    <div class="flex items-center">
+                        <div v-if="sortDirection === 'ascending'" @click="sortDirection = 'descending'; sort();"
+                            class="btn btn-sm btn-ghost rounded-left">
+                            <ArrowUp :size="16" />
+                        </div>
+                        <div v-else @click="sortDirection = 'ascending'; sort();"
+                            class="btn btn-sm btn-ghost rounded-left">
+                            <ArrowDown :size="16" />
+                        </div>
+                        <select name="sort-by" class="select select-sm w-full max-w-xs rounded-right mr-1"
+                            @change="selectSortBy">
+                            <option disabled>Sort by</option>
+                            <option>Name</option>
+                            <option>Updated</option>
+                        </select>
+                    </div>
                 </div>
                 <ul>
                     <li v-for="board in boards" class="group">

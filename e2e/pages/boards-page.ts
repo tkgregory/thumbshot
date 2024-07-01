@@ -38,6 +38,7 @@ export class BoardsPage {
         await this.createBoardButton().click()
         await this.page.locator('#create_board_modal input[placeholder="New board name"]').fill(name)
         await this.page.locator('button:has-text("Create Board")').click()
+        await expect(this.listSelector(name)).toHaveCount(1, { timeout: 5000 })
     }
 
     async updateBoardName(originalName: string, newName: string) {
@@ -75,6 +76,10 @@ export class BoardsPage {
 
     listSelector(name: string) {
         return this.page.locator(this.listSelectorString(name))
+    }
+
+    boardListIndex(index: number) {
+        return this.page.locator(`.drawer-side ul li:nth-child(${index + 1})`)
     }
 
     listSelectorString(name: string) {
