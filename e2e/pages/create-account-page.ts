@@ -1,6 +1,6 @@
 import { type Page, expect } from '@playwright/test';
 import crypto from 'crypto'
-import { CognitoIdentityProviderClient, AdminConfirmSignUpCommand, ListUsersCommand, AdminDeleteUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, AdminConfirmSignUpCommand, ListUsersCommand, AdminDeleteUserCommand, ListUsersCommandOutput } from "@aws-sdk/client-cognito-identity-provider";
 import { exec } from 'child_process';
 
 export class CreateAccountPage {
@@ -86,10 +86,11 @@ export class CreateAccountPage {
             UserPoolId: userPoolId,
             Filter: `"email"="${email}"`,
         };
-        const listUsersResponse = await client.send(new ListUsersCommand(listUsersInput));
 
-        if (listUsersResponse === undefined || listUsersResponse.Users === undefined || listUsersResponse.Users.length === 0) {
-            throw new Error(`No user found with email ${email}`);
+        let listUsersResponse: ListUsersCommandOutput | undefined
+        while (listUsersResponse === undefined || listUsersResponse.Users === undefined || listUsersResponse.Users.length === 0) {
+            listUsersResponse = await client.send(new ListUsersCommand(listUsersInput));
+            await new Promise(f => setTimeout(f, 1000));
         }
 
         return listUsersResponse.Users[0].Username
