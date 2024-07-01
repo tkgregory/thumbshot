@@ -9,7 +9,8 @@ export default {
       DEFAULT: '4px',
       'lg': '0.5rem',
       'left': 'var(--rounded-btn, 0.5rem) 0 0 var(--rounded-btn, 0.5rem)',
-      'right': '0 var(--rounded-btn, 0.5rem) var(--rounded-btn, 0.5rem) 0'
+      'right': '0 var(--rounded-btn, 0.5rem) var(--rounded-btn, 0.5rem) 0',
+      'full': '9999px'
     },
     extend: {
       fontFamily: {
