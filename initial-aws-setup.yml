@@ -163,6 +163,7 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action:
+                  - cognito-idp:ListUsers
                   - cognito-idp:DescribeUserPool
                   - cognito-idp:UpdateUserPool
                   - cognito-idp:DeleteUserPool
