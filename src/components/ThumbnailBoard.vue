@@ -20,6 +20,7 @@ const defaultChannelName = 'Enter your channel name'
 const errorMessage = ref()
 const isDragging = ref(false)
 const dragSourceIndexRef = ref()
+const isLoading = ref(true)
 
 defineExpose({ reset, previewData, load })
 defineEmits(['generateSinglePreview'])
@@ -129,9 +130,11 @@ async function save() {
 
 async function load() {
     if (props.frontEndOnly) {
+        isLoading.value = false
         return
     }
 
+    isLoading.value = true
     fetchPathWithAuth('GET', `/user/boards/${props.boardId}`).then((response) => {
         if (response.status === 404) {
             errorMessage.value = 'Board not found'
@@ -143,6 +146,7 @@ async function load() {
     }).then((json) => {
         boardName.value = json.name
         previewData.value = json.previews
+        isLoading.value = false
     })
 }
 
@@ -313,62 +317,68 @@ function dragEnd() {
 </script>
 
 <template>
-    <h2 class="text-2xl">{{ boardName }}</h2>
-    <div v-if="errorMessage" role="alert" class="alert alert-error">
-        <CircleX />
-        <span>{{ errorMessage }}</span>
-    </div>
-    <template v-else-if="previewData.length === 0">
-        <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
-            <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"
-                @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)"
-                @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError)" />
-            <div class="hidden md:block relative">
-                <img src="/visualisation.png" class="absolute -translate-x-16" />
-            </div>
-        </div>
+    <template v-if="isLoading">
+        <span class="mx-auto loading loading-spinner loading-xl"></span>
     </template>
     <template v-else>
-        <youtube-container
-            class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
-            <template v-for="(preview, index) in previewData">
-                <draggable-element draggable="true" @drag="drag" @dragstart="(event: any) => dragStart(event, index)"
-                    @dragend="dragEnd" @drop.preventDefault="(event: any) => { drop(event, index); save(); }"
-                    @dragover.prevent>
-                    <YouTubePreview :isGetFromYouTubeEnabled="!frontEndOnly" :imageSrc="getImageSrc(preview)"
-                        :title="preview.title" :channelName="preview.channelName"
-                        :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
-                        :moveRightEnabled="index != previewData.length - 1" :index="index"
-                        :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
-                        :isHighlighted="isDragging && dragSourceIndexRef === index"
-                        @changeTitle="(title) => { preview.title = title; save(); }"
-                        @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
-                        @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
-                        @deletePreview="deletePreview(index); save();"
-                        @duplicatePreview="duplicatePreview(index); save();" @moveLeft="moveLeft(index); save();"
-                        @moveRight="moveRight(index); save();" @generatePreview="$emit('generateSinglePreview', index);"
-                        @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForPreview(preview, youTubeVideoURL, closeModal, handleError); save(); }" />
-                </draggable-element>
-            </template>
-            <template v-if="previewData.length < maxPreviewCount">
+        <h2 class="text-2xl">{{ boardName }}</h2>
+        <div v-if="errorMessage" role="alert" class="alert alert-error">
+            <CircleX />
+            <span>{{ errorMessage }}</span>
+        </div>
+        <template v-else-if="previewData.length === 0">
+            <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
                 <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"
                     @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)"
-                    @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
-            </template>
-            <template v-else>
-                <div class="aspect-video flex flex-col justify-center items-center text-xl">
-                    <div class="w-full">
-                        <template v-if="$slots.previewLimit">
-                            <slot name="previewLimit" />
-                        </template>
-                        <template v-else>
-                            <p>Preview limit reached.</p>
-                            <p>Remove previews to add up.</p>
-                        </template>
-                    </div>
+                    @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError)" />
+                <div class="hidden md:block relative">
+                    <img src="/visualisation.png" class="absolute -translate-x-16" />
                 </div>
-            </template>
-        </youtube-container>
+            </div>
+        </template>
+        <template v-else>
+            <youtube-container
+                class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
+                <template v-for="(preview, index) in previewData">
+                    <draggable-element draggable="true" @drag="drag"
+                        @dragstart="(event: any) => dragStart(event, index)" @dragend="dragEnd"
+                        @drop.preventDefault="(event: any) => { drop(event, index); save(); }" @dragover.prevent>
+                        <YouTubePreview :isGetFromYouTubeEnabled="!frontEndOnly" :imageSrc="getImageSrc(preview)"
+                            :title="preview.title" :channelName="preview.channelName"
+                            :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
+                            :moveRightEnabled="index != previewData.length - 1" :index="index"
+                            :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
+                            :isHighlighted="isDragging && dragSourceIndexRef === index"
+                            @changeTitle="(title) => { preview.title = title; save(); }"
+                            @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
+                            @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
+                            @deletePreview="deletePreview(index); save();"
+                            @duplicatePreview="duplicatePreview(index); save();" @moveLeft="moveLeft(index); save();"
+                            @moveRight="moveRight(index); save();"
+                            @generatePreview="$emit('generateSinglePreview', index);"
+                            @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForPreview(preview, youTubeVideoURL, closeModal, handleError); save(); }" />
+                    </draggable-element>
+                </template>
+                <template v-if="previewData.length < maxPreviewCount">
+                    <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"
+                        @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)"
+                        @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
+                </template>
+                <template v-else>
+                    <div class="aspect-video flex flex-col justify-center items-center text-xl">
+                        <div class="w-full">
+                            <template v-if="$slots.previewLimit">
+                                <slot name="previewLimit" />
+                            </template>
+                            <template v-else>
+                                <p>Preview limit reached.</p>
+                                <p>Remove previews to add up.</p>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </youtube-container>
+        </template>
     </template>
 
     <Teleport to="body">
