@@ -40,7 +40,7 @@ export const handler = async (event) => {
     if (process.env.SET_NGROK_HEADER === 'true') {
       page.setExtraHTTPHeaders({ 'ngrok-skip-browser-warning': 'true' })
     }
-    await page.goto(boardURL);
+    await page.goto(boardURL, { "waitUntil": "networkidle0" });
 
     const firstChildSelector = 'youtube-container > youtube-preview:first-child'
     await page.waitForSelector(firstChildSelector)
