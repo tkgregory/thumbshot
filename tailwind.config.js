@@ -5,13 +5,6 @@ export default {
     themes: ["light", "dark"],
   },
   theme: {
-    borderRadius: {
-      DEFAULT: '4px',
-      'lg': '0.5rem',
-      'left': 'var(--rounded-btn, 0.5rem) 0 0 var(--rounded-btn, 0.5rem)',
-      'right': '0 var(--rounded-btn, 0.5rem) var(--rounded-btn, 0.5rem) 0',
-      'full': '9999px'
-    },
     extend: {
       fontFamily: {
         roboto: ['Roboto', 'Arial', 'sans-serif']
@@ -28,6 +21,10 @@ export default {
       },
       colors: {
         'youtube-dark': '#0F0F0F',
+      },
+      borderRadius: {
+        'left': 'var(--rounded-btn, 0.5rem) 0 0 var(--rounded-btn, 0.5rem)',
+        'right': '0 var(--rounded-btn, 0.5rem) var(--rounded-btn, 0.5rem) 0',
       },
     },
   },
