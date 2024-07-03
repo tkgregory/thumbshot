@@ -20,8 +20,8 @@ const renamedBoardName = ref()
 defineExpose({ boards })
 const emits = defineEmits(['selectedBoardUpdated'])
 const pro = ref()
-const sortBy = ref('Name')
-const sortDirection = ref('ascending')
+const sortBy = ref(localStorage.getItem('sortBy') !== null ? localStorage.getItem('sortBy') : 'Name')
+const sortDirection = ref(localStorage.getItem('sortDirection') !== null ? localStorage.getItem('sortDirection') : 'ascending')
 import { ArrowUp } from 'lucide-vue-next';
 import { ArrowDown } from 'lucide-vue-next';
 isPro().then(value => pro.value = value)
@@ -136,8 +136,17 @@ async function clearLocalStorage() {
         })
 }
 
+function changeSortDirection(direction: string) {
+    sortDirection.value = direction;
+    localStorage.setItem('sortDirection', sortDirection.value)
+    sort();
+}
+
 function selectSortBy(event: any) {
     sortBy.value = event.target.value
+    if (sortBy.value !== null) {
+        localStorage.setItem('sortBy', sortBy.value)
+    }
     sort()
 }
 
@@ -182,19 +191,18 @@ function sort() {
                         </div>
                     </div>
                     <div class="flex items-center">
-                        <div v-if="sortDirection === 'ascending'" @click="sortDirection = 'descending'; sort();"
+                        <div v-if="sortDirection === 'ascending'" @click="changeSortDirection('descending')"
                             class="btn btn-sm btn-ghost rounded-left">
                             <ArrowUp :size="16" />
                         </div>
-                        <div v-else @click="sortDirection = 'ascending'; sort();"
-                            class="btn btn-sm btn-ghost rounded-left">
+                        <div v-else @click="changeSortDirection('ascending')" class="btn btn-sm btn-ghost rounded-left">
                             <ArrowDown :size="16" />
                         </div>
                         <select name="sort-by" class="select select-sm w-full max-w-xs rounded-right mr-1"
                             @change="selectSortBy">
                             <option disabled>Sort by</option>
-                            <option>Name</option>
-                            <option>Updated</option>
+                            <option :selected="sortBy === 'Name'">Name</option>
+                            <option :selected="sortBy === 'Updated'">Updated</option>
                         </select>
                     </div>
                 </div>

@@ -93,4 +93,8 @@ export class BoardsPage {
     randomName() {
         return `My new board ${crypto.randomBytes(5).toString('hex')}`
     }
+
+    sortBy() {
+        return this.page.locator('select[name="sort-by"]')
+    }
 }
