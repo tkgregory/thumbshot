@@ -95,7 +95,6 @@ Resources:
                   - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:chromium*'
               - Effect: Allow
                 Action:
-                  - logs:DescribeLogGroups
                   - logs:CreateLogGroup
                   - logs:DeleteLogGroup
                   - logs:TagResource
@@ -103,6 +102,10 @@ Resources:
                 Resource:
                   - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/thumbshot-*'
                   - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/http-api/thumbshot-*'
+              - Effect: Allow
+                Action:
+                  - logs:DescribeLogGroups
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - route53:ChangeResourceRecordSets
