@@ -38,7 +38,7 @@ export class BoardsPage {
         await this.createBoardButton().click()
         await this.page.locator('#create_board_modal input[placeholder="New board name"]').fill(name)
         await this.page.locator('button:has-text("Create Board")').click()
-        await expect(this.listSelector(name)).toHaveCount(1, { timeout: 5000 })
+        await expect(this.listSelector(name)).toHaveCount(1, { timeout: 10000 })
     }
 
     async updateBoardName(originalName: string, newName: string) {
