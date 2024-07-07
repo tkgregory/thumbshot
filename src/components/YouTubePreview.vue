@@ -56,7 +56,8 @@ const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'de
 </script>
 
 <template>
-  <youtube-preview class="block text-youtube-parent" :class="{ [`bg-base-100 rounded-xl`]: isHighlighted }">
+  <youtube-preview class="relative block text-youtube-parent">
+    <div v-if="isHighlighted" class="absolute bg-primary w-full h-full z-10 rounded-xl" />
     <div v-if="showNumbers" class="text-youtube mb-1">Option {{ index + 1 }}</div>
     <YouTubeThumbnail :isGetFromYouTubeEnabled="isGetFromYouTubeEnabled" :imageSrc="imageSrc"
       :moveLeftEnabled="moveLeftEnabled" :moveRightEnabled="moveRightEnabled" :duplicateEnabled="duplicateEnabled"

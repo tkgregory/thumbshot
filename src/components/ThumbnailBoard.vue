@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { fetchPathWithAuth } from '../composables/api'
 import { realYouTubeVideos } from '../composables/data'
 import { getVideoData } from '../composables/youtube'
@@ -20,6 +20,7 @@ const defaultChannelName = 'Enter your channel name'
 const errorMessage = ref()
 const isDragging = ref(false)
 const dragSourceIndexRef = ref()
+const dragTargetIndexRef = ref()
 const isLoading = ref(true)
 
 defineExpose({ reset, previewData, load })
@@ -292,28 +293,28 @@ function drop(event: any, index: number) {
     if (dragSourceIndex === undefined || dragSourceIndex === "") {
         throw new Error('dragSourceIndex is undefined')
     }
-    const dragTargetIndex = calculateTargetIndex(event, parseInt(dragSourceIndex), index)
     const itemToInsert = previewData.value.splice(dragSourceIndex, 1)[0]
-    previewData.value.splice(dragTargetIndex, 0, itemToInsert);
+    previewData.value.splice(index, 0, itemToInsert);
 }
 
-function calculateTargetIndex(event: any, dragSourceIndex: number, dragTargetIndex: number) {
-    var boundingRectangle = event.target.getBoundingClientRect();
-    const xPosition = event.pageX - boundingRectangle.left
-    const left = xPosition < boundingRectangle.width / 2
-    if (left && dragSourceIndex < dragTargetIndex) {
-        return dragTargetIndex - 1
-    } else if (!left && dragSourceIndex > dragTargetIndex) {
-        return dragTargetIndex + 1
-    }
-
-    return dragTargetIndex
+function dragOver(index: number) {
+    dragTargetIndexRef.value = index
 }
 
 function dragEnd() {
     isDragging.value = false
 }
 
+const displayPreviewData = computed(() => {
+    if (isDragging.value && dragSourceIndexRef.value !== undefined && dragTargetIndexRef.value !== undefined) {
+        const previewDataClone = [...previewData.value];
+        const itemToInsert = previewDataClone.splice(dragSourceIndexRef.value, 1)[0]
+        previewDataClone.splice(dragTargetIndexRef.value, 0, itemToInsert);
+        return previewDataClone
+    }
+    return previewData.value
+
+})
 </script>
 
 <template>
@@ -339,16 +340,18 @@ function dragEnd() {
         <template v-else>
             <youtube-container
                 class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
-                <template v-for="(preview, index) in previewData">
+                <template v-for="(preview, index) in displayPreviewData">
                     <draggable-element draggable="true" @drag="drag"
                         @dragstart="(event: any) => dragStart(event, index)" @dragend="dragEnd"
-                        @drop.preventDefault="(event: any) => { drop(event, index); save(); }" @dragover.prevent>
+                        @drop.preventDefault="(event: any) => { drop(event, index); save(); }"
+                        @dragover.prevent="dragOver(index)">
+
                         <YouTubePreview :isGetFromYouTubeEnabled="!frontEndOnly" :imageSrc="getImageSrc(preview)"
                             :title="preview.title" :channelName="preview.channelName"
                             :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
                             :moveRightEnabled="index != previewData.length - 1" :index="index"
                             :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
-                            :isHighlighted="isDragging && dragSourceIndexRef === index"
+                            :isHighlighted="isDragging && dragTargetIndexRef === index"
                             @changeTitle="(title) => { preview.title = title; save(); }"
                             @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
                             @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
