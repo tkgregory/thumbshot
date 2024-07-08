@@ -76,7 +76,7 @@ const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'de
           <EditableText name="title" :value="title" placeholder="Your video title"
             @changeValue="(title: string) => $emit('changeTitle', title)" />
         </div>
-        <div class="flex flex-col text-[#AAAAAA] font-normal text-youtube">
+        <div class="flex flex-col text-[#AAAAAA] font-normal text-youtube-metadata">
           <EditableText name="channelName" :value="channelName" placeholder="Your channel name"
             @changeValue="(channelName: string) => $emit('changeChannelName', channelName)" />
           <div>

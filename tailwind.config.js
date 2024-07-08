@@ -11,6 +11,7 @@ export default {
       },
       fontSize: {
         youtube: '1.6em',
+        "youtube-metadata": '1.4em',
         "youtube-parent": '10px',
       },
       lineHeight: {

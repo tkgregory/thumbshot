@@ -24,7 +24,7 @@ getCurrentUser()
 <template>
   <NavBar ref="navBar" @selectedBoardUpdated="boardContainer?.thumbnailBoard?.load()" />
 
-  <main class="max-w-screen-xl min-h-[calc(100vh-4rem)] mx-auto py-4 px-8">
+  <main class="min-h-[calc(100vh-4rem)] mx-auto py-4 px-8">
     <template v-if="navBar?.isSignedIn">
       <div class="min-h-[calc(100vh-4rem)]">
         <template v-if="route.params.boardId">

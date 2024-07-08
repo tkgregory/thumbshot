@@ -12,7 +12,7 @@ if (route.params.boardIndex != null) {
 </script>
 
 <template>
-    <main class="max-w-screen-xl min-h-screen mx-auto px-8">
+    <main class="min-h-screen mx-auto px-8">
         <screenshot-container class="block p-[16px]">
             <div class="flex flex-col gap-8">
                 <ScreenshotThumbnailBoard :boardId="boardId" :boardIndex="boardIndex" />

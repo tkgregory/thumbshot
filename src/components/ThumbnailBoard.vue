@@ -40,6 +40,10 @@ const props = defineProps({
         type: Number,
         default: 9
     },
+    columnCount: {
+        type: Number,
+        required: false
+    }
 })
 
 load()
