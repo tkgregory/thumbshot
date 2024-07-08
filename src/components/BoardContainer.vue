@@ -2,6 +2,7 @@
 import ThumbnailBoard from './ThumbnailBoard.vue'
 import LoadingButton from './LoadingButton.vue'
 import Settings from './Settings.vue'
+import NumberPicker from './NumberPicker.vue'
 import { Camera } from 'lucide-vue-next';
 import { RotateCcw } from 'lucide-vue-next';
 import { Copy } from 'lucide-vue-next';
@@ -23,6 +24,7 @@ const isJustDownloaded = ref(false)
 const thumbnailBoard = ref<InstanceType<typeof ThumbnailBoard>>()
 const error = ref()
 const pro = ref()
+const columnCount = ref()
 isPro().then(value => pro.value = value)
 
 const props = defineProps(['boardId'])
@@ -102,6 +104,10 @@ function download() {
                     <Camera />
                 </LoadingButton>
             </div>
+            <div class="hidden lg:block tooltip" data-tip="Set column count">
+                <NumberPicker name="columnCount" :min="3" :max="5" defaultTextValue="Auto"
+                    @change="(value) => columnCount = value" />
+            </div>
             <div class="tooltip" data-tip="Change settings">
                 <Settings />
             </div>
@@ -145,7 +151,7 @@ function download() {
         </div>
         <ThumbnailBoard ref="thumbnailBoard" :boardId="boardId" :isGeneratingSinglePreview="isGeneratingSinglePreview"
             @generateSinglePreview="(index) => generateSinglePreview(index)"
-            :max-preview-count="accountLimits[pro ? 'pro' : 'free'].previewLimit">
+            :max-preview-count="accountLimits[pro ? 'pro' : 'free'].previewLimit" :columnCount="columnCount">
             <template #previewLimit>
                 <template v-if="pro">
                     <p>You reached the {{ accountLimits.pro.previewLimit }} thumbnail limit.</p>

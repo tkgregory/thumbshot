@@ -48,6 +48,14 @@ export class ThumbShotPage {
         return this.page.locator('div[data-tip="Reset"]')
     }
 
+    getDecreaseColumnsButton() {
+        return this.page.locator('div[data-tip="Set column count"] .lucide-minus-icon')
+    }
+
+    getIncreaseColumnsButton() {
+        return this.page.locator('div[data-tip="Set column count"] .lucide-plus-icon')
+    }
+
     async clickDelete(index: number) {
         await this.page.hover(`youtube-thumbnail:nth-child(${index + 1})`)
         await this.page.locator('youtube-thumbnail div[data-tip="Delete this preview"]').nth(index).click()

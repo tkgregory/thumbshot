@@ -39,6 +39,10 @@ const props = defineProps({
     maxPreviewCount: {
         type: Number,
         default: 9
+    },
+    columnCount: {
+        type: String,
+        required: false,
     }
 })
 
@@ -339,6 +343,7 @@ const displayPreviewData = computed(() => {
         </template>
         <template v-else>
             <youtube-container
+                :class="{ [`lg:grid-cols-3`]: columnCount == '3', [`lg:grid-cols-4`]: columnCount == '4', [`lg:grid-cols-5`]: columnCount == '5' }"
                 class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
                 <template v-for="(preview, index) in displayPreviewData">
                     <draggable-element draggable="true" @drag="drag"
