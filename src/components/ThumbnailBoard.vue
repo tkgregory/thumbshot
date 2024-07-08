@@ -39,10 +39,6 @@ const props = defineProps({
     maxPreviewCount: {
         type: Number,
         default: 9
-    },
-    columnCount: {
-        type: Number,
-        required: false
     }
 })
 
