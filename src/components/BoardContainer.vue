@@ -104,8 +104,8 @@ function download() {
                     <Camera />
                 </LoadingButton>
             </div>
-            <div class="hidden lg:block tooltip" data-tip="Set column count">
-                <NumberPicker name="columnCount" :min="3" :max="5" defaultTextValue="Auto"
+            <div class="hidden xl:block tooltip" data-tip="Set column count">
+                <NumberPicker name="columnCount" :min="3" :max="6" defaultTextValue="Auto"
                     @change="(value) => columnCount = value" />
             </div>
             <div class="tooltip" data-tip="Change settings">
