@@ -5,7 +5,8 @@ export class SettingsPage {
     }
 
     async open() {
-        await this.page.locator('div[data-tip="Change settings"]').click()
+        await this.page.locator('.lucide-circle-user-round-icon').click()
+        await this.page.locator('a:has-text("Settings")').click()
     }
 
     numberingSetting() {

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { SettingsIcon } from 'lucide-vue-next';
 import { watch } from 'vue'
 import { loadSettings } from '../composables/settings'
 
@@ -8,6 +7,7 @@ showNumbers.value = loadSettings().showNumbers
 watch(showNumbers, async () => {
     saveStorage()
 })
+defineExpose({ show })
 
 function saveStorage() {
     try {
@@ -16,24 +16,28 @@ function saveStorage() {
         console.error(e)
     }
 }
+
+function show() {
+    (document.getElementById('settings_modal') as HTMLFormElement).showModal()
+}
 </script>
 
 <template>
-    <div class="drawer drawer-end">
-        <input id="settings-drawer" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content">
-            <label for="settings-drawer" class="drawer-button btn btn-square btn-neutral">
-                <SettingsIcon />
+    <dialog id="settings_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold">Settings</h3>
+            <label class="label cursor-pointer">
+                <span class="label-text">Show numbers on screenshot</span>
+                <input type="checkbox" class="checkbox" v-model="showNumbers" />
             </label>
-        </div>
-        <div class="drawer-side z-10">
-            <label for="settings-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-            <div class="form-control menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-                <label class="label cursor-pointer">
-                    <span class="label-text">Show numbers on screenshot</span>
-                    <input type="checkbox" class="checkbox" v-model="showNumbers" />
-                </label>
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn">Close</button>
+                </form>
             </div>
         </div>
-    </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
 </template>

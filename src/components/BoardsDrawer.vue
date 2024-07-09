@@ -10,14 +10,15 @@ import { accountLimits } from '../composables/data'
 import { config } from '../composables/data'
 import type { Board } from '../types/Board.type'
 import { getCurrentUser } from 'aws-amplify/auth';
-
+import { CircleChevronLeft } from 'lucide-vue-next';
 const route = useRoute()
 const router = useRouter()
 const boards = ref([] as Board[])
 const newBoardName = ref()
+const isDrawerOpen = ref()
 const renamedBoardId = ref()
 const renamedBoardName = ref()
-defineExpose({ boards })
+defineExpose({ boards, open })
 const emits = defineEmits(['selectedBoardUpdated'])
 const pro = ref()
 const sortBy = ref(localStorage.getItem('sortBy') !== null ? localStorage.getItem('sortBy') : 'Name')
@@ -162,13 +163,20 @@ function sort() {
         boards.value.reverse()
     }
 }
+
+function open() {
+    isDrawerOpen.value = true
+}
 </script>
 
 <template>
     <div class="drawer drawer-end">
-        <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+        <input id="my-drawer-4" type="checkbox" class="drawer-toggle" v-model="isDrawerOpen" />
         <div class="drawer-content flex justify-end">
-            <label for="my-drawer-4" class="drawer-button btn btn-primary">Boards</label>
+            <label for="my-drawer-4" class="drawer-button btn btn-ghost">
+                <CircleChevronLeft />
+                Boards
+            </label>
         </div>
         <div class="drawer-side z-10">
             <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>

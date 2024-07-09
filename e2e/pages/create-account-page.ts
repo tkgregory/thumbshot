@@ -12,12 +12,21 @@ export class CreateAccountPage {
         this.randomPassword = crypto.randomBytes(5).toString('hex')
     }
 
+    async signOut() {
+        await this.userButton().click()
+        await this.signOutButton().click()
+    }
+
     signOutButton() {
-        return this.page.locator('.btn >> text="Sign out"')
+        return this.page.locator('a:has-text("Sign out")')
     }
 
     signInButton() {
-        return this.page.locator('a >> text="Sign in"').first()
+        return this.page.locator('a:has-text("Sign in")').first()
+    }
+
+    userButton() {
+        return this.page.locator('.lucide-circle-user-round-icon')
     }
 
     async signInAsFreeUser() {
@@ -26,25 +35,25 @@ export class CreateAccountPage {
             throw new Error('Supply test user password using `THUMBSHOT_PRO_TEST_USER_PASSWORD` environment variable.')
         }
 
-        await this.signOutButton().click()
+        await this.signOut()
         await this.signIn('t.k.gregory+automatedtestuser@gmail.com', password)
     }
 
     async signIn(email: string, password: string) {
-        await expect(this.page.locator('.btn >> text="Sign in"')).toHaveCount(1, { timeout: 10000 })
+        await expect(this.signInButton()).toHaveCount(1, { timeout: 10000 })
 
         await this.signInButton().click()
         await this.page.locator('input[name="username"]').fill(email)
 
         await this.page.locator('input[name="password"]').fill(password)
         await this.page.locator('form button:text("Sign in")').first().click()
-        await expect(this.page.locator('.btn >> text="Sign out"')).toHaveCount(1, { timeout: 5000 })
+        await expect(this.userButton()).toHaveCount(1, { timeout: 5000 })
     }
 
     async useNewAccount() {
-        await this.signOutButton().click()
+        await this.signOut()
 
-        await this.page.locator('.btn >> text="Sign in"').click({ timeout: 10000 })
+        await this.signInButton().click({ timeout: 10000 })
         await this.page.locator('button:has-text("Create Account")').click()
 
         await this.page.locator('input[name="email"]').fill(this.randomEmail)

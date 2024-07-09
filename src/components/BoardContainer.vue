@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import ThumbnailBoard from './ThumbnailBoard.vue'
 import LoadingButton from './LoadingButton.vue'
-import Settings from './Settings.vue'
 import NumberPicker from './NumberPicker.vue'
 import { Camera } from 'lucide-vue-next';
 import { RotateCcw } from 'lucide-vue-next';
@@ -15,7 +14,6 @@ import { fetchScreenshot } from '../composables/api'
 import { isPro } from '../composables/user'
 import { accountLimits } from '../composables/data'
 import { config } from '../composables/data'
-
 const isGeneratingPreview = ref(false);
 const isGeneratingSinglePreview = ref(false);
 const previewUrl = ref()
@@ -107,9 +105,6 @@ function download() {
             <div class="hidden xl:block tooltip" data-tip="Set column count">
                 <NumberPicker name="columnCount" :min="3" :max="6" defaultTextValue="Auto"
                     @change="(value) => columnCount = value" />
-            </div>
-            <div class="tooltip" data-tip="Change settings">
-                <Settings />
             </div>
             <dialog id="generate_preview_modal" class="modal">
                 <div class="modal-box">

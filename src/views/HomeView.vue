@@ -6,12 +6,14 @@ import FooterBar from '../components/FooterBar.vue'
 import NavBar from '../components/NavBar.vue'
 import { useRoute, useRouter } from "vue-router";
 import { getCurrentUser } from 'aws-amplify/auth';
+import BoardsDrawer from '../components/BoardsDrawer.vue'
 
 const navBar = ref<InstanceType<typeof NavBar>>()
 const route = useRoute()
 const router = useRouter()
 
 const boardContainer = ref<InstanceType<typeof BoardContainer>>()
+const boardsDrawerComponent = ref()
 
 getCurrentUser()
   .then((user) => {
@@ -26,12 +28,15 @@ getCurrentUser()
 
   <main class="min-h-[calc(100vh-4rem)] mx-auto py-4 px-8">
     <template v-if="navBar?.isSignedIn">
-      <div class="min-h-[calc(100vh-4rem)]">
+      <div class="relative min-h-[calc(100vh-4rem)]">
+        <div class="absolute right-0">
+          <BoardsDrawer @selectedBoardUpdated="$emit('selectedBoardUpdated')" ref="boardsDrawerComponent" />
+        </div>
         <template v-if="route.params.boardId">
           <BoardContainer :boardId="route.params.boardId" ref="boardContainer" />
         </template>
         <template v-else>
-          Create or select a thumbnail board to get started.
+          Create or select a <a class="link" @click="boardsDrawerComponent.open()">thumbnail board</a> to get started.
         </template>
       </div>
     </template>
