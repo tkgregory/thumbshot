@@ -37,7 +37,7 @@ getCurrentUser()
     </template>
     <template v-else>
       <!-- 10rem=(4rem nav bar + 4rem padding + 4rem nav bar / 2) -->
-      <div class="min-h-[calc(100vh-10rem)] flex items-center">
+      <div class="min-h-[calc(100vh-10rem)] max-w-screen-xl mx-auto flex items-center">
         <div class="flex flex-wrap gap-12">
           <div class="grow lg:basis-2/5 flex flex-col gap-4">
             <h1 class="text-2xl sm:text-4xl font-bold line-clamp-2 text-accent">Compare and share YouTube thumbnail
