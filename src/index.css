@@ -1,10 +1,6 @@
 /* ./src/index.css */
 @tailwind base;
 
-:root {
-    --navbar-padding: .5rem 2rem;
-}
-
 @layer base {
     [data-theme="dark"] body {
         background-color:  rgb(15, 15, 15);

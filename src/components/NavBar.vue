@@ -33,7 +33,7 @@ Hub.listen('auth', (data) => {
 </script>
 
 <template>
-    <div class="navbar bg-base-100">
+    <div class="navbar px-4 sm:px-8 bg-base-100">
         <div class="flex-1">
             <a class="flex gap-2 text-xl" href="/">
                 <img src="/logo.png" alt="logo" width="30" height="30" />

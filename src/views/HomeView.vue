@@ -26,7 +26,7 @@ getCurrentUser()
 <template>
   <NavBar ref="navBar" @selectedBoardUpdated="boardContainer?.thumbnailBoard?.load()" />
 
-  <main class="min-h-[calc(100vh-4rem)] mx-auto py-4 px-8">
+  <main class="min-h-[calc(100vh-4rem)] mx-auto py-4 px-4 sm:px-8">
     <template v-if="navBar?.isSignedIn">
       <div class="relative min-h-[calc(100vh-4rem)]">
         <div class="absolute right-0">
@@ -36,7 +36,10 @@ getCurrentUser()
           <BoardContainer :boardId="route.params.boardId" ref="boardContainer" />
         </template>
         <template v-else>
-          Create or select a <a class="link" @click="boardsDrawerComponent.open()">thumbnail board</a> to get started.
+          <div class="w-2/3">
+            Create or select a <a class="link" @click="boardsDrawerComponent.open()">thumbnail board</a> to get
+            started.
+          </div>
         </template>
       </div>
     </template>
