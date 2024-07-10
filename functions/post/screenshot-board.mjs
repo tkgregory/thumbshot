@@ -45,6 +45,11 @@ export const handler = async (event) => {
     }
     await page.goto(boardURL, { "waitUntil": "networkidle0" });
 
+    function imagesHaveLoaded() {
+      return Array.from(document.images).every((image) => image.complete);
+    }
+    await page.waitForFunction(imagesHaveLoaded, { timeout: 5000 });
+
     const firstChildSelector = 'youtube-container > youtube-preview:first-child'
     await page.waitForSelector(firstChildSelector)
     const first = await getBoundingRectangle(page, firstChildSelector);
