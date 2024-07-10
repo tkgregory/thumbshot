@@ -235,19 +235,19 @@ async function onChangeTeaserImage(event: any, finishLoading: () => void) {
             imageURL: imageURL,
             channelName: defaultChannelName()
         })
-        return
+    } else {
+        const response = await fetch(imageURL)
+        const blob = await response.blob()
+        const compressedBlob = await compressImage(blob)
+        const index_1 = previewData.value.length
+        const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
+        previewData.value.splice(index_1, 0, {
+            title: defaultTitle,
+            s3ObjectKey: s3ObjectKey,
+            channelName: defaultChannelName()
+        })
+        await save()
     }
-    const response = await fetch(imageURL)
-    const blob = await response.blob()
-    const compressedBlob = await compressImage(blob)
-    const index_1 = previewData.value.length
-    const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
-    previewData.value.splice(index_1, 0, {
-        title: defaultTitle,
-        s3ObjectKey: s3ObjectKey,
-        channelName: defaultChannelName()
-    })
-    await save()
     finishLoading()
 }
 
