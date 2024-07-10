@@ -2,6 +2,7 @@ import { test, expect } from './pages/fixtures';
 
 test.beforeEach(async ({ browserName, page, boardsPage, thumbshotPage }) => {
     test.skip(browserName === 'webkit', 'Not working');
+    test.slow()
     await page.goto('/')
     await boardsPage.useNewBoard()
 
@@ -13,7 +14,7 @@ test.beforeEach(async ({ browserName, page, boardsPage, thumbshotPage }) => {
     await thumbshotPage.updateTitle(2, 'Third title')
 });
 
-test('Drag and drop to right before', async ({ thumbshotPage }) => {
+test('Drag and drop to right', async ({ thumbshotPage }) => {
     await thumbshotPage.getPreview(0).dragTo(thumbshotPage.getPreview(1));
 
     await expect(thumbshotPage.getPreviewTitle(0)).toHaveText('Second title')
@@ -21,7 +22,7 @@ test('Drag and drop to right before', async ({ thumbshotPage }) => {
     await expect(thumbshotPage.getPreviewTitle(2)).toHaveText('Third title')
 });
 
-test('Drag and drop to left before', async ({ thumbshotPage }) => {
+test('Drag and drop to left', async ({ thumbshotPage }) => {
     await thumbshotPage.getPreview(2).dragTo(thumbshotPage.getPreview(0));
 
     await expect(thumbshotPage.getPreviewTitle(0)).toHaveText('Third title')
