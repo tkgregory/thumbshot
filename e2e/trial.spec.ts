@@ -5,12 +5,14 @@ test.beforeEach(async ({ page }) => {
     page.locator('button:has-text("Compare My Thumbnails")').click()
 });
 
-test('Can add a thumbnail', async ({ page, thumbshotPage }) => {
+test('Can add a trial thumbnail with default values', async ({ page, thumbshotPage }) => {
     await thumbshotPage.addThumbnail('correct-dimensions.png')
 
     const image = page.locator('youtube-thumbnail > img:first-child').first()
     const src = await image.getAttribute('src')
     expect(src).toMatch(/blob:http/)
+    await expect(thumbshotPage.getPreviewTitle(0)).toHaveText('Enter your video title')
+    await expect(thumbshotPage.getChannelName(0)).toHaveText('Enter your channel name')
 });
 
 test('Can change a thumbnail twice', async ({ page, thumbshotPage }) => {

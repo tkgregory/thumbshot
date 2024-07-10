@@ -9,6 +9,7 @@ import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
 import YouTubePreview from './YouTubePreview.vue'
 import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
 import { CircleX } from 'lucide-vue-next';
+import { loadSettings } from '../composables/settings'
 
 const validExtensions = ['jpg', 'jpeg', 'png']
 
@@ -16,7 +17,6 @@ const previewData = ref<YouTubePreviewData[]>([])
 const error = ref()
 const boardName = ref()
 const defaultTitle = 'Enter your video title'
-const defaultChannelName = 'Enter your channel name'
 const errorMessage = ref()
 const isDragging = ref(false)
 const dragSourceIndexRef = ref()
@@ -233,7 +233,7 @@ async function onChangeTeaserImage(event: any, finishLoading: () => void) {
         previewData.value.splice(index, 0, {
             title: defaultTitle,
             imageURL: imageURL,
-            channelName: defaultChannelName
+            channelName: defaultChannelName()
         })
         return
     }
@@ -245,7 +245,7 @@ async function onChangeTeaserImage(event: any, finishLoading: () => void) {
     previewData.value.splice(index_1, 0, {
         title: defaultTitle,
         s3ObjectKey: s3ObjectKey,
-        channelName: defaultChannelName
+        channelName: defaultChannelName()
     })
     await save()
     finishLoading()
@@ -278,6 +278,10 @@ async function getFromYouTubeForPreview(preview: YouTubePreviewData, youTubeVide
     preview.imageURL = videoData.imageURL
     preview.s3ObjectKey = undefined
     closeModal()
+}
+
+function defaultChannelName() {
+    return loadSettings().defaultChannelName || 'Enter your channel name'
 }
 
 function drag() {

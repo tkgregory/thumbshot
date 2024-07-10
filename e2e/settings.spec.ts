@@ -28,3 +28,17 @@ test('Saves numbering setting false', async ({ page, settingsPage, browserName }
     await settingsPage.open()
     await expect(settingsPage.numberingSetting()).not.toBeChecked
 });
+
+test('Default channel name defaults to empty', async ({ settingsPage }) => {
+    await settingsPage.open()
+    await expect(settingsPage.defaultChannelName()).toBeEmpty()
+});
+
+test('Saves default channel name', async ({ page, settingsPage }) => {
+    await settingsPage.open()
+    await settingsPage.defaultChannelName().fill("Mr. Beast")
+
+    await page.reload();
+    await settingsPage.open()
+    await expect(settingsPage.defaultChannelName()).toHaveValue("Mr. Beast")
+});
