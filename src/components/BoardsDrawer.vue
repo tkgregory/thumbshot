@@ -21,6 +21,7 @@ const renamedBoardName = ref()
 defineExpose({ boards, open })
 const emits = defineEmits(['selectedBoardUpdated'])
 const pro = ref()
+const isLoading = ref(true)
 const sortBy = ref(localStorage.getItem('sortBy') !== null ? localStorage.getItem('sortBy') : 'Name')
 const sortDirection = ref(localStorage.getItem('sortDirection') !== null ? localStorage.getItem('sortDirection') : 'ascending')
 import { ArrowUp } from 'lucide-vue-next';
@@ -30,6 +31,7 @@ isPro().then(value => pro.value = value)
 listBoards()
 
 async function listBoards() {
+    isLoading.value = true
     return fetchPathWithAuth('GET', '/user/boards').then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
@@ -38,6 +40,7 @@ async function listBoards() {
     }).then((json) => {
         boards.value = json
         sort()
+        isLoading.value = false
     })
 }
 
@@ -212,7 +215,8 @@ function open() {
                         </select>
                     </div>
                 </div>
-                <ul>
+                <div v-if="isLoading" class="loading loading-spinner loading-md mx-auto"></div>
+                <ul v-else>
                     <li v-for="board in boards" class="group">
                         <RouterLink class="flex py-0 pr-0 h-12" :to="`/boards/${board.id}`"
                             @click="updateLocalStorage(board.id)">
