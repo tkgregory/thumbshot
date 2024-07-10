@@ -14,6 +14,10 @@ const props = defineProps({
     },
     boardIndex: {
         type: Number
+    },
+    columnCount: {
+        type: String,
+        required: false
     }
 })
 
@@ -33,6 +37,7 @@ async function loadServer() {
 
 <template>
     <youtube-container
+        :class="{ [`xl:grid-cols-3`]: columnCount == '3', [`xl:grid-cols-4`]: columnCount == '4', [`xl:grid-cols-5`]: columnCount == '5', [`xl:grid-cols-6`]: columnCount == '6' }"
         class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
         <template v-if="boardIndex != null">
             <template v-if="previewData.length >= boardIndex + 1">

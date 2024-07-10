@@ -38,7 +38,7 @@ function reset() {
 
 function generatePreview() {
     isGeneratingPreview.value = true
-    return fetchScreenshot(props.boardId, { showNumbers: loadSettings().showNumbers })
+    return fetchScreenshot(props.boardId, { showNumbers: loadSettings().showNumbers }, columnCount.value)
         .then(json => {
             previewUrl.value = json.previewUrl
             if (document) {
@@ -51,7 +51,7 @@ function generatePreview() {
 
 function generateSinglePreview(index: number) {
     isGeneratingSinglePreview.value = true
-    return fetchScreenshot(props.boardId, { showNumbers: false }, index)
+    return fetchScreenshot(props.boardId, { showNumbers: false }, undefined, index)
         .then(json => {
             previewUrl.value = json.previewUrl
             if (document) {

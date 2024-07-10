@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ScreenshotThumbnailBoard from '../components/ScreenshotThumbnailBoard.vue'
-import { useRoute } from "vue-router";
+import { useRoute } from "vue-router"
 
 const route = useRoute()
 
@@ -9,13 +9,15 @@ let boardIndex: number
 if (route.params.boardIndex != null) {
     boardIndex = parseInt(route.params.boardIndex as string)
 }
+
+const columnCount = localStorage.getItem('columnCount') || undefined
 </script>
 
 <template>
     <main class="min-h-screen mx-auto px-8">
         <screenshot-container class="block p-[16px]">
             <div class="flex flex-col gap-8">
-                <ScreenshotThumbnailBoard :boardId="boardId" :boardIndex="boardIndex" />
+                <ScreenshotThumbnailBoard :boardId="boardId" :boardIndex="boardIndex" :columnCount="columnCount" />
             </div>
 
             <div class="flex items-center justify-start gap-1 mt-8">

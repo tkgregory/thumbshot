@@ -1,6 +1,6 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 
-export async function fetchScreenshot(boardId: string, settings: any, index?: number) {
+export async function fetchScreenshot(boardId: string, settings: any, columnCount: any, index?: number) {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/boards/${boardId}/screenshot`, {
         method: 'POST',
         headers: {
@@ -8,7 +8,8 @@ export async function fetchScreenshot(boardId: string, settings: any, index?: nu
         },
         body: JSON.stringify({
             index: index,
-            settings: settings
+            settings: settings,
+            columnCount: columnCount
         })
     })
     if (response.status !== 200) {

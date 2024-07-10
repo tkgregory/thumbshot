@@ -35,6 +35,9 @@ export const handler = async (event) => {
     await page.evaluateOnNewDocument((body) => {
       localStorage.setItem('showInstructions', false);
       localStorage.setItem('settings', JSON.stringify(body.settings));
+      if (body.columnCount !== undefined) {
+        localStorage.setItem('columnCount', body.columnCount);
+      }
     }, body);
 
     if (process.env.SET_NGROK_HEADER === 'true') {
