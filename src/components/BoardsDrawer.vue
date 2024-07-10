@@ -92,18 +92,16 @@ async function createBoard() {
         name: newBoardName.value,
         previews: []
     }
-    await fetchPathWithAuth('POST', `/user/boards`, body).then((response) => {
+    const json = await fetchPathWithAuth('POST', `/user/boards`, body).then((response) => {
         if (response.status !== 200) {
             throw new Error(`Invalid response with status ${response.status}`)
         }
         return response.json()
-    }).then((json) => {
-        router.push(`/boards/${json.id}`);
-        updateLocalStorage(json.id).then(() => {
-            (document.getElementById('create_board_modal') as HTMLFormElement).close();
-            return listBoards();
-        })
     })
+    router.push(`/boards/${json.id}`);
+    await updateLocalStorage(json.id);
+    (document.getElementById('create_board_modal') as HTMLFormElement).close();
+    await listBoards();
 }
 
 async function renameBoard() {
