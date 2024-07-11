@@ -8,6 +8,7 @@ import { getImageSrc } from '../composables/image'
 import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
 import YouTubePreview from './YouTubePreview.vue'
 import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
+import FileDragDrop from './FileDragDrop.vue'
 import { CircleX } from 'lucide-vue-next';
 import { loadSettings } from '../composables/settings'
 
@@ -160,17 +161,13 @@ function reset() {
     save()
 }
 
-async function validateImage(event: any) {
-    if (!event.target.files[0]) {
-        return Promise.reject()
-    }
-
-    const fileName = event.target.files[0].name
+async function validateImage(file: any) {
+    const fileName = file.name
     if (validExtensions.indexOf(fileName.split('.').pop().toLowerCase()) == -1) {
         showError(`Image must be one of these types: ${validExtensions.join(", ")}`)
         return Promise.reject()
     } else {
-        const url = URL.createObjectURL(event.target.files[0])
+        const url = URL.createObjectURL(file)
         resetImageInput(event)
 
         return getImage(url).then((image) => {
@@ -209,7 +206,7 @@ function showError(errorMessage: string) {
 }
 
 async function onChangeExistingImage(event: any, preview: YouTubePreviewData, finishLoading: () => void) {
-    const imageURL = await validateImage(event)
+    const imageURL = await validateImage(event.target.files[0])
     if (props.frontEndOnly) {
         preview.imageURL = imageURL;
     } else {
@@ -225,8 +222,8 @@ async function onChangeExistingImage(event: any, preview: YouTubePreviewData, fi
     finishLoading()
 }
 
-async function onChangeTeaserImage(event: any, finishLoading: () => void) {
-    const imageURL = await validateImage(event)
+async function onChangeTeaserImage(file: any, finishLoading: () => void) {
+    const imageURL = await validateImage(file)
     if (props.frontEndOnly) {
         const index = previewData.value.length
 
@@ -337,9 +334,14 @@ const displayPreviewData = computed(() => {
         </div>
         <template v-else-if="previewData.length === 0">
             <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
-                <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"
-                    @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)"
-                    @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError)" />
+                <FileDragDrop v-slot="slotProps"
+                    @changeImage="(file, finishUploading) => onChangeTeaserImage(file, finishUploading)">
+                    <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly"
+                        :isHighlighted="slotProps.isFileDragging" :isFileUploading="slotProps.isFileUploading"
+                        @randomize="randomize(); save();"
+                        @changeImage="(event, finishLoading) => onChangeTeaserImage(event.target.files[0], finishLoading)"
+                        @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError)" />
+                </FileDragDrop>
                 <div class="hidden md:block relative">
                     <img src="/visualisation.png" class="absolute -translate-x-16" />
                 </div>
@@ -372,9 +374,14 @@ const displayPreviewData = computed(() => {
                     </draggable-element>
                 </template>
                 <template v-if="previewData.length < maxPreviewCount">
-                    <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly" @randomize="randomize(); save();"
-                        @changeImage="(event, finishLoading) => onChangeTeaserImage(event, finishLoading)"
-                        @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
+                    <FileDragDrop v-slot="slotProps"
+                        @changeImage="(file, finishUploading) => onChangeTeaserImage(file, finishUploading)">
+                        <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly"
+                            :isHighlighted="slotProps.isFileDragging" :isFileUploading="slotProps.isFileUploading"
+                            @randomize="randomize(); save();"
+                            @changeImage="(event, finishLoading) => onChangeTeaserImage(event.target.files[0], finishLoading)"
+                            @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
+                    </FileDragDrop>
                 </template>
                 <template v-else>
                     <div class="aspect-video flex flex-col justify-center items-center text-xl">

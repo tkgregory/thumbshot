@@ -1,4 +1,5 @@
 import { test, expect } from './pages/fixtures';
+import { dragAndDropFile } from './utils/drag-and-drop';
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/#/trial')
@@ -42,6 +43,24 @@ test('Can add up to 3 custom thumbnails', async ({ page, thumbshotPage }) => {
     await expect(page.getByText('Add thumbnail or randomize')).toBeVisible()
     await thumbshotPage.addThumbnail('correct-dimensions.png')
     await expect(page.getByText('Add thumbnail or randomize')).not.toBeVisible()
+});
+
+test('Can drag file into first trial slot', async ({ page }) => {
+    await dragAndDropFile(page, 'file-drop-zone', './e2e/images/correct-dimensions.png', 'correct-dimensions.png')
+
+    const image = page.locator('youtube-thumbnail > img:first-child').first()
+    const src = await image.getAttribute('src')
+    expect(src).toMatch(/blob:http/)
+});
+
+test('Can drag file into any other trial slot', async ({ page, thumbshotPage }) => {
+    await thumbshotPage.addThumbnail('correct-dimensions.png')
+
+    await dragAndDropFile(page, 'file-drop-zone', './e2e/images/correct-dimensions.png', 'correct-dimensions.png')
+
+    const image = page.locator('youtube-thumbnail > img:first-child').nth(1)
+    const src = await image.getAttribute('src')
+    expect(src).toMatch(/blob:http/)
 });
 
 test('Can update title', async ({ page, thumbshotPage }) => {
