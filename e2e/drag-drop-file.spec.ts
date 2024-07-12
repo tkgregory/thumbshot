@@ -32,7 +32,7 @@ function tests(name: string) {
     });
 
     test(`Can drag single file - ${name}`, async ({ page, thumbshotPage }) => {
-        await dragAndDropFile(page, 'file-drop-zone', './e2e/images/correct-dimensions.png', 'correct-dimensions.png')
+        await dragAndDropFile(page, 'file-drop-zone', './e2e/images/correct-dimensions.png')
         await expect(thumbshotPage.allPreviews()).toHaveCount(1, { timeout: 5000 })
     });
 
