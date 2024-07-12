@@ -81,4 +81,18 @@ function validationTests() {
         const src2 = await image2.getAttribute('src')
         expect(src2).not.toBe(src1)
     });
+
+    test('Can continue upload after error', async ({ page }) => {
+        const fileChooserPromise = page.waitForEvent('filechooser');
+        await page.locator('div[data-tip="Add thumbnail"] > label').click()
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles(['./e2e/images/wrong-aspect-ratio.png']);
+
+        await page.locator('body').click({ position: { x: 0, y: 0 } })
+
+        await page.locator('div[data-tip="Add thumbnail"] > label').click()
+        const fileChooser2 = await fileChooserPromise;
+        await fileChooser2.setFiles(['./e2e/images/correct-dimensions.png']);
+        await expect(page.locator('div[role="alert"]')).toHaveCount(0)
+    });
 }

@@ -223,7 +223,10 @@ async function onChangeExistingImage(event: any, preview: YouTubePreviewData, fi
 }
 
 async function onChangeTeaserImage(file: any, finishLoading: () => void) {
-    const imageURL = await validateImage(file)
+    const imageURL = await validateImage(file).catch((error) => {
+        finishLoading()
+        throw error
+    })
     if (props.frontEndOnly) {
         const index = previewData.value.length
 
