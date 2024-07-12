@@ -17,7 +17,6 @@ const validExtensions = ['jpg', 'jpeg', 'png']
 const previewData = ref<YouTubePreviewData[]>([])
 const error = ref()
 const boardName = ref()
-const defaultTitle = 'Enter your video title'
 const errorMessage = ref()
 const isDragging = ref(false)
 const dragSourceIndexRef = ref()
@@ -52,6 +51,10 @@ load()
 watch(() => props.boardId, () => {
     load()
 });
+
+function defaultTitle() {
+    return boardName.value || 'Enter your video title'
+}
 
 function randomize() {
     const index = previewData.value.length
@@ -224,7 +227,7 @@ async function onChangeTeaserImage(file: any, finishLoading: () => void) {
         const index = previewData.value.length
 
         previewData.value.splice(index, 0, {
-            title: defaultTitle,
+            title: defaultTitle(),
             imageURL: imageURL,
             channelName: defaultChannelName()
         })
@@ -235,7 +238,7 @@ async function onChangeTeaserImage(file: any, finishLoading: () => void) {
         const index_1 = previewData.value.length
         const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
         previewData.value.splice(index_1, 0, {
-            title: defaultTitle,
+            title: defaultTitle(),
             s3ObjectKey: s3ObjectKey,
             channelName: defaultChannelName()
         })
@@ -257,7 +260,7 @@ async function onChangeTeaserImages(files: any, updateLoading: () => void, cance
     for (let i = 0; i < imageURLs.length; i++) {
         if (props.frontEndOnly) {
             collectedPreviews.push({
-                title: defaultTitle,
+                title: defaultTitle(),
                 imageURL: imageURLs[i],
                 channelName: defaultChannelName()
             })
@@ -267,7 +270,7 @@ async function onChangeTeaserImages(files: any, updateLoading: () => void, cance
             const compressedBlob = await compressImage(blob)
             const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
             collectedPreviews.push({
-                title: defaultTitle,
+                title: defaultTitle(),
                 s3ObjectKey: s3ObjectKey,
                 channelName: defaultChannelName()
             })

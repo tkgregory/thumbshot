@@ -8,7 +8,7 @@ test('Navigates back to last viewed board', async ({ page, boardsPage }) => {
     const boardName = await boardsPage.useNewBoard()
     await page.goto('/')
 
-    await expect(boardsPage.boardTitle(boardName)).toHaveCount(1)
+    await expect(boardsPage.boardTitle()).toHaveText(boardName)
 });
 
 test('Forgets board across user logins', async ({ page, boardsPage, createAccountPage }) => {
