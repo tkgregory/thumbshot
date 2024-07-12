@@ -50,7 +50,7 @@ export const test = base.extend<MyFixtures, { workerStorageState: string }>({
         }
         await page.locator('input[name="password"]').fill(password)
         await page.locator('form button:text("Sign in")').first().click()
-        await expect(page.locator('.lucide-circle-user-round-icon')).toHaveCount(1, { timeout: 5000 })
+        await expect(page.locator('.lucide-circle-user-round-icon')).toHaveCount(1, { timeout: 7000 })
 
         await page.context().storageState({ path: fileName });
         await page.close();

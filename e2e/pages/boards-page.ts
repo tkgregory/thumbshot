@@ -11,6 +11,7 @@ export class BoardsPage {
 
     async closeBoardsDrawer() {
         await this.page.click('.drawer-side')
+        await expect(this.page.locator('.drawer-side div:text-is("Boards")')).not.toBeInViewport()
     }
 
     async useNewBoard() {
@@ -19,7 +20,7 @@ export class BoardsPage {
         await this.openBoardsDrawer()
         await this.createBoard(name)
         await this.closeBoardsDrawer()
-        await expect(this.boardTitle(name)).toHaveCount(1)
+        await expect(this.boardTitle()).toHaveText(name)
 
         return name
     }
@@ -70,8 +71,8 @@ export class BoardsPage {
         return match[1]
     }
 
-    boardTitle(name: string) {
-        return this.page.locator(`h2:has-text("${name}")`)
+    boardTitle() {
+        return this.page.locator('h2')
     }
 
     listSelector(name: string) {

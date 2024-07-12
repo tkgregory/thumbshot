@@ -104,7 +104,8 @@ async function createBoard() {
     router.push(`/boards/${json.id}`);
     await updateLocalStorage(json.id);
     (document.getElementById('create_board_modal') as HTMLFormElement).close();
-    await listBoards();
+    boards.value.push(json)
+    sort()
 }
 
 async function renameBoard() {
@@ -172,15 +173,15 @@ function open() {
 
 <template>
     <div class="drawer drawer-end">
-        <input id="my-drawer-4" type="checkbox" class="drawer-toggle" v-model="isDrawerOpen" />
+        <input id="boards-drawer" type="checkbox" class="drawer-toggle" v-model="isDrawerOpen" />
         <div class="drawer-content flex justify-end">
-            <label for="my-drawer-4" class="drawer-button btn btn-ghost">
+            <label for="boards-drawer" class="drawer-button btn btn-ghost">
                 <CircleChevronLeft />
                 Boards
             </label>
         </div>
         <div class="drawer-side z-10">
-            <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
+            <label for="boards-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
 
             <div class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
                 <div class="text-xl mb-4 flex gap-4 items-center justify-between">

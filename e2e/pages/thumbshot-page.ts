@@ -24,6 +24,10 @@ export class ThumbShotPage {
         await this.page.locator('input[name="channelName"]').blur()
     }
 
+    allPreviews() {
+        return this.page.locator('youtube-container youtube-preview')
+    }
+
     getPreview(index: number) {
         return this.page.locator(`draggable-element:nth-child(${index + 1}) youtube-preview`).first()
     }
