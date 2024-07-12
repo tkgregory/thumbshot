@@ -368,72 +368,56 @@ const displayPreviewData = computed(() => {
             <CircleX />
             <span>{{ errorMessage }}</span>
         </div>
-        <template v-else-if="previewData.length === 0">
-            <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
+        <youtube-container
+            :class="{ [`xl:grid-cols-3`]: columnCount == '3', [`xl:grid-cols-4`]: columnCount == '4', [`xl:grid-cols-5`]: columnCount == '5', [`xl:grid-cols-6`]: columnCount == '6' }"
+            class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
+            <template v-for="(preview, index) in displayPreviewData">
+                <draggable-element draggable="true" @drag="drag" @dragstart="(event: any) => dragStart(event, index)"
+                    @dragend="dragEnd" @drop.preventDefault="(event: any) => { drop(event, index); save(); }"
+                    @dragover.prevent="dragOver(index)">
+
+                    <YouTubePreview :isGetFromYouTubeEnabled="!frontEndOnly" :imageSrc="getImageSrc(preview)"
+                        :title="preview.title" :channelName="preview.channelName"
+                        :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
+                        :moveRightEnabled="index != previewData.length - 1" :index="index"
+                        :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
+                        :isHighlighted="isDragging && dragTargetIndexRef === index"
+                        @changeTitle="(title) => { preview.title = title; save(); }"
+                        @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
+                        @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
+                        @deletePreview="deletePreview(index); save();"
+                        @duplicatePreview="duplicatePreview(index); save();" @moveLeft="moveLeft(index); save();"
+                        @moveRight="moveRight(index); save();" @generatePreview="$emit('generateSinglePreview', index);"
+                        @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForPreview(preview, youTubeVideoURL, closeModal, handleError); save(); }" />
+                </draggable-element>
+            </template>
+            <template v-if="previewData.length < maxPreviewCount">
                 <FileDragDrop v-slot="slotProps"
                     @addImages="(files, updateLoading, cancelLoading) => onChangeTeaserImages(files, updateLoading, cancelLoading)">
                     <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly"
                         :isHighlighted="slotProps.isFileDragging" :isFileUploading="slotProps.isFileUploading"
                         :percentComplete="slotProps.percentComplete" @randomize="randomize(); save();"
                         @changeImage="(event, finishLoading) => onChangeTeaserImage(event.target.files[0], finishLoading)"
-                        @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError)" />
+                        @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
                 </FileDragDrop>
-                <div class="hidden md:block relative">
-                    <img src="/visualisation.png" class="absolute -translate-x-16" />
+                <div v-if="previewData.length === 0" class="col-span-2 hidden md:block">
+                    <img src="/visualisation.png" class="-translate-x-16" />
                 </div>
-            </div>
-        </template>
-        <template v-else>
-            <youtube-container
-                :class="{ [`xl:grid-cols-3`]: columnCount == '3', [`xl:grid-cols-4`]: columnCount == '4', [`xl:grid-cols-5`]: columnCount == '5', [`xl:grid-cols-6`]: columnCount == '6' }"
-                class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
-                <template v-for="(preview, index) in displayPreviewData">
-                    <draggable-element draggable="true" @drag="drag"
-                        @dragstart="(event: any) => dragStart(event, index)" @dragend="dragEnd"
-                        @drop.preventDefault="(event: any) => { drop(event, index); save(); }"
-                        @dragover.prevent="dragOver(index)">
-
-                        <YouTubePreview :isGetFromYouTubeEnabled="!frontEndOnly" :imageSrc="getImageSrc(preview)"
-                            :title="preview.title" :channelName="preview.channelName"
-                            :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
-                            :moveRightEnabled="index != previewData.length - 1" :index="index"
-                            :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
-                            :isHighlighted="isDragging && dragTargetIndexRef === index"
-                            @changeTitle="(title) => { preview.title = title; save(); }"
-                            @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
-                            @changeImage="(event, finishLoading) => onChangeExistingImage(event, preview, finishLoading)"
-                            @deletePreview="deletePreview(index); save();"
-                            @duplicatePreview="duplicatePreview(index); save();" @moveLeft="moveLeft(index); save();"
-                            @moveRight="moveRight(index); save();"
-                            @generatePreview="$emit('generateSinglePreview', index);"
-                            @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForPreview(preview, youTubeVideoURL, closeModal, handleError); save(); }" />
-                    </draggable-element>
-                </template>
-                <template v-if="previewData.length < maxPreviewCount">
-                    <FileDragDrop v-slot="slotProps"
-                        @addImages="(files, updateLoading, cancelLoading) => onChangeTeaserImages(files, updateLoading, cancelLoading)">
-                        <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly"
-                            :isHighlighted="slotProps.isFileDragging" :isFileUploading="slotProps.isFileUploading"
-                            :percentComplete="slotProps.percentComplete" @randomize="randomize(); save();"
-                            @changeImage="(event, finishLoading) => onChangeTeaserImage(event.target.files[0], finishLoading)"
-                            @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
-                    </FileDragDrop>
-                </template>
-                <template v-else>
-                    <div class="aspect-video flex flex-col justify-center items-center text-xl">
-                        <div class="w-full">
-                            <template v-if="$slots.previewLimit">
-                                <slot name="previewLimit" />
-                            </template>
-                            <template v-else>
-                                <p>Preview limit reached.</p>
-                                <p>Remove previews to add up.</p>
-                            </template>
-                        </div>
+            </template>
+            <template v-else>
+                <div class="aspect-video flex flex-col justify-center items-center text-xl">
+                    <div class="w-full">
+                        <template v-if="$slots.previewLimit">
+                            <slot name="previewLimit" />
+                        </template>
+                        <template v-else>
+                            <p>Preview limit reached.</p>
+                            <p>Remove previews to add up.</p>
+                        </template>
                     </div>
-                </template>
-            </youtube-container>
-        </template>
+                </div>
+            </template>
+        </youtube-container>
     </template>
 
     <Teleport to="body">
