@@ -20,6 +20,9 @@ defineProps({
         type: Boolean,
         default: false
     },
+    percentComplete: {
+        type: Number,
+    },
 })
 
 const isLoading = ref(false)
@@ -44,7 +47,7 @@ const getFromYouTubeModal = ref()
             <div v-if="isFileUploading"
                 class="absolute flex flex-col gap-4 justify-center text-xl items-center bg-base-200 w-full h-full z-10 rounded-xl">
                 <span class="loading loading-spinner loading-md"></span>
-                Uploading
+                Uploading {{ percentComplete }}%
             </div>
             <div
                 class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full flex flex-col items-center gap-2">

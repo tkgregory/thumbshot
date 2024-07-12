@@ -168,7 +168,6 @@ async function validateImage(file: any) {
         return Promise.reject()
     } else {
         const url = URL.createObjectURL(file)
-        resetImageInput(event)
 
         return getImage(url).then((image) => {
             if (image.width / image.height != 16 / 9) {
@@ -192,10 +191,6 @@ function getImage(url: string): Promise<HTMLImageElement> {
         image.onerror = reject
         image.src = url
     })
-}
-
-function resetImageInput(event: any) {
-    event.target.value = null
 }
 
 function showError(errorMessage: string) {
@@ -250,6 +245,44 @@ async function onChangeTeaserImage(file: any, finishLoading: () => void) {
     }
     finishLoading()
 }
+
+async function onChangeTeaserImages(files: any, updateLoading: () => void, cancelLoading: () => void) {
+    const collectedPreviews = [] as YouTubePreviewData[]
+
+    const imageURLs = await Promise.all(Array.from(files).map(async (file: any) => {
+        return await validateImage(file).catch((error) => {
+            cancelLoading()
+            throw error
+        })
+    }))
+
+    for (let i = 0; i < imageURLs.length; i++) {
+        if (props.frontEndOnly) {
+            collectedPreviews.push({
+                title: defaultTitle,
+                imageURL: imageURLs[i],
+                channelName: defaultChannelName()
+            })
+        } else {
+            const response = await fetch(imageURLs[i])
+            const blob = await response.blob()
+            const compressedBlob = await compressImage(blob)
+            const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
+            collectedPreviews.push({
+                title: defaultTitle,
+                s3ObjectKey: s3ObjectKey,
+                channelName: defaultChannelName()
+            })
+        }
+        updateLoading()
+    }
+
+    previewData.value.push(...collectedPreviews)
+    if (!props.frontEndOnly) {
+        await save()
+    }
+}
+
 
 async function getFromYouTubeForTeaser(youTubeVideoURL: any, closeModal: Function, handleError: Function) {
     let videoData
@@ -338,10 +371,10 @@ const displayPreviewData = computed(() => {
         <template v-else-if="previewData.length === 0">
             <div class="grid grid-cols-auto-fill-300 md:grid-cols-[minmax(300px,_1fr),2fr]">
                 <FileDragDrop v-slot="slotProps"
-                    @changeImage="(file, finishUploading) => onChangeTeaserImage(file, finishUploading)">
+                    @addImages="(files, updateLoading, cancelLoading) => onChangeTeaserImages(files, updateLoading, cancelLoading)">
                     <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly"
                         :isHighlighted="slotProps.isFileDragging" :isFileUploading="slotProps.isFileUploading"
-                        @randomize="randomize(); save();"
+                        :percentComplete="slotProps.percentComplete" @randomize="randomize(); save();"
                         @changeImage="(event, finishLoading) => onChangeTeaserImage(event.target.files[0], finishLoading)"
                         @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError)" />
                 </FileDragDrop>
@@ -378,10 +411,10 @@ const displayPreviewData = computed(() => {
                 </template>
                 <template v-if="previewData.length < maxPreviewCount">
                     <FileDragDrop v-slot="slotProps"
-                        @changeImage="(file, finishUploading) => onChangeTeaserImage(file, finishUploading)">
+                        @addImages="(files, updateLoading, cancelLoading) => onChangeTeaserImages(files, updateLoading, cancelLoading)">
                         <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly"
                             :isHighlighted="slotProps.isFileDragging" :isFileUploading="slotProps.isFileUploading"
-                            @randomize="randomize(); save();"
+                            :percentComplete="slotProps.percentComplete" @randomize="randomize(); save();"
                             @changeImage="(event, finishLoading) => onChangeTeaserImage(event.target.files[0], finishLoading)"
                             @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
                     </FileDragDrop>
