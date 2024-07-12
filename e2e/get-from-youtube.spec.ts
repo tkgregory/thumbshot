@@ -1,5 +1,7 @@
 import { test, expect } from './pages/fixtures';
 
+test.describe.configure({ retries: 2 });
+
 test.beforeEach(async ({ page, boardsPage }) => {
     test.slow()
     await page.goto('/')
