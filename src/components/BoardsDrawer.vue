@@ -104,7 +104,8 @@ async function createBoard() {
     router.push(`/boards/${json.id}`);
     await updateLocalStorage(json.id);
     (document.getElementById('create_board_modal') as HTMLFormElement).close();
-    await listBoards();
+    boards.value.push(json)
+    sort()
 }
 
 async function renameBoard() {
