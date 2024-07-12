@@ -16,9 +16,9 @@ test('Can add up to 9 thumbnails', async ({ page, thumbshotPage, boardsPage }) =
         await thumbshotPage.clickRandom()
     }
 
-    await expect(page.getByText('Add thumbnail or randomize')).toBeVisible()
+    await expect(page.getByText('Drop thumbnails here')).toBeVisible()
     await thumbshotPage.clickRandom()
-    await expect(page.getByText('Add thumbnail or randomize')).not.toBeVisible()
+    await expect(page.getByText('Drop thumbnails here')).not.toBeVisible()
 });
 
 test('Can add up to 3 boards', async ({ boardsPage }) => {

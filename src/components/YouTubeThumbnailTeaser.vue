@@ -40,19 +40,19 @@ const getFromYouTubeModal = ref()
             <div
                 class="rounded-xl object-cover group-hover:brightness-[.30] transition duration-200 cursor-pointer bg-youtube-dark" />
             <div v-if="isHighlighted"
-                class="absolute flex flex-col gap-4 justify-center text-xl items-center bg-base-200 w-full h-full z-10 rounded-xl">
+                class="absolute flex flex-col gap-4 justify-center text-xl items-center w-full h-full z-10 rounded-xl">
                 <CloudUpload :size="48" />
                 Drop to upload
             </div>
-            <div v-if="isFileUploading"
-                class="absolute flex flex-col gap-4 justify-center text-xl items-center bg-base-200 w-full h-full z-10 rounded-xl">
+            <div v-else-if="isFileUploading"
+                class="absolute flex flex-col gap-4 justify-center text-xl items-center w-full h-full z-10 rounded-xl">
                 <span class="loading loading-spinner loading-md"></span>
                 Uploading {{ percentComplete }}%
             </div>
-            <div
-                class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full flex flex-col items-center gap-2">
+            <div v-else
+                class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full flex flex-col items-center gap-4">
                 <div class="text-xl w-full text-center">
-                    Add thumbnail or randomize
+                    Drop thumbnails here
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="tooltip w-[32px]" data-tip="Add thumbnail">

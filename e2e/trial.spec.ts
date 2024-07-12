@@ -30,18 +30,18 @@ test('Can add up to 3 random thumbnails', async ({ page, thumbshotPage }) => {
     await thumbshotPage.clickRandom()
     await thumbshotPage.clickRandom()
 
-    await expect(page.getByText('Add thumbnail or randomize')).toBeVisible()
+    await expect(page.getByText('Drop thumbnails here')).toBeVisible()
     await thumbshotPage.clickRandom()
-    await expect(page.getByText('Add thumbnail or randomize')).not.toBeVisible()
+    await expect(page.getByText('Drop thumbnails here')).not.toBeVisible()
 });
 
 test('Can add up to 3 custom thumbnails', async ({ page, thumbshotPage }) => {
     await thumbshotPage.addThumbnail('correct-dimensions.png')
     await thumbshotPage.addThumbnail('correct-dimensions.png')
 
-    await expect(page.getByText('Add thumbnail or randomize')).toBeVisible()
+    await expect(page.getByText('Drop thumbnails here')).toBeVisible()
     await thumbshotPage.addThumbnail('correct-dimensions.png')
-    await expect(page.getByText('Add thumbnail or randomize')).not.toBeVisible()
+    await expect(page.getByText('Drop thumbnails here')).not.toBeVisible()
 });
 
 test('Can update title', async ({ page, thumbshotPage }) => {

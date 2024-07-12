@@ -11,5 +11,5 @@ test('Can add more than 9 thumbnails', async ({ page, thumbshotPage }) => {
         await thumbshotPage.clickRandom()
     }
 
-    await expect(page.getByText('Add thumbnail or randomize')).toBeVisible()
+    await expect(page.getByText('Drop thumbnails here')).toBeVisible()
 });
