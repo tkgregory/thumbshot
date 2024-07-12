@@ -11,6 +11,7 @@ export class BoardsPage {
 
     async closeBoardsDrawer() {
         await this.page.click('.drawer-side')
+        await expect(this.page.locator('.drawer-side div:text-is("Boards")')).not.toBeInViewport()
     }
 
     async useNewBoard() {
