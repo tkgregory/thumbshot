@@ -141,19 +141,17 @@ async function load() {
     }
 
     isLoading.value = true
-    fetchPathWithAuth('GET', `/user/boards/${props.boardId}`).then((response) => {
-        if (response.status === 404) {
-            errorMessage.value = 'Board not found'
-        }
-        else if (response.status !== 200) {
-            throw new Error(`Invalid response with status ${response.status}`)
-        }
-        return response.json()
-    }).then((json) => {
+    const response = await fetchPathWithAuth('GET', `/user/boards/${props.boardId}`)
+    if (response.status === 200) {
+        const json = await response.json()
         boardName.value = json.name
         previewData.value = json.previews
-        isLoading.value = false
-    })
+    } else if (response.status === 404) {
+        errorMessage.value = 'Board not found'
+    } else {
+        throw new Error(`Invalid response with status ${response.status}`)
+    }
+    isLoading.value = false
 }
 
 function reset() {
@@ -368,7 +366,7 @@ const displayPreviewData = computed(() => {
             <CircleX />
             <span>{{ errorMessage }}</span>
         </div>
-        <youtube-container
+        <youtube-container v-else
             :class="{ [`xl:grid-cols-3`]: columnCount == '3', [`xl:grid-cols-4`]: columnCount == '4', [`xl:grid-cols-5`]: columnCount == '5', [`xl:grid-cols-6`]: columnCount == '6' }"
             class="grid grid-cols-auto-fill-300 gap-y-[40px] gap-x-[16px] font-medium text-[12px] font-roboto">
             <template v-for="(preview, index) in displayPreviewData">
