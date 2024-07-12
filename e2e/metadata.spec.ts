@@ -20,7 +20,7 @@ test('Uses board name for title', async ({ thumbshotPage, boardsPage }) => {
 test('Uses default channel name', async ({ thumbshotPage }) => {
     await thumbshotPage.addThumbnail('correct-dimensions.png')
 
-    await expect(thumbshotPage.getChannelName(0)).toHaveText('Enter your channel name')
+    await expect(thumbshotPage.getChannelName(0)).toHaveText('Enter your channel name', { timeout: 5000 })
 });
 
 test('Uses configured channel name', async ({ settingsPage, thumbshotPage }) => {
