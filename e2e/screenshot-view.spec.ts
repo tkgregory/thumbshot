@@ -1,6 +1,6 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({ page, boardsPage }) => {
+test.beforeEach(async ({ page, boardsPage, thumbshotPage }) => {
   test.slow()
   await page.goto('/')
   await boardsPage.useNewBoard()
@@ -8,6 +8,7 @@ test.beforeEach(async ({ page, boardsPage }) => {
   await page.locator('div[data-tip="Randomize"]').click()
   await page.locator('div[data-tip="Randomize"]').click()
   await page.locator('div[data-tip="Randomize"]').click()
+  await expect(thumbshotPage.allPreviews()).toHaveCount(3)
 });
 
 test('Shows numbers', async ({ page, boardsPage }) => {
