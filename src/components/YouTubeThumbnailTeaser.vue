@@ -77,7 +77,7 @@ const getFromYouTubeModal = ref()
         </template>
     </div>
     <Teleport to="body">
-        <SimpleTextModal title="Get from YouTube"
+        <SimpleTextModal title="Get from YouTube" id="getFromYouTubeTeaserModal"
             @submit="(text, handleSuccess, handleFailure) => $emit('getFromYouTube', text, handleSuccess, handleFailure)"
             ref="getFromYouTubeModal" />
     </Teleport>
