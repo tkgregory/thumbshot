@@ -15,7 +15,7 @@ export default defineConfig({
     baseURL: 'http://localhost:5173',
     trace: 'retain-on-failure',
   },
-  projects: process.env.CI ? [
+  projects: [
     {
       name: 'chromium',
       use: {
@@ -32,12 +32,6 @@ export default defineConfig({
       name: 'webkit',
       use: {
         ...devices['Desktop Safari']
-      }
-    }] : [
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome']
       }
     }],
   webServer: {
