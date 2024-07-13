@@ -218,35 +218,6 @@ async function onChangeExistingImage(event: any, preview: YouTubePreviewData, fi
     finishLoading()
 }
 
-async function onChangeTeaserImage(file: any, finishLoading: () => void) {
-    const imageURL = await validateImage(file).catch((error) => {
-        finishLoading()
-        throw error
-    })
-    if (props.frontEndOnly) {
-        const index = previewData.value.length
-
-        previewData.value.splice(index, 0, {
-            title: defaultTitle(),
-            imageURL: imageURL,
-            channelName: defaultChannelName()
-        })
-    } else {
-        const response = await fetch(imageURL)
-        const blob = await response.blob()
-        const compressedBlob = await compressImage(blob)
-        const index_1 = previewData.value.length
-        const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
-        previewData.value.splice(index_1, 0, {
-            title: defaultTitle(),
-            s3ObjectKey: s3ObjectKey,
-            channelName: defaultChannelName()
-        })
-        await save()
-    }
-    finishLoading()
-}
-
 async function onChangeTeaserImages(files: any, updateLoading: () => void, cancelLoading: () => void) {
     const collectedPreviews = [] as YouTubePreviewData[]
 
@@ -394,11 +365,11 @@ const displayPreviewData = computed(() => {
             </template>
             <template v-if="previewData.length < maxPreviewCount">
                 <FileDragDrop v-slot="slotProps"
-                    @addImages="(files, updateLoading, cancelLoading) => onChangeTeaserImages(files, updateLoading, cancelLoading)">
+                    @addImages="(files: any, updateLoading: any, cancelLoading: any) => onChangeTeaserImages(files, updateLoading, cancelLoading)">
                     <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly"
                         :isHighlighted="slotProps.isFileDragging" :isFileUploading="slotProps.isFileUploading"
                         :percentComplete="slotProps.percentComplete" @randomize="randomize(); save();"
-                        @changeImage="(event, finishLoading) => onChangeTeaserImage(event.target.files[0], finishLoading)"
+                        @changeImage="(event, updateLoading, cancelLoading) => onChangeTeaserImages(event.target.files, updateLoading, cancelLoading)"
                         @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
                 </FileDragDrop>
                 <div v-if="previewData.length === 0" class="col-span-2 hidden md:block">

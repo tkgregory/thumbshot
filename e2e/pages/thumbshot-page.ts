@@ -12,6 +12,13 @@ export class ThumbShotPage {
         await fileChooser.setFiles([`./e2e/images/${imageName}`]);
     }
 
+    async addThumbnails(imageName: string[]) {
+        const fileChooserPromise = this.page.waitForEvent('filechooser');
+        await this.page.locator('div[data-tip="Add thumbnail"] > label').click()
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles(imageName.map(name => `./e2e/images/${name}`));
+    }
+
     async updateTitle(index: number, title: string) {
         await this.page.locator(`draggable-element:nth-child(${index + 1}) span[class="cursor-pointer"]`).first().click()
         await this.page.locator('input[name="title"]').fill(title)

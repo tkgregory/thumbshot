@@ -17,6 +17,12 @@ test('Uses board name for title', async ({ thumbshotPage, boardsPage }) => {
     await expect(thumbshotPage.getPreviewTitle(0)).toHaveText(boardTitle, { timeout: 5000 })
 });
 
+test('Uploads multiple thumbnails at once', async ({ thumbshotPage }) => {
+    await thumbshotPage.addThumbnails(['correct-dimensions.png', 'correct-dimensions-2.jpg'])
+
+    await expect(thumbshotPage.allPreviews()).toHaveCount(2, { timeout: 5000 })
+});
+
 test('Uses default channel name', async ({ thumbshotPage }) => {
     await thumbshotPage.addThumbnail('correct-dimensions.png')
 

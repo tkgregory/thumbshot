@@ -27,6 +27,18 @@ defineProps({
 
 const isLoading = ref(false)
 const getFromYouTubeModal = ref()
+
+function onChangeImage(event: any) {
+    isLoading.value = true;
+    let processed = 0
+
+    emit('changeImage', event, () => {
+        processed++;
+        if (processed === event.target.files.length) {
+            isLoading.value = false;
+        }
+    }, () => { isLoading.value = false })
+}
 </script>
 
 <template>
@@ -58,8 +70,7 @@ const getFromYouTubeModal = ref()
                     <div class="tooltip w-[32px]" data-tip="Add thumbnail">
                         <label>
                             <Upload :size="32" class="clickable" />
-                            <input name="thumbnail" type="file" accept="image/*"
-                                @change="isLoading = true; $emit('changeImage', $event, () => { isLoading = false })"
+                            <input name="thumbnail" type="file" accept="image/*" multiple @change="onChangeImage"
                                 class="hidden" />
                         </label>
                     </div>
