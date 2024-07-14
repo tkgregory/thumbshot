@@ -11,8 +11,8 @@ import YouTubeThumbnailTeaser from './YouTubeThumbnailTeaser.vue'
 import FileDragDrop from './FileDragDrop.vue'
 import { CircleX } from 'lucide-vue-next';
 import { loadSettings } from '../composables/settings'
+import { validateImage } from '../composables/image'
 
-const validExtensions = ['jpg', 'jpeg', 'png']
 
 const previewData = ref<YouTubePreviewData[]>([])
 const error = ref()
@@ -162,38 +162,6 @@ function reset() {
     save()
 }
 
-async function validateImage(file: any) {
-    const fileName = file.name
-    if (validExtensions.indexOf(fileName.split('.').pop().toLowerCase()) == -1) {
-        showError(`Image must be one of these types: ${validExtensions.join(", ")}`)
-        return Promise.reject()
-    } else {
-        const url = URL.createObjectURL(file)
-
-        return getImage(url).then((image) => {
-            if (image.width / image.height != 16 / 9) {
-                showError("Image aspect ratio must be 16:9")
-                return Promise.reject()
-            }
-            if (image.width < 1280 || image.height < 720) {
-                showError("Image size must be at least 1280x720 pixels")
-                return Promise.reject()
-            }
-
-            return url
-        })
-    }
-}
-
-function getImage(url: string): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-        let image = new Image()
-        image.onload = () => resolve(image)
-        image.onerror = reject
-        image.src = url
-    })
-}
-
 function showError(errorMessage: string) {
     error.value = errorMessage
     if (document) {
@@ -201,8 +169,16 @@ function showError(errorMessage: string) {
     }
 }
 
-async function onChangeExistingImage(event: any, preview: YouTubePreviewData, finishLoading: () => void) {
-    const imageURL = await validateImage(event.target.files[0])
+async function onChangeExistingImage(file: any, preview: YouTubePreviewData, finishLoading: () => void) {
+    let imageURL
+    try {
+        imageURL = await validateImage(file)
+    } catch (error: any) {
+        showError(error.message)
+        finishLoading()
+        return
+    }
+
     if (props.frontEndOnly) {
         preview.imageURL = imageURL;
     } else {
@@ -222,10 +198,13 @@ async function onChangeTeaserImages(files: any, updateLoading: () => void, cance
     const collectedPreviews = [] as YouTubePreviewData[]
 
     const imageURLs = await Promise.all(Array.from(files).map(async (file: any) => {
-        return await validateImage(file).catch((error) => {
+        try {
+            return await validateImage(file)
+        } catch (error: any) {
+            showError(error.message)
             cancelLoading()
             throw error
-        })
+        }
     }))
 
     for (let i = 0; i < imageURLs.length; i++) {

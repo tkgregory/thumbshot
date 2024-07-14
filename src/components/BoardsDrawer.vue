@@ -66,6 +66,7 @@ function sortByName(a: Board, b: Board) {
 
 async function deleteBoard(deleteBoardId: string) {
     if (confirm('Are you sure you want to delete this board?')) {
+        isLoading.value = true
         await fetchPathWithAuth('DELETE', `/user/boards/${deleteBoardId}`).then((response) => {
             if (response.status !== 204) {
                 throw new Error(`Invalid response with status ${response.status}`)
@@ -229,7 +230,7 @@ function open() {
                                         <Pencil :size="14" />
                                     </div>
                                 </div>
-                                <div class="tooltip tooltip-left" data-tip="Delete" @click.stop="deleteBoard(board.id)">
+                                <div class="tooltip tooltip-left" data-tip="Delete" @click.stop.prevent="deleteBoard(board.id)">
                                     <div class="btn btn-ghost px-2">
                                         <Trash2 :size="14" />
                                     </div>

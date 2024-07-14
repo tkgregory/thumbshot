@@ -37,3 +37,34 @@ export async function compressImage(imageBitmap: ImageBitmapSource): Promise<Blo
         })
     })
 }
+
+function getImage(url: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+        let image = new Image()
+        image.onload = () => resolve(image)
+        image.onerror = reject
+        image.src = url
+    })
+}
+
+export async function validateImage(file: any) {
+    const validExtensions = ['jpg', 'jpeg', 'png']
+
+    const fileName = file.name
+    if (validExtensions.indexOf(fileName.split('.').pop().toLowerCase()) == -1) {
+        throw Error(`Image must be one of these types: ${validExtensions.join(", ")}`)
+    } else {
+        const url = URL.createObjectURL(file)
+
+        return getImage(url).then((image) => {
+            if (image.width / image.height != 16 / 9) {
+                throw Error("Image aspect ratio must be 16:9")
+            }
+            if (image.width < 1280 || image.height < 720) {
+                throw Error("Image size must be at least 1280x720 pixels")
+            }
+
+            return url
+        })
+    }
+}

@@ -12,7 +12,6 @@ defineProps({
     type: String
   },
   imageSrc: {
-    required: true,
     type: String
   },
   duplicateEnabled: {
@@ -49,20 +48,22 @@ defineProps({
   },
   isGetFromYouTubeEnabled: {
     type: Boolean
-  }
+  },
+  isHoverControlsEnabled: { type: Boolean, default: true }
 })
 
 const emit = defineEmits(['changeTitle', 'changeChannelName', 'changeImage', 'deletePreview', 'duplicatePreview', 'moveLeft', 'moveRight', 'generatePreview', 'getFromYouTube'])
 </script>
 
 <template>
-  <youtube-preview class="relative block text-youtube-parent">
+  <youtube-preview class="relative block text-youtube-parent w-full">
     <div v-if="isHighlighted" class="absolute bg-primary w-full h-full z-10 rounded-xl" />
     <div v-if="showNumbers" class="text-youtube mb-1">Option {{ index + 1 }}</div>
     <YouTubeThumbnail :isGetFromYouTubeEnabled="isGetFromYouTubeEnabled" :imageSrc="imageSrc"
       :moveLeftEnabled="moveLeftEnabled" :moveRightEnabled="moveRightEnabled" :duplicateEnabled="duplicateEnabled"
       :isGeneratingPreview="isGeneratingPreview" :isSinglePreviewEnabled="isSinglePreviewEnabled"
-      @duplicatePreview="$emit('duplicatePreview')" @deletePreview="$emit('deletePreview')"
+      :isHoverControlsEnabled="isHoverControlsEnabled" @duplicatePreview="$emit('duplicatePreview')"
+      @deletePreview="$emit('deletePreview')"
       @changeImage="(event, finishLoading) => emit('changeImage', event, finishLoading)" @moveLeft="
         $emit('moveLeft')" @moveRight="$emit('moveRight')" @generatePreview="$emit('generatePreview')"
       @getFromYouTube="(youTubeVideoURL, closeModal, handleError) => $emit('getFromYouTube', youTubeVideoURL, closeModal, handleError)" />

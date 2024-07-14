@@ -34,7 +34,7 @@ async function fileDrop(event: any) {
         @dragleave="(event: any) => { if (event.target == fileEnterTarget) isFileDragging = false; }"
         @drop.prevent="(event: any) => { fileDrop(event); }"
         :class="isFileDragging || isFileUploading ? 'border-primary' : ''"
-        class="border-dashed border-4 bg-base-300 border-base-content rounded-xl">
+        class="border-dashed border-4 bg-base-300 border-base-content rounded-xl block">
         <slot :isFileDragging="isFileDragging" :isFileUploading="isFileUploading" :percentComplete="percentComplete">
         </slot>
     </file-drop-zone>
