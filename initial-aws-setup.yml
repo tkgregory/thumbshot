@@ -99,13 +99,14 @@ Resources:
                   - logs:DeleteLogGroup
                   - logs:TagResource
                   - logs:UntagResource
-                Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/thumbshot-*'
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/http-api/thumbshot-*'
-              - Effect: Allow
-                Action:
                   - logs:DescribeLogGroups
                   - logs:CreateLogDelivery
+                  - logs:CreateLogStream',
+                  - logs:DescribeLogGroups',
+                  - logs:DescribeLogStreams',
+                  - logs:PutLogEvents',
+                  - logs:GetLogEvents',
+                  - logs:FilterLogEvents'
                 Resource: '*'
               - Effect: Allow
                 Action:
