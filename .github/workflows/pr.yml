@@ -18,11 +18,11 @@ jobs:
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: us-east-1
-    - uses: serverless/github-action@v3.2
+    - uses: serverless/github-action@v4
       with:
         args: deploy --stage dev
     - run: npm run build:dev
-    - uses: serverless/github-action@v3.2
+    - uses: serverless/github-action@v4
       with:
         args: s3sync --stage dev
     - uses: actions/upload-artifact@v4
