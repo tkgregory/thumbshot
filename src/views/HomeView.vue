@@ -38,11 +38,12 @@ random()
 async function random() {
   const response = await fetch(`${import.meta.env.VITE_API_URL}/youtube/videos`)
   if (response.status !== 200) {
-    throw new Error(`Invalid response with status ${response.status}`)
+    startGame()
+    console.error(`Invalid /youtube/videos response with status ${response.status}`)
+  } else {
+    const json = await response.json()
+    randomise(json, 2)
   }
-  const json = await response.json()
-
-  randomise(json, 2)
 }
 
 async function randomise(json: any, index: number) {
@@ -55,12 +56,16 @@ async function randomise(json: any, index: number) {
     setTimeout(() => { randomise(json, index + 1) }, timeout)
   } else {
     setTimeout(() => {
-      title.value = 'Enter your video title'
-      channelTitle.value = 'Enter your channel name'
-      thumbnailURL.value = undefined
-      isGameStarted.value = true
+
     }, timeout);
   }
+}
+
+function startGame() {
+  title.value = 'Enter your video title'
+  channelTitle.value = 'Enter your channel name'
+  thumbnailURL.value = undefined
+  isGameStarted.value = true
 }
 
 async function onChangeImage(file: any, finishLoading: () => void) {

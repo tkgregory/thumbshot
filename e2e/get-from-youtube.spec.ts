@@ -4,6 +4,7 @@ test.describe.configure({ retries: 2 });
 
 test.beforeEach(async ({ page, boardsPage }) => {
     test.slow()
+    test.skip() //Ignoring while quota is exceeded
     await page.goto('/')
     await boardsPage.useNewBoard()
 });
