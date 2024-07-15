@@ -7,6 +7,7 @@ import { RotateCcw } from 'lucide-vue-next';
 import { Copy } from 'lucide-vue-next';
 import { Check } from 'lucide-vue-next';
 import { Download } from 'lucide-vue-next';
+import { Images } from 'lucide-vue-next';
 import { ref } from 'vue'
 import { computed } from 'vue'
 import { loadSettings } from '../composables/settings'
@@ -17,7 +18,8 @@ import { config } from '../composables/data'
 const isGeneratingPreview = ref(false);
 const isGeneratingSinglePreview = ref(false);
 const previewUrl = ref()
-const isJustCopied = ref(false)
+const isJustCopiedURL = ref(false)
+const isJustCopiedImage = ref(false)
 const isJustDownloaded = ref(false)
 const thumbnailBoard = ref<InstanceType<typeof ThumbnailBoard>>()
 const error = ref()
@@ -69,14 +71,52 @@ function handlePreviewImageError() {
     }
 }
 
-function copyToClipboard() {
+function copyURLToClipboard() {
     if (previewUrl != null) {
-        isJustCopied.value = true
+        isJustCopiedURL.value = true
         setTimeout(() => {
-            isJustCopied.value = false
+            isJustCopiedURL.value = false
         }, 3000)
         return navigator.clipboard.writeText(previewUrl.value)
     }
+}
+
+async function copyImageToClipboard() {
+    if (previewUrl != null) {
+        const response = await fetch(previewUrl.value)
+        const imageBlob = await response.blob()
+        const pngBlob = await convertToPng(imageBlob);
+
+        await navigator.clipboard.write([
+            new ClipboardItem({
+                'image/png': pngBlob
+            })
+        ]);
+
+        isJustCopiedImage.value = true
+        setTimeout(() => {
+            isJustCopiedImage.value = false
+        }, 3000)
+    }
+}
+
+function convertToPng(blob) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob((pngBlob) => {
+                resolve(pngBlob);
+            }, 'image/png');
+        };
+
+        img.src = URL.createObjectURL(blob);
+    });
 }
 
 function download() {
@@ -110,12 +150,18 @@ function download() {
                 <div class="modal-box">
                     <h3 class="font-bold text-lg">Share your preview image</h3>
                     <div class="flex items-center gap-2">
-                        <input type="text" class="input input-bordered w-full max-w-xs my-4" :value="previewUrl"
+                        <input type="text" class="input input-bordered grow max-w-64 my-4" :value="previewUrl"
                             id="previewUrl" readonly />
-                        <div class="tooltip" :data-tip="isJustCopied ? 'Copied!' : 'Copy URL to clipboard'">
-                            <button @click="copyToClipboard" class="btn btn-square btn-neutral">
-                                <Copy v-if="!isJustCopied" />
-                                <Check v-if="isJustCopied" color="#00ff00" />
+                        <div class="tooltip" :data-tip="isJustCopiedURL ? 'Copied!' : 'Copy URL to clipboard'">
+                            <button @click="copyURLToClipboard" class="btn btn-square btn-neutral">
+                                <Copy v-if="!isJustCopiedURL" />
+                                <Check v-if="isJustCopiedURL" color="#00ff00" />
+                            </button>
+                        </div>
+                        <div class="tooltip" :data-tip="isJustCopiedImage ? 'Copied!' : 'Copy image to clipboard'">
+                            <button @click="copyImageToClipboard" class="btn btn-square btn-neutral">
+                                <Images v-if="!isJustCopiedImage" />
+                                <Check v-if="isJustCopiedImage" color="#00ff00" />
                             </button>
                         </div>
                         <div class="tooltip" :data-tip="isJustDownloaded ? 'Downloaded!' : 'Download image'">

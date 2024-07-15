@@ -405,6 +405,13 @@ resources:
           BlockPublicPolicy: false
           IgnorePublicAcls: false
           RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+              AllowedOrigins:
+                - 'http://localhost:5173'
+                - 'https://${param:domainName}'
         LifecycleConfiguration:
           Rules:
             - Id: DeleteRule
