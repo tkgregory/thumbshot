@@ -30,19 +30,6 @@ test('Single screenshot button stops loading', async ({ thumbshotPage }) => {
   await expect(thumbshotPage.getScreenshotURL()).toHaveValue(/https/, { timeout: 10000 })
 });
 
-test('Copies downloadable image URL', async ({ page, context, request, browserName, thumbshotPage }) => {
-  test.skip(browserName !== 'chromium', 'Still working on it');
-
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await thumbshotPage.clickGenerateSingleScreenshot(0)
-  await page.locator('div[data-tip="Copy URL to clipboard"] > button').click()
-
-  const handle = await page.evaluateHandle(() => navigator.clipboard.readText());
-  const previewUrl = await handle.jsonValue();
-  const previewUrlResponse = await request.get(previewUrl)
-  expect(previewUrlResponse.status()).toBe(200)
-});
-
 test('Copies image to clipboard', async ({ page, context, request, browserName }) => {
   test.skip(browserName !== 'chromium', 'Still working on it');
 

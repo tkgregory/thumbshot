@@ -26,20 +26,6 @@ test('Screenshot all button generates downloadable image URL', async ({ page, re
   expect(previewUrlResponse.status()).toBe(200)
 });
 
-test('Copies downloadable image URL', async ({ page, context, request, browserName }) => {
-  test.skip(browserName !== 'chromium', 'Still working on it');
-
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  await page.locator('div[data-tip="Randomize"]').click()
-  await page.locator('div[data-tip="Generate shareable preview image"] > button').click()
-  await page.locator('div[data-tip="Copy URL to clipboard"] > button').click()
-
-  const handle = await page.evaluateHandle(() => navigator.clipboard.readText());
-  const previewUrl = await handle.jsonValue();
-  const previewUrlResponse = await request.get(previewUrl)
-  expect(previewUrlResponse.status()).toBe(200)
-});
-
 test('Copies image to clipboard', async ({ page, context, request, browserName }) => {
   test.skip(browserName !== 'chromium', 'Still working on it');
 

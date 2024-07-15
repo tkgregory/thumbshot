@@ -71,16 +71,6 @@ function handlePreviewImageError() {
     }
 }
 
-function copyURLToClipboard() {
-    if (previewUrl != null) {
-        isJustCopiedURL.value = true
-        setTimeout(() => {
-            isJustCopiedURL.value = false
-        }, 3000)
-        return navigator.clipboard.writeText(previewUrl.value)
-    }
-}
-
 async function copyImageToClipboard() {
     if (previewUrl != null) {
         const response = await fetch(previewUrl.value)
@@ -100,23 +90,25 @@ async function copyImageToClipboard() {
     }
 }
 
-function convertToPng(blob) {
+function convertToPng(blob: any) {
     return new Promise((resolve) => {
         const img = new Image();
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
+        if (ctx === null) {
+            throw new Error('Could not create canvas context');
+        }
 
         img.onload = () => {
             canvas.width = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
-            canvas.toBlob((pngBlob) => {
+            canvas.toBlob((pngBlob: any) => {
                 resolve(pngBlob);
             }, 'image/png');
         };
-
         img.src = URL.createObjectURL(blob);
-    });
+    }) as Promise<Blob>;
 }
 
 function download() {
@@ -152,15 +144,9 @@ function download() {
                     <div class="flex items-center gap-2">
                         <input type="text" class="input input-bordered grow max-w-64 my-4" :value="previewUrl"
                             id="previewUrl" readonly />
-                        <div class="tooltip" :data-tip="isJustCopiedURL ? 'Copied!' : 'Copy URL to clipboard'">
-                            <button @click="copyURLToClipboard" class="btn btn-square btn-neutral">
-                                <Copy v-if="!isJustCopiedURL" />
-                                <Check v-if="isJustCopiedURL" color="#00ff00" />
-                            </button>
-                        </div>
                         <div class="tooltip" :data-tip="isJustCopiedImage ? 'Copied!' : 'Copy image to clipboard'">
                             <button @click="copyImageToClipboard" class="btn btn-square btn-neutral">
-                                <Images v-if="!isJustCopiedImage" />
+                                <Copy v-if="!isJustCopiedImage" />
                                 <Check v-if="isJustCopiedImage" color="#00ff00" />
                             </button>
                         </div>
