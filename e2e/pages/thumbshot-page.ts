@@ -101,7 +101,7 @@ export class ThumbShotPage {
     async clickRandom() {
         const previewCount = await this.allPreviews().count()
         await this.page.locator('div[data-tip="Randomize"]').click()
-        await expect(this.allPreviews()).toHaveCount(previewCount + 1)
+        await expect(this.allPreviews()).toHaveCount(previewCount + 1, { timeout: 5000 })
     }
 
     async clickGetFromYouTubeForTeaser() {
