@@ -48,7 +48,7 @@ async function random() {
 async function randomise(json: any, index: number) {
   title.value = json.items[index].snippet.title
   channelTitle.value = json.items[index].snippet.channelTitle
-  thumbnailURL.value = json.items[index].snippet.thumbnails.maxres.url
+  thumbnailURL.value = `https://img.youtube.com/vi/${json.items[index].id.videoId}/maxresdefault.jpg`
 
   const timeout = 2000
   if (index < 4 && index + 1 < json.items.length) {

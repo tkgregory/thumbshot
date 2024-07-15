@@ -1,7 +1,7 @@
 'use strict'
 
 export const handler = async (event) => {
-    const response = await fetch(`https://youtube.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&key=${process.env.YOUTUBE_API_KEY}`)
+    const response = await fetch(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=24&videoDuration=long&key=${process.env.YOUTUBE_API_KEY}`)
     const body = await response.json()
 
     return {
