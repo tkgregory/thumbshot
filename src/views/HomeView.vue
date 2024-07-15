@@ -9,6 +9,7 @@ import { getCurrentUser } from 'aws-amplify/auth';
 import BoardsDrawer from '../components/BoardsDrawer.vue'
 import YouTubePreview from '../components/YouTubePreview.vue'
 import { validateImage } from '../composables/image'
+import JSConfetti from 'js-confetti'
 
 const navBar = ref<InstanceType<typeof NavBar>>()
 const route = useRoute()
@@ -80,7 +81,12 @@ function showError(errorMessage: string) {
 }
 
 const progress = computed(() => {
-  return (isSetTitle.value ? 1 : 0) + (isSetChannelTitle.value ? 1 : 0) + (isSetThumbnailURL.value ? 1 : 0)
+  const progress = (isSetTitle.value ? 1 : 0) + (isSetChannelTitle.value ? 1 : 0) + (isSetThumbnailURL.value ? 1 : 0)
+  if (progress === 3) {
+    const jsConfetti = new JSConfetti()
+    jsConfetti.addConfetti()
+  }
+  return progress
 })
 
 </script>
@@ -134,7 +140,8 @@ const progress = computed(() => {
                   @changeTitle="(newTitle) => { title = newTitle; isSetTitle = true; }"
                   @changeChannelName="(newChannelName) => { channelTitle = newChannelName; isSetChannelTitle = true; }"
                   @changeImage="(file, cancelLoading) => { onChangeImage(file, cancelLoading); }" />
-                <progress v-if="isGameStarted" class="progress progress-primary w-full" :value="progress" max="3"></progress>
+                <progress v-if="isGameStarted" class="progress progress-primary w-full" :value="progress"
+                  max="3"></progress>
               </div>
             </div>
           </div>
