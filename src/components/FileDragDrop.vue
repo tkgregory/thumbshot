@@ -7,6 +7,7 @@ const percentComplete = ref(0)
 const fileEnterTarget = ref()
 
 const emits = defineEmits(['addImages'])
+defineProps({ isBorderPrimary: { type: Boolean, default: false } })
 
 async function fileDrop(event: any) {
     const files = event.dataTransfer.files;
@@ -33,7 +34,7 @@ async function fileDrop(event: any) {
         @dragenter="(event: any) => { if (event.dataTransfer.types.indexOf('Files') != -1) isFileDragging = true; fileEnterTarget = event.target; }"
         @dragleave="(event: any) => { if (event.target == fileEnterTarget) isFileDragging = false; }"
         @drop.prevent="(event: any) => { fileDrop(event); }"
-        :class="isFileDragging || isFileUploading ? 'border-primary' : ''"
+        :class="{ [`border-primary`]: isFileDragging || isFileUploading || isBorderPrimary }"
         class="border-dashed border-4 bg-base-300 border-base-content rounded-xl block">
         <slot :isFileDragging="isFileDragging" :isFileUploading="isFileUploading" :percentComplete="percentComplete">
         </slot>

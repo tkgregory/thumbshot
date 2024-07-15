@@ -33,7 +33,7 @@ const getFromYouTubeModal = ref()
             :class="{ 'group-hover:brightness-[.30] transition duration-200 cursor-pointer': isHoverControlsEnabled }"
             class="rounded-xl object-cover" :src="imageSrc" id="output" draggable="false" />
 
-        <FileDragDrop v-else v-slot="slotProps"
+        <FileDragDrop v-else :isBorderPrimary="true"
             @addImages="(files: any, _updateLoading: any, cancelLoading: any) => $emit('changeImage', files[0], cancelLoading)">
             <div
                 class="aspect-video w-full bg-base-100 rounded-xl flex flex-col gap-4 justify-center items-center text-xl lg:text-3xl p-4">

@@ -117,24 +117,21 @@ const progress = computed(() => {
         <div class="flex flex-wrap gap-12">
           <div class="grid lg:grid-cols-2 gap-12">
             <div class="grow lg:basis-2/5 flex flex-col justify-center gap-4">
-              <h1 class="text-2xl sm:text-4xl font-bold line-clamp-2 text-accent">Compare and share YouTube thumbnail
+              <h1 class="text-2xl sm:text-4xl font-bold line-clamp-2">Compare and share YouTube thumbnail
                 ideas</h1>
               <h2 class="text-lg sm:text-2xl line-clamp-3">View video ideas side-by-side, get feedback, & pick a
                 winner to make your next video pop.</h2>
               <div class="flex gap-2 mt-1">
                 <RouterLink to="/sign-in" class="lg:grow">
-                  <button class="btn btn-accent sm:btn-lg sm:min-w-40 lg:w-full">Sign up</button>
-                </RouterLink>
-                <RouterLink to="/trial" class="lg:grow">
-                  <button class="btn btn-primary sm:btn-lg sm:min-w-40 lg:w-full">Try for free</button>
+                  <button class="btn btn-accent sm:btn-lg sm:min-w-40 lg:w-1/2">Sign up for free</button>
                 </RouterLink>
               </div>
             </div>
-            <div v-if="title != undefined" class="mockup-browser bg-base-300 w-full">
+            <div v-if="title != undefined" class="mockup-browser bg-base-300 lg:w-full">
               <div class="mockup-browser-toolbar">
                 <div class="input">youtube.com</div>
               </div>
-              <div class="bg-base-200 flex flex-col justify-center px-16 py-8 gap-8">
+              <div class="bg-base-200 flex flex-col justify-center px-8 lg:px-16 py-8 gap-8">
                 <YouTubePreview :isGetFromYouTubeEnabled="false" :title="title" :channelName="channelTitle"
                   :imageSrc="thumbnailURL" :index="0" :isHoverControlsEnabled="false"
                   @changeTitle="(newTitle) => { title = newTitle; isSetTitle = true; }"
