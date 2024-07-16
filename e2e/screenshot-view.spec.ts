@@ -12,7 +12,6 @@ test.beforeEach(async ({ page, boardsPage, thumbshotPage }) => {
 });
 
 test('Shows numbers', async ({ page, boardsPage }) => {
-  await page.waitForTimeout(1000); // pause to wait for save to complete
   await boardsPage.gotoScreenshotView()
 
   await expect(page.locator('youtube-preview').nth(0)).toContainText('Option 1', { timeout: 5000 })
