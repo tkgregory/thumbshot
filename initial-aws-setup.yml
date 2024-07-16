@@ -101,12 +101,13 @@ Resources:
                   - logs:UntagResource
                   - logs:DescribeLogGroups
                   - logs:CreateLogDelivery
-                  - logs:CreateLogStream',
-                  - logs:DescribeLogGroups',
-                  - logs:DescribeLogStreams',
-                  - logs:PutLogEvents',
-                  - logs:GetLogEvents',
-                  - logs:FilterLogEvents'
+                  - logs:CreateLogStream
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvent
+                  - logs:GetLogEvents
+                  - logs:FilterLogEvents
+                  - logs:ListLogDeliveries
                 Resource: '*'
               - Effect: Allow
                 Action:
