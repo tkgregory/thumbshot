@@ -6,7 +6,9 @@ test.beforeEach(async ({ page, boardsPage, thumbshotPage }) => {
   await boardsPage.useNewBoard()
 
   await page.locator('div[data-tip="Randomize"]').click()
+  await expect(thumbshotPage.allPreviews()).toHaveCount(1)
   await page.locator('div[data-tip="Randomize"]').click()
+  await expect(thumbshotPage.allPreviews()).toHaveCount(2)
   await page.locator('div[data-tip="Randomize"]').click()
   await expect(thumbshotPage.allPreviews()).toHaveCount(3)
 });
