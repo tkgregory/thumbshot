@@ -33,7 +33,6 @@ export const handler = async (event) => {
 
     let page = await browser.newPage();
     await page.evaluateOnNewDocument((body) => {
-      localStorage.setItem('showInstructions', false);
       localStorage.setItem('settings', JSON.stringify(body.settings));
       if (body.columnCount !== undefined) {
         localStorage.setItem('columnCount', body.columnCount);

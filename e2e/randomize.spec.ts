@@ -1,8 +1,8 @@
 import { test, expect } from './pages/fixtures';
 
-test.beforeEach(async ({ page }) => {
-    await page.goto('/#/trial')
-    await page.locator('button:has-text("Compare My Thumbnails")').click()
+test.beforeEach(async ({ page, boardsPage }) => {
+    await page.goto('/')
+    await boardsPage.useNewBoard()
 });
 
 test('Randomize shows default YouTube preview', async ({ page, thumbshotPage }) => {

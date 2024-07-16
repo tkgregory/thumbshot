@@ -30,9 +30,6 @@ const props = defineProps({
         type: String,
         required: false
     },
-    frontEndOnly: {
-        type: Boolean,
-    },
     isGeneratingSinglePreview: {
         type: Boolean,
     },
@@ -115,10 +112,6 @@ async function uploadThumbnail(imageBlob: Blob, fileExtension: string) {
 }
 
 async function save() {
-    if (props.frontEndOnly) {
-        return
-    }
-
     for (const preview of previewData.value) {
         if (preview.s3ObjectKey !== undefined && preview.imageURL !== undefined) {
             throw Error('Cannot save both s3ObjectKey and imageURL to the server.')
@@ -138,11 +131,6 @@ async function save() {
 }
 
 async function load() {
-    if (props.frontEndOnly) {
-        isLoading.value = false
-        return
-    }
-
     isLoading.value = true
     const response = await fetchPathWithAuth('GET', `/user/boards/${props.boardId}`)
     if (response.status === 200) {
@@ -179,17 +167,13 @@ async function onChangeExistingImage(file: any, preview: YouTubePreviewData, fin
         return
     }
 
-    if (props.frontEndOnly) {
-        preview.imageURL = imageURL;
-    } else {
-        const response = await fetch(imageURL)
-        const blob = await response.blob()
-        const compressedBlob = await compressImage(blob)
-        const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
-        preview.s3ObjectKey = s3ObjectKey
-        preview.imageURL = undefined
-        await save()
-    }
+    const response = await fetch(imageURL)
+    const blob = await response.blob()
+    const compressedBlob = await compressImage(blob)
+    const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
+    preview.s3ObjectKey = s3ObjectKey
+    preview.imageURL = undefined
+    await save()
 
     finishLoading()
 }
@@ -208,30 +192,20 @@ async function onChangeTeaserImages(files: any, updateLoading: () => void, cance
     }))
 
     for (let i = 0; i < imageURLs.length; i++) {
-        if (props.frontEndOnly) {
-            collectedPreviews.push({
-                title: defaultTitle(),
-                imageURL: imageURLs[i],
-                channelName: defaultChannelName()
-            })
-        } else {
-            const response = await fetch(imageURLs[i])
-            const blob = await response.blob()
-            const compressedBlob = await compressImage(blob)
-            const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
-            collectedPreviews.push({
-                title: defaultTitle(),
-                s3ObjectKey: s3ObjectKey,
-                channelName: defaultChannelName()
-            })
-        }
+        const response = await fetch(imageURLs[i])
+        const blob = await response.blob()
+        const compressedBlob = await compressImage(blob)
+        const s3ObjectKey = await uploadThumbnail(compressedBlob, 'jpg')
+        collectedPreviews.push({
+            title: defaultTitle(),
+            s3ObjectKey: s3ObjectKey,
+            channelName: defaultChannelName()
+        })
         updateLoading()
     }
 
     previewData.value.push(...collectedPreviews)
-    if (!props.frontEndOnly) {
-        await save()
-    }
+    await save()
 }
 
 
@@ -327,11 +301,10 @@ const displayPreviewData = computed(() => {
                     @dragend="dragEnd" @drop.preventDefault="(event: any) => { drop(event, index); save(); }"
                     @dragover.prevent="dragOver(index)">
 
-                    <YouTubePreview :isGetFromYouTubeEnabled="!frontEndOnly" :imageSrc="getImageSrc(preview)"
-                        :title="preview.title" :channelName="preview.channelName"
-                        :duplicateEnabled="previewData.length != maxPreviewCount" :moveLeftEnabled="index != 0"
-                        :moveRightEnabled="index != previewData.length - 1" :index="index"
-                        :isGeneratingPreview="isGeneratingSinglePreview" :isSinglePreviewEnabled="!frontEndOnly"
+                    <YouTubePreview :imageSrc="getImageSrc(preview)" :title="preview.title"
+                        :channelName="preview.channelName" :duplicateEnabled="previewData.length != maxPreviewCount"
+                        :moveLeftEnabled="index != 0" :moveRightEnabled="index != previewData.length - 1" :index="index"
+                        :isGeneratingPreview="isGeneratingSinglePreview"
                         :isHighlighted="isDragging && dragTargetIndexRef === index"
                         @changeTitle="(title) => { preview.title = title; save(); }"
                         @changeChannelName="(channelName) => { preview.channelName = channelName; save(); }"
@@ -345,9 +318,9 @@ const displayPreviewData = computed(() => {
             <template v-if="previewData.length < maxPreviewCount">
                 <FileDragDrop v-slot="slotProps"
                     @addImages="(files: any, updateLoading: any, cancelLoading: any) => onChangeTeaserImages(files, updateLoading, cancelLoading)">
-                    <YouTubeThumbnailTeaser :isGetFromYouTubeEnabled="!frontEndOnly"
-                        :isHighlighted="slotProps.isFileDragging" :isFileUploading="slotProps.isFileUploading"
-                        :percentComplete="slotProps.percentComplete" @randomize="randomize(); save();"
+                    <YouTubeThumbnailTeaser :isHighlighted="slotProps.isFileDragging"
+                        :isFileUploading="slotProps.isFileUploading" :percentComplete="slotProps.percentComplete"
+                        @randomize="randomize(); save();"
                         @changeImage="(event, updateLoading, cancelLoading) => onChangeTeaserImages(event.target.files, updateLoading, cancelLoading)"
                         @getFromYouTube="async (youTubeVideoURL, closeModal, handleError) => { await getFromYouTubeForTeaser(youTubeVideoURL, closeModal, handleError); save(); }" />
                 </FileDragDrop>

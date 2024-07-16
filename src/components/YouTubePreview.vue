@@ -47,7 +47,8 @@ defineProps({
     default: false
   },
   isGetFromYouTubeEnabled: {
-    type: Boolean
+    type: Boolean,
+    default: true
   },
   isHoverControlsEnabled: { type: Boolean, default: true }
 })
