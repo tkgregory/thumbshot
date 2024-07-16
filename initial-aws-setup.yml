@@ -112,6 +112,7 @@ Resources:
                 Action:
                   - route53:ChangeResourceRecordSets
                   - route53:Get*
+                  - route53:ListResourceRecordSets
                 Resource: '*'
               - Effect: Allow
                 Action:
