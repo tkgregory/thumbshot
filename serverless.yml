@@ -594,7 +594,7 @@ resources:
           DefaultTTL: 300
           MaxTTL: 31536000
           MinTTL: 1
-          Name: ApiCachePolicy
+          Name: ApiCachePolicy-${sls:stage}
           ParametersInCacheKeyAndForwardedToOrigin:
             CookiesConfig:
               CookieBehavior: none
