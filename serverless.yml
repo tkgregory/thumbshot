@@ -566,8 +566,8 @@ resources:
           CacheBehaviors:
             - PathPattern: ${param:youtubeVideosApiPath}*
               TargetOriginId: ApiGatewayOrigin
-              ViewerProtocolPolicy: https-only
-              CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+              ViewerProtocolPolicy: redirect-to-https
+              CachePolicyId: !Ref ApiCachePolicy
               OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader
               AllowedMethods:
                 - GET
@@ -587,6 +587,25 @@ resources:
         AliasTarget:
           DNSName: !GetAtt ApiCloudFrontDistribution.DomainName
           HostedZoneId: Z2FDTNDATAQYW2 # value as described in AWS docs
+    ApiCachePolicy:
+      Type: AWS::CloudFront::CachePolicy
+      Properties:
+        CachePolicyConfig:
+          DefaultTTL: 300
+          MaxTTL: 31536000
+          MinTTL: 1
+          Name: ApiCachePolicy
+          ParametersInCacheKeyAndForwardedToOrigin:
+            CookiesConfig:
+              CookieBehavior: none
+            EnableAcceptEncodingBrotli: true
+            EnableAcceptEncodingGzip: true
+            HeadersConfig:
+              HeaderBehavior: whitelist
+              Headers:
+                - Origin
+            QueryStringsConfig:
+              QueryStringBehavior: none
     SESEmailIdentity:
       Type: AWS::SES::EmailIdentity
       Properties:
