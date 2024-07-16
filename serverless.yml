@@ -19,6 +19,7 @@ provider:
   logs:
     httpApi: true
   httpApi:
+    metrics: true
     cors:
       allowedOrigins:
         - 'http://localhost:5173'
@@ -604,6 +605,7 @@ resources:
               HeaderBehavior: whitelist
               Headers:
                 - Origin
+                - Authorization
             QueryStringsConfig:
               QueryStringBehavior: none
     SESEmailIdentity:
