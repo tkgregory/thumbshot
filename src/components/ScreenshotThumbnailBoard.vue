@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { loadSettings } from '../composables/settings'
 import { getImageSrc } from '../composables/image'
 import type { YouTubePreviewData } from '../types/YouTubePreviewData.type'
@@ -7,6 +7,7 @@ import YouTubePreview from './YouTubePreview.vue'
 
 const previewData = ref<YouTubePreviewData[]>([])
 const boardName = ref()
+const isPollingServer = ref(true)
 const props = defineProps({
     boardId: {
         required: true,
@@ -32,8 +33,14 @@ async function loadServer() {
     boardName.value = json.name
     previewData.value = json.previews
 
-    setTimeout(loadServer, 1000)
+    if (isPollingServer.value) {
+        setTimeout(loadServer, 1000)
+    }
 }
+
+onUnmounted(() => {
+    isPollingServer.value = false
+})
 </script>
 
 <template>
