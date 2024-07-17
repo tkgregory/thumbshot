@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import Typing from './Typing.vue'
 import YouTubePreview from '../components/YouTubePreview.vue'
 import { validateImage } from '../composables/image'
 import JSConfetti from 'js-confetti'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const title = ref()
 const channelTitle = ref()
@@ -12,17 +13,30 @@ const isSetTitle = ref(false)
 const isSetChannelTitle = ref(false)
 const isSetThumbnailURL = ref(false)
 const isGameStarted = ref(false)
+const typing = ref()
 
 random()
 async function random() {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/youtube/videos`)
     if (response.status !== 200) {
-        startGame()
+        beginUserInteraction()
         console.error(`Invalid /youtube/videos response with status ${response.status}`)
     } else {
         const json = await response.json()
+        await waitUntil(() => typing.value && typing.value.finished)
         randomise(json, 0)
     }
+}
+
+function waitUntil(condition: any, interval: number = 100) {
+    return new Promise<void>(function (resolve, _reject) {
+        (function wait() {
+            if (condition()) {
+                return resolve();
+            }
+            setTimeout(wait, interval);
+        })();
+    });
 }
 
 async function randomise(json: any, index: number) {
@@ -36,12 +50,12 @@ async function randomise(json: any, index: number) {
         setTimeout(() => { randomise(json, index + 1) }, timeout)
     } else {
         setTimeout(() => {
-            startGame()
+            beginUserInteraction()
         }, timeout);
     }
 }
 
-function startGame() {
+function beginUserInteraction() {
     title.value = 'Enter your video title'
     channelTitle.value = 'Enter your channel name'
     thumbnailURL.value = undefined
@@ -76,13 +90,15 @@ const progress = computed(() => {
 </script>
 
 <template>
-    <div v-if="title != undefined" class="mockup-browser bg-base-300 lg:w-full aspect-[6/5]">
+    <div class="mockup-browser bg-base-300 lg:w-full aspect-[6/5]">
         <div class="mockup-browser-toolbar">
-            <div class="input">youtube.com</div>
+            <div class="input">
+                <Typing text="youtube.com" ref="typing" />
+            </div>
         </div>
         <div class="bg-base-200 flex flex-col px-8 lg:px-16 py-8 gap-8 h-full">
-            <YouTubePreview :isGetFromYouTubeEnabled="false" :title="title" :channelName="channelTitle"
-                :imageSrc="thumbnailURL" :index="0" :isHoverControlsEnabled="false"
+            <YouTubePreview v-if="title != undefined" :isGetFromYouTubeEnabled="false" :title="title"
+                :channelName="channelTitle" :imageSrc="thumbnailURL" :index="0" :isHoverControlsEnabled="false"
                 @changeTitle="(newTitle) => { title = newTitle; isSetTitle = true; }"
                 @changeChannelName="(newChannelName) => { channelTitle = newChannelName; isSetChannelTitle = true; }"
                 @changeImage="(file, cancelLoading) => { onChangeImage(file, cancelLoading); }" />
