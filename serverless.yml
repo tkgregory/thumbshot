@@ -9,8 +9,10 @@ params:
     websiteHostedZoneId: Z084235213DTZ50AT2VLL
     dynamoDBTablePrefix: ${sls:stage}-
     youtubeVideosApiPath: /youtube/videos
+    youtubeApiKey: ${ssm:/aws/reference/secretsmanager/YOUTUBE_API_KEY_DEV}
   prod:
     domainName: thumbshot.io
+    youtubeApiKey: ${ssm:/aws/reference/secretsmanager/YOUTUBE_API_KEY}
 provider:
   name: aws
   runtime: nodejs18.x
@@ -256,7 +258,7 @@ functions:
           method: get
           authorizer: serviceAuthorizer
     environment:
-      YOUTUBE_API_KEY: ${ssm:/aws/reference/secretsmanager/YOUTUBE_API_KEY}
+      YOUTUBE_API_KEY: ${param:youtubeApiKey}
   getRandomYouTubeVideos:
     handler: functions/get/get-random-youtube-videos.handler
     runtime: nodejs18.x
@@ -265,7 +267,7 @@ functions:
           path: ${param:youtubeVideosApiPath}
           method: get
     environment:
-      YOUTUBE_API_KEY: ${ssm:/aws/reference/secretsmanager/YOUTUBE_API_KEY}
+      YOUTUBE_API_KEY: ${param:youtubeApiKey}
 layers:
   chromium:
     package:
