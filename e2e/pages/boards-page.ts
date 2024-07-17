@@ -58,7 +58,6 @@ export class BoardsPage {
     }
 
     async gotoScreenshotView() {
-        await this.page.waitForTimeout(1000); // pause to wait for save to complete
         await this.page.goto(`/#/boards/${this.boardId()}/screenshot`)
         await expect(this.page.locator('screenshot-container')).toHaveCount(1)
     }

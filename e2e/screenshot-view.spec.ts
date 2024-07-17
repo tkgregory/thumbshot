@@ -5,12 +5,9 @@ test.beforeEach(async ({ page, boardsPage, thumbshotPage }) => {
   await page.goto('/')
   await boardsPage.useNewBoard()
 
-  await page.locator('div[data-tip="Randomize"]').click()
-  await expect(thumbshotPage.allPreviews()).toHaveCount(1)
-  await page.locator('div[data-tip="Randomize"]').click()
-  await expect(thumbshotPage.allPreviews()).toHaveCount(2)
-  await page.locator('div[data-tip="Randomize"]').click()
-  await expect(thumbshotPage.allPreviews()).toHaveCount(3)
+  await thumbshotPage.clickRandom()
+  await thumbshotPage.clickRandom()
+  await thumbshotPage.clickRandom()
 });
 
 test('Shows numbers', async ({ page, boardsPage }) => {

@@ -100,7 +100,13 @@ export class ThumbShotPage {
 
     async clickRandom() {
         const previewCount = await this.allPreviews().count()
+
+        const requestPromise = this.page.waitForRequest(request =>
+            new RegExp(/user\/boards\/.+/).test(request.url()) && request.method() === 'PUT',
+        );
         await this.page.locator('div[data-tip="Randomize"]').click()
+        await requestPromise;
+
         await expect(this.allPreviews()).toHaveCount(previewCount + 1, { timeout: 5000 })
     }
 
