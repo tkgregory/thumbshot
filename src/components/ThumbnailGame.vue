@@ -30,8 +30,9 @@ async function randomise(json: any, index: number) {
     channelTitle.value = json.items[index].snippet.channelTitle
     thumbnailURL.value = `https://img.youtube.com/vi/${json.items[index].id.videoId}/maxresdefault.jpg`
 
+    const thumbnailsToShow = 3
     const timeout = 2000
-    if (index < 3 && index + 1 < json.items.length) {
+    if (index + 1 < thumbnailsToShow && index + 1 < json.items.length) {
         setTimeout(() => { randomise(json, index + 1) }, timeout)
     } else {
         setTimeout(() => {

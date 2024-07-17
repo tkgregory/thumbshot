@@ -23,15 +23,16 @@ const props = defineProps({
 
 loadServer()
 async function loadServer() {
-    fetch(`${import.meta.env.VITE_API_URL}/boards/${props.boardId}`).then((response) => {
-        if (response.status !== 200) {
-            throw new Error(`Invalid response with status ${response.status}`)
-        }
-        return response.json()
-    }).then((json) => {
-        boardName.value = json.name
-        previewData.value = json.previews
-    })
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/boards/${props.boardId}`)
+
+    if (response.status !== 200) {
+        throw new Error(`Invalid response with status ${response.status}`)
+    }
+    const json = await response.json()
+    boardName.value = json.name
+    previewData.value = json.previews
+
+    setTimeout(loadServer, 1000)
 }
 </script>
 
