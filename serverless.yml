@@ -594,7 +594,7 @@ resources:
       Type: AWS::CloudFront::CachePolicy
       Properties:
         CachePolicyConfig:
-          DefaultTTL: 300
+          DefaultTTL: 600
           MaxTTL: 31536000
           MinTTL: 1
           Name: ApiCachePolicy-${sls:stage}
