@@ -1,6 +1,7 @@
 import { test, expect } from './pages/fixtures';
 
 test.beforeEach(async ({ page }) => {
+    test.slow()
     await page.goto('/')
 });
 
